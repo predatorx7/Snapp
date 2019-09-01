@@ -129,6 +129,30 @@ flutter:
   # Resource Images
    - assets/res_image/logo.png
    - assets/res_image/placeholder.png
+   - assets/res_image/mother_res.png
+  # Resource Icons
+   - assets/res_icons/directOutline.png
+   - assets/res_icons/userOutline.png
+   - assets/res_icons/heartOutline.png
+   - assets/res_icons/heartFilled.png
+   - assets/res_icons/heartFilledRed.png
+   - assets/res_icons/newPost.png
+   - assets/res_icons/searchOutline.png
+   - assets/res_icons/searchFilled.png
+   - assets/res_icons/homeFilled.png
+   - assets/res_icons/commentLike.png
+   - assets/res_icons/saveOutline.png
+   - assets/res_icons/commentOutline.png
+   - assets/res_icons/cameraOutline.png
+   - assets/res_icons/moreHorizontalOutline.png
+   - assets/res_icons/homeOutline.png
+   - assets/res_icons/userFilled.png
+   - assets/res_icons/userFollowOutline.png
+   - assets/res_icons/settingsOutline.png
+   - assets/res_icons/addOutline.png
+   - assets/res_icons/photoOutline.png
+   - assets/res_icons/infoOutline.png
+   - assets/res_icons/instagramOutline.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "55312059516",
+    "firebase_url": "https://instagram-clone-kootumb.firebaseio.com",
+    "project_id": "instagram-clone-kootumb",
+    "storage_bucket": "instagram-clone-kootumb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:55312059516:android:cb0b863134f94cbd",
+        "android_client_info": {
+          "package_name": "org.kootumb_assignment.instagram"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "55312059516-2j0ofasga4aoceinkvlc0u8eu6qq6qb9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "org.kootumb_assignment.instagram",
+            "certificate_hash": "c1849681cc2707b3aeac8f8ebf927ebbafba4cc6"
+          }
+        },
+        {
+          "client_id": "55312059516-o340jtk9pfgfua6iiggn0psse680eeaa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCoRF84hWQ-dPXoApy6epO-fIx-6FmEScA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "55312059516-o340jtk9pfgfua6iiggn0psse680eeaa.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

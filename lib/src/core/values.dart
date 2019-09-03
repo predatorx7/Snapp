@@ -1,10 +1,34 @@
 // Colors
-int colorPrimary = 0xff455cde,
-    colorPrimaryDark = 0xff403d3d,
-    colorAccent = 0xffc2bdbf,
-    colorBlack = 0xff000000,
-    colorGreen = 0xff4cab03;
-// Strings
-String appName = 'InstagramTest',
-    /* TODO: Remove or change this placeholder text */
-    helloBlankFragment = 'Hello blank fragment';
+import 'package:flutter/material.dart';
+
+InputBorder fieldInputBorder({Color borderColor}) => OutlineInputBorder(
+      borderRadius: BorderRadius.circular(5),
+      borderSide: BorderSide(
+        width: 1,
+        color: borderColor ?? Colors.grey[350],
+      ),
+    );
+
+Color notBlack = Color(0xff262626);
+
+InputDecoration outlineTextField({
+  String hintText,
+  String errorText,
+  Widget suffixIcon,
+}) =>
+    InputDecoration(
+      filled: true,
+      hintText: hintText,
+      errorText: errorText,
+      suffixIcon: suffixIcon,
+      hintStyle: TextStyle(
+        color: Colors.grey[500],
+        fontSize: 12,
+      ),
+      fillColor: Colors.grey[100],
+      border: fieldInputBorder(),
+      enabledBorder: fieldInputBorder(),
+      focusedBorder: fieldInputBorder(),
+      errorBorder: fieldInputBorder(borderColor: Colors.red),
+      contentPadding: EdgeInsets.all(12),
+    );

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:instagram/src/core/utils/styles.dart';
-import 'package:instagram/src/ui/pages/changeusername.dart';
+import 'package:instagram/src/ui/pages/register/change_username.dart';
 import 'package:instagram/src/ui/components/buttons.dart';
 
 class SignUpSuccess extends StatefulWidget {

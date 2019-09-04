@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:instagram/src/core/utils/styles.dart';
-import 'package:instagram/src/models/plainModels/user_repo.dart';
+import 'package:instagram/src/models/plain_models/user_repo.dart';
 import 'package:instagram/src/ui/components/buttons.dart';
 import 'package:provider/provider.dart';
 

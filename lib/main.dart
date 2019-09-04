@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:instagram/src/models/plain_models/user_repo.dart';
-import 'package:instagram/src/pages/dashboard.dart';
-import 'package:instagram/src/pages/final_signup.dart';
-import 'package:instagram/src/pages/login.dart';
-import 'package:instagram/src/pages/signup.dart';
+import 'package:instagram/src/ui/pages/dashboard.dart';
+import 'package:instagram/src/ui/pages/register/signup.dart';
+import 'package:instagram/src/ui/pages/login.dart';
+import 'package:instagram/src/ui/pages/register/signup_choice_check.dart';
+import 'package:instagram/src/ui/pages/register/signup_success.dart';
 import 'package:provider/provider.dart';
 
 void main() {
+  /// To keep app in Portrait Mode
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+  // This widget is the root of this application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -49,6 +51,8 @@ class MyApp extends StatelessWidget {
               case Status.CheckFailed:
               case Status.CheckingEmail:
                 return SignUpPage();
+              case Status.Registered:
+                return SignUpSuccess();
             }
           },
         ),

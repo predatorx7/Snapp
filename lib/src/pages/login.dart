@@ -164,10 +164,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => SignUpPage()),
-                      );
+                      user.openPage(page: 'CheckEmail');
                     },
                     child: RichText(
                       textAlign: TextAlign.left,

@@ -139,22 +139,39 @@ class _FinalSignUpPageState extends State<FinalSignUpPage> {
               height: 46,
               width: double.infinity,
               child: ICFlatButton(
+                conditionForProcessIndicator: user.status == Status.Registering,
                 text: 'Continue',
                 onPressed: _isButtonDisabled
                     ? null
                     : () {
                         Validator3000 valValue = Validator3000();
                         print('I work');
+                        var validity = true;
+
+                        /// TODO: STOP REGISTER ON INVALID NAME
+                        if (valValue.isNameValid(_usernameController.text) !=
+                            null) {
+                          _key.currentState.showSnackBar(
+                            SnackBar(
+                              backgroundColor: Colors.redAccent,
+                              content: Text(
+                                'Invalid name',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          );
+                          validity = false;
+                        }
+
                         if (_passwordController.text.length < 7) {
                           setState(() {
                             _showError = true;
                           });
-                        } else {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => FinalSignUpPage()),
-                          );
+                          validity = false;
+                        }
+                        if (validity) {
+                          user.signUp(
+                              user.email, _passwordController.text, _key);
                         }
                       },
               ),
@@ -167,14 +184,14 @@ class _FinalSignUpPageState extends State<FinalSignUpPage> {
                 children: <Widget>[
                   Icon(
                     Icons.info_outline,
-                    color: Colors.grey,
+                    color: Colors.red[200],
                   ),
                   SizedBox(
                     height: 5,
                   ),
                   Text(
                     'Please check your mail for verification email after completing the registration process.',
-                    style: TextStyle(color: Colors.grey),
+                    style: TextStyle(color: Colors.red[200]),
                   ),
                 ],
               ),

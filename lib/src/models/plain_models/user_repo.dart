@@ -17,6 +17,7 @@ class UserRepository with ChangeNotifier {
   FirebaseAuth _auth;
   FirebaseUser _user;
   Status _status = Status.Uninitialized;
+  String _email;
 
   UserRepository.instance() : _auth = FirebaseAuth.instance {
     _auth.onAuthStateChanged.listen(_onAuthStateChanged);
@@ -24,6 +25,7 @@ class UserRepository with ChangeNotifier {
 
   Status get status => _status;
   FirebaseUser get user => _user;
+  String get email => _email;
 
   Future<bool> signIn(
       String email, String password, GlobalKey<ScaffoldState> key) async {
@@ -77,7 +79,6 @@ class UserRepository with ChangeNotifier {
 
   Future<bool> doesEmailExist(
       {String email, GlobalKey<ScaffoldState> key}) async {
-    if (!email.contains('@')) email = email + '@instac.com';
     print('Testing $email');
     try {
       _status = Status.CheckingEmail;
@@ -90,6 +91,10 @@ class UserRepository with ChangeNotifier {
       print(error);
       switch (error.code) {
         case 'ERROR_USER_NOT_FOUND':
+          errorText = 'User not found';
+          _email = email;
+          _status = Status.UnRegistered;
+          notifyListeners();
           return false;
           break;
         case 'ERROR_INVALID_EMAIL':
@@ -123,6 +128,20 @@ class UserRepository with ChangeNotifier {
         ),
       );
       return true;
+    }
+  }
+
+  Future openPage({String page}) {
+    switch (page) {
+      case 'CheckEmail':
+        _status = Status.CheckFailed;
+        notifyListeners();
+        break;
+      case 'Register':
+        _status = Status.UnRegistered;
+        notifyListeners();
+        break;
+      default:
     }
   }
 
@@ -178,7 +197,13 @@ class UserRepository with ChangeNotifier {
   }
 
   Future<void> _onAuthStateChanged(FirebaseUser firebaseUser) async {
-    if (firebaseUser == null) {
+    if (firebaseUser == null &&
+        (_status == Status.CheckingEmail || _status == Status.CheckFailed)) {
+      _status = Status.CheckFailed;
+    } else if (firebaseUser == null &&
+        (_status == Status.Registering || _status == Status.UnRegistered)) {
+      _status = Status.UnRegistered;
+    } else if (firebaseUser == null) {
       _status = Status.Unauthenticated;
     } else {
       _user = firebaseUser;

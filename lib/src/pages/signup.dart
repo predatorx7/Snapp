@@ -187,6 +187,8 @@ class _SignUpPageState extends State<SignUpPage> {
                   height: 46,
                   width: double.infinity,
                   child: ICFlatButton(
+                    conditionForProcessIndicator:
+                        user.status == Status.CheckingEmail,
                     text: 'Next',
                     onPressed: _isButtonDisabled
                         ? null
@@ -200,17 +202,8 @@ class _SignUpPageState extends State<SignUpPage> {
                                 _showError = true;
                               });
                             } else {
-                              if (!await user.doesEmailExist(
-                                  email: _usernameController.text, key: _key)) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => FinalSignUpPage(
-                                      emailId: _usernameController.text,
-                                    ),
-                                  ),
-                                );
-                              }
+                              await user.doesEmailExist(
+                                  email: _usernameController.text, key: _key);
                             }
                           },
                   ),

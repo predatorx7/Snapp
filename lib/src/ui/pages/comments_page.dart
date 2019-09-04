@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:instagram/src/pages/widgets/buttons.dart';
+import 'package:instagram/src/ui/components/buttons.dart';
 
 class CommentsPage extends StatefulWidget {
   @override

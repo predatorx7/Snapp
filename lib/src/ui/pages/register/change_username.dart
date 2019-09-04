@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:instagram/src/core/validators.dart';
-import 'package:instagram/src/core/values.dart';
-import 'package:instagram/src/pages/widgets/buttons.dart';
+import 'package:instagram/src/core/utils/validators.dart';
+import 'package:instagram/src/core/utils/styles.dart';
+import 'package:instagram/src/ui/components/buttons.dart';
 
 class ChangeUsername extends StatefulWidget {
   final String userId;

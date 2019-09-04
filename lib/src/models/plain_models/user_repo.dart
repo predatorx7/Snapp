@@ -3,14 +3,18 @@ import 'package:flutter/widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 enum Status {
+  // Use for Authentication
   Uninitialized,
   Authenticated,
   Authenticating,
   Unauthenticated,
+  // Use for Checking Email
   CheckFailed,
   CheckingEmail,
+  // Use for Registration
   Registering,
-  UnRegistered
+  UnRegistered,
+  Registered
 }
 
 class UserRepository with ChangeNotifier {
@@ -27,15 +31,20 @@ class UserRepository with ChangeNotifier {
   FirebaseUser get user => _user;
   String get email => _email;
 
+  /// Used for Signing in and providing authentication to UserRepo.
+  /// Shows SnackBar on error with error message (That's why it needs Scaffold Key)
   Future<bool> signIn(
       String email, String password, GlobalKey<ScaffoldState> key) async {
+    /// Check for userIds in database. Get it's email and use that to login. Else, follow.
     if (!email.contains('@')) email = email + '@instac.com';
     print('$email : $password');
     try {
+      // Starting Authentication
       _status = Status.Authenticating;
       notifyListeners();
       await _auth.signInWithEmailAndPassword(email: email, password: password);
-      print(_auth.app.name);
+      print('App name: ${_auth.app.name}');
+      // Will not return if error caught.
       return true;
     } catch (error) {
       var errorText;
@@ -64,13 +73,14 @@ class UserRepository with ChangeNotifier {
       }
       key.currentState.showSnackBar(
         SnackBar(
-          backgroundColor: Colors.redAccent,
+          backgroundColor: Colors.red,
           content: Text(
             errorText,
             style: TextStyle(color: Colors.white),
           ),
         ),
       );
+      // Authentication failed
       _status = Status.Unauthenticated;
       notifyListeners();
       return false;
@@ -83,35 +93,38 @@ class UserRepository with ChangeNotifier {
     try {
       _status = Status.CheckingEmail;
       notifyListeners();
+      /// Using wrong password to check email existence.
       await _auth.signInWithEmailAndPassword(
           email: email, password: 'test_password');
       print(_auth.app.name);
+      // Logged in with fake password? Not possible. Don't allow fake password in registration.
+      return null;
     } catch (error) {
       var errorText;
       print(error);
       switch (error.code) {
         case 'ERROR_USER_NOT_FOUND':
+          // User not found! This email can be used for registration.
           errorText = 'User not found';
           _email = email;
           _status = Status.UnRegistered;
           notifyListeners();
           return false;
           break;
-        case 'ERROR_INVALID_EMAIL':
-          errorText = "Email or Username is invalid";
-          break;
         case 'ERROR_WRONG_PASSWORD':
           errorText = 'Email already exists';
           break;
-        case 'ERROR_USER_DISABLED':
-          errorText = "Account disabled";
+        case 'ERROR_INVALID_EMAIL':
+          errorText = "Email or Username is invalid";
           break;
         case 'ERROR_TOO_MANY_REQUESTS':
           errorText = "Too many requests";
           break;
         case 'ERROR_OPERATION_NOT_ALLOWED':
+          // If Sign in method disabled
           errorText = "Operation not allowed";
           break;
+        case 'ERROR_USER_DISABLED':
         default:
           errorText = "Something went wrong";
           print(errorText);
@@ -131,7 +144,9 @@ class UserRepository with ChangeNotifier {
     }
   }
 
-  Future openPage({String page}) {
+  /// A work around to change page as unauthenticated user
+  /// Make sure to add conditions & case for pages with their Statuses here and in _onAuthStateChanged() below
+  void openPage({String page}) {
     switch (page) {
       case 'CheckEmail':
         _status = Status.CheckFailed;
@@ -145,11 +160,13 @@ class UserRepository with ChangeNotifier {
     }
   }
 
+  /// Use for Signing up and providing authentication to UserRepo.
+  /// Shows SnackBar on error with error message (That's why it needs Scaffold Key)
   Future<bool> signUp(
       String email, String password, GlobalKey<ScaffoldState> key) async {
     var result;
     if (!email.contains('@')) email = email + 'instac.com';
-    // CHECK FOR USERID existense and get Email
+    // CHECK FOR userID existence and get Email
     try {
       _status = Status.Registering;
       notifyListeners();
@@ -199,9 +216,11 @@ class UserRepository with ChangeNotifier {
   Future<void> _onAuthStateChanged(FirebaseUser firebaseUser) async {
     if (firebaseUser == null &&
         (_status == Status.CheckingEmail || _status == Status.CheckFailed)) {
+      // if Unauthenticated but checking email to enter registration process.
       _status = Status.CheckFailed;
     } else if (firebaseUser == null &&
         (_status == Status.Registering || _status == Status.UnRegistered)) {
+      // if Unauthenticated but in registration process.
       _status = Status.UnRegistered;
     } else if (firebaseUser == null) {
       _status = Status.Unauthenticated;

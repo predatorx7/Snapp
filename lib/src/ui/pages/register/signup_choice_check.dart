@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:instagram/src/core/validators.dart';
-import 'package:instagram/src/core/values.dart';
-import 'package:instagram/src/models/plain_models/user_repo.dart';
-import 'package:instagram/src/pages/final_signup.dart';
-import 'package:instagram/src/pages/widgets/buttons.dart';
+import 'package:instagram/src/core/utils/validators.dart';
+import 'package:instagram/src/core/utils/styles.dart';
+import 'package:instagram/src/models/plainModels/user_repo.dart';
+import 'package:instagram/src/ui/components/buttons.dart';
 import 'package:provider/provider.dart';
 
 class SignUpPage extends StatefulWidget {

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:instagram/src/core/values.dart';
-import 'package:instagram/src/pages/changeusername.dart';
-import 'package:instagram/src/pages/widgets/buttons.dart';
+import 'package:instagram/src/core/utils/styles.dart';
+import 'package:instagram/src/ui/pages/changeusername.dart';
+import 'package:instagram/src/ui/components/buttons.dart';
 
 class SignUpSuccess extends StatefulWidget {
+  /// CHECK & Recieve USERID VIA PROVIDER
   final String userId;
   SignUpSuccess({this.userId = 'smushaheed'});
   @override

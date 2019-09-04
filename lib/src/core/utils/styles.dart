@@ -1,5 +1,26 @@
-// Colors
 import 'package:flutter/material.dart';
+
+int actionColor = 0xff3897f0;
+
+Color notBlack = Color(0xff262626);
+
+TextStyle headStyle() => TextStyle(
+      fontWeight: FontWeight.bold,
+      color: notBlack,
+      fontSize: 14,
+    );
+
+TextStyle bodyStyle() => TextStyle(
+      fontWeight: FontWeight.bold,
+      color: notBlack,
+      fontSize: 14,
+    );
+
+TextStyle body2Style() => TextStyle(
+      fontWeight: FontWeight.normal,
+      color: Colors.grey,
+      fontSize: 14,
+    );
 
 InputBorder fieldInputBorder({Color borderColor}) => OutlineInputBorder(
       borderRadius: BorderRadius.circular(5),
@@ -7,23 +28,6 @@ InputBorder fieldInputBorder({Color borderColor}) => OutlineInputBorder(
         width: 1,
         color: borderColor ?? Colors.grey[350],
       ),
-    );
-
-Color notBlack = Color(0xff262626);
-TextStyle headStyle() => TextStyle(
-      fontWeight: FontWeight.bold,
-      color: notBlack,
-      fontSize: 14,
-    );
-TextStyle bodyStyle() => TextStyle(
-      fontWeight: FontWeight.bold,
-      color: notBlack,
-      fontSize: 14,
-    );
-TextStyle body2Style() => TextStyle(
-      fontWeight: FontWeight.normal,
-      color: Colors.grey,
-      fontSize: 14,
     );
 
 InputDecoration outlineTextField({

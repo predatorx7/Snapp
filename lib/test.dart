@@ -4,20 +4,19 @@ import 'package:instagram/src/pages/comments.dart';
 import 'package:instagram/src/pages/final_signup.dart';
 import 'package:instagram/src/pages/login.dart';
 import 'package:instagram/src/pages/signup.dart';
+import 'package:instagram/src/pages/signup_success.dart';
 
-class TestPage extends StatefulWidget {
-  @override
-  _TestPageState createState() => _TestPageState();
-}
-
-class _TestPageState extends State<TestPage> {
+class TestPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text('Test Page'),
+      ),
       body: ListView(
+        // shrinkWrap: true,
         children: <Widget>[
-          RaisedButton(
+          FlatButton(
             child: Text('Comments Page'),
             onPressed: () {
               Navigator.push(
@@ -26,7 +25,7 @@ class _TestPageState extends State<TestPage> {
               );
             },
           ),
-          RaisedButton(
+          FlatButton(
             child: Text('Login Page'),
             onPressed: () {
               Navigator.push(
@@ -35,7 +34,7 @@ class _TestPageState extends State<TestPage> {
               );
             },
           ),
-          RaisedButton(
+          FlatButton(
             child: Text('Signup Page'),
             onPressed: () {
               Navigator.push(
@@ -44,15 +43,25 @@ class _TestPageState extends State<TestPage> {
               );
             },
           ),
-          RaisedButton(
-            child: Text('Signup Page'),
+          FlatButton(
+            child: Text('Final Signup Page'),
             onPressed: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => FinalSignUpPage(
-                          emailId: 'smushaheed@test.com',
-                        )),
+                  builder: (context) => FinalSignUpPage(),
+                ),
+              );
+            },
+          ),
+          FlatButton(
+            child: Text('Signup Success'),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => SignUpSuccess(),
+                ),
               );
             },
           )

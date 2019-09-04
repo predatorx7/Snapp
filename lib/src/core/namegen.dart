@@ -32,19 +32,19 @@ String genUserID(String email, String name) {
       break;
     default:
   }
-  checkIdAvailablity(userIds);
+  // checkAvailablity(userIds));
   userIds = [];
   for (var i = 9; i < 20; i++) {
     targetText = email.substring(0, email.indexOf('@')) + '$i';
     userIds.add(targetText);
   }
-  checkIdAvailablity(userIds);
+  // checkAvailablity(userIds);
   userIds = [];
   for (var i = 20; i < 50; i++) {
     targetText = email.substring(0, email.indexOf('@')) + '$i';
     userIds.add(targetText);
   }
-  checkIdAvailablity(userIds);
+  // checkAvailablity(userIds);
   userIds = [];
 
   var listOfRandomNum = new List.generate(12, (_) => randomNum(50, 100));
@@ -53,11 +53,8 @@ String genUserID(String email, String name) {
     targetText = email.substring(0, email.indexOf('@')) + '$numbers';
     userIds.add(targetText);
   }
-  checkIdAvailablity(userIds);
-}
-
-bool checkIdAvailablity(List<String> userId) {
-  print(userId);
+  // checkAvailablity(userIds);
+  return userIds[randomNum(0, userIds.length - 1)];
 }
 
 List<dynamic> checkAvailability() {
@@ -70,5 +67,5 @@ List<dynamic> checkAvailability() {
 }
 
 void main() {
-  genUserID('smushaheed@outlook.com', 'Syed Mushaheed');
+  print(genUserID('smushaheed@outlook.com', 'Syed Mushaheed'));
 }

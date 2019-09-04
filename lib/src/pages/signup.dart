@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:instagram/src/core/validators.dart';
 import 'package:instagram/src/core/values.dart';
+import 'package:instagram/src/models/plain_models/user_repo.dart';
 import 'package:instagram/src/pages/final_signup.dart';
 import 'package:instagram/src/pages/widgets/buttons.dart';
+import 'package:provider/provider.dart';
 
 class SignUpPage extends StatefulWidget {
   @override
@@ -11,6 +13,7 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
+  GlobalKey<ScaffoldState> _key = GlobalKey<ScaffoldState>();
   TextEditingController _usernameController;
   bool _isButtonDisabled = true, _isTapped = false, _showError = false;
   FocusNode _focusEmail;
@@ -108,7 +111,9 @@ class _SignUpPageState extends State<SignUpPage> {
 
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserRepository>(context);
     return Scaffold(
+      key: _key,
       body: Stack(
         children: <Widget>[
           Padding(
@@ -185,7 +190,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     text: 'Next',
                     onPressed: _isButtonDisabled
                         ? null
-                        : () {
+                        : () async {
                             Validator3000 valValue = Validator3000();
                             print('I work');
                             var textIs =
@@ -195,11 +200,17 @@ class _SignUpPageState extends State<SignUpPage> {
                                 _showError = true;
                               });
                             } else {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => FinalSignUpPage()),
-                              );
+                              if (!await user.doesEmailExist(
+                                  email: _usernameController.text, key: _key)) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => FinalSignUpPage(
+                                      emailId: _usernameController.text,
+                                    ),
+                                  ),
+                                );
+                              }
                             }
                           },
                   ),

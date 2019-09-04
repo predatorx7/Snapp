@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:instagram/test.dart';
+import 'package:instagram/src/models/plain_models/user_repo.dart';
+import 'package:instagram/src/pages/dashboard.dart';
+import 'package:instagram/src/pages/final_signup.dart';
+import 'package:instagram/src/pages/login.dart';
+import 'package:instagram/src/pages/signup.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
@@ -22,20 +27,55 @@ class MyApp extends StatelessWidget {
           elevation: 2,
           brightness: Brightness.light,
           color: Colors.grey[100],
+          iconTheme: IconThemeData(color: Colors.black),
         ),
-        // primarySwatch: Colors.grey,
-        // primaryColor: Color(colorPrimary),
-        // accentColor: Color(colorAccent),
-        // primaryColorDark: Color(colorPrimaryDark),
         splashColor: Colors.transparent,
-        // // textTheme: buildTextTheme(base.textTheme, kWhite),
-        // inputDecorationTheme: InputDecorationTheme(
-        //   fillColor: Colors.grey,
-        //   border: OutlineInputBorder(),
-        //   // labelStyle: TextStyle(color: kYellow, fontSize: 24.0),
-        // ),
       ),
-      home: TestPage(),
+      home: ChangeNotifierProvider(
+        builder: (_) => UserRepository.instance(),
+        child: Consumer(
+          builder: (context, UserRepository user, _) {
+            switch (user.status) {
+              case Status.Uninitialized:
+                return Splash();
+              case Status.Unauthenticated:
+              case Status.Authenticating:
+                return LoginPage();
+              case Status.Authenticated:
+                return Dashboard(user: user.user);
+              case Status.UnRegistered:
+              case Status.Registering:
+                return FinalSignUpPage();
+              case Status.CheckFailed:
+              case Status.CheckingEmail:
+                return SignUpPage();
+            }
+          },
+        ),
+      ),
+      // home: TestPage(),
+    );
+  }
+}
+
+class Splash extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text(
+            "WELCOME",
+            style: TextStyle(
+                color: Colors.grey, fontWeight: FontWeight.w900, fontSize: 40),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: CircularProgressIndicator(),
+          ),
+        ],
+      ),
     );
   }
 }

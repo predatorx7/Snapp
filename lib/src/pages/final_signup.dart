@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:instagram/src/core/validators.dart';
 import 'package:instagram/src/core/values.dart';
+import 'package:instagram/src/models/plain_models/user_repo.dart';
 import 'package:instagram/src/pages/widgets/buttons.dart';
+import 'package:provider/provider.dart';
 
 class FinalSignUpPage extends StatefulWidget {
   final String emailId;
-  FinalSignUpPage({@required this.emailId});
+  FinalSignUpPage({this.emailId = 'smushaheed@test.com'});
   @override
   _FinalSignUpPageState createState() => _FinalSignUpPageState();
 }
@@ -13,6 +15,7 @@ class FinalSignUpPage extends StatefulWidget {
 class _FinalSignUpPageState extends State<FinalSignUpPage> {
   TextEditingController _usernameController, _passwordController;
   bool _isButtonDisabled = true, _isTapped = false, _showError = false;
+  GlobalKey<ScaffoldState> _key = GlobalKey<ScaffoldState>();
   FocusNode _focusPassword;
   @override
   void initState() {
@@ -32,7 +35,9 @@ class _FinalSignUpPageState extends State<FinalSignUpPage> {
 
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserRepository>(context);
     return Scaffold(
+      key: _key,
       body: Padding(
         padding: const EdgeInsets.only(left: 30.0, right: 30),
         child: Column(

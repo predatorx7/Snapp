@@ -1,55 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-/// Flat Button which has not splash or highlight.
-/// It has text colors as Instagram Blue.
-class ICTextButton extends StatefulWidget {
-  final void Function() onPressed;
-  final String text;
-
-  /// Width for text of size 16 in wrapped form is 68 for 'Post' and 74 for 'Postx'
-  final double width;
-  ICTextButton({@required this.onPressed, @required this.text, this.width});
-  @override
-  _ICTextButtonState createState() => _ICTextButtonState();
-}
-
-class _ICTextButtonState extends State<ICTextButton> {
-  bool _pressed;
-  void initState() {
-    _pressed = true;
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: widget.width,
-      child: FlatButton(
-        highlightColor: Colors.transparent,
-        disabledTextColor: Color(0x773897f0),
-        textColor: Color(
-          _pressed ? 0xff3897f0 : 0x773897f0,
-        ),
-        child: Text(
-          widget.text,
-        ),
-        onHighlightChanged: ((_) {
-          setState(() {
-            _pressed = !_pressed;
-          });
-        }),
-        onPressed: widget.onPressed,
-      ),
-    );
-  }
-}
-
 class ICFlatButton extends StatefulWidget {
   final void Function() onPressed;
   final String text;
+  final bool conditionForProcessIndicator;
 
-  ICFlatButton({@required this.onPressed, @required this.text});
+  ICFlatButton(
+      {@required this.onPressed,
+      @required this.text,
+      this.conditionForProcessIndicator = false});
 
   @override
   _ICFlatButtonState createState() => _ICFlatButtonState();
@@ -63,14 +23,83 @@ class _ICFlatButtonState extends State<ICFlatButton> {
       disabledColor: Color(0x553897f0),
       disabledTextColor: Colors.white,
       textColor: Colors.white,
-      child: Text(
-        widget.text,
-        style: TextStyle(fontSize: 12),
-      ),
+      child: widget.conditionForProcessIndicator
+          ? CircularProgressIndicator(
+              strokeWidth: 3,
+              backgroundColor: Colors.white,
+              // value: 0,
+              // valueColor: new AlwaysStoppedAnimation<Color>(Colors.transparent),
+            )
+          : Text(
+              widget.text,
+              style: TextStyle(fontSize: 14),
+            ),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(4.0),
       ),
       onPressed: widget.onPressed,
+    );
+  }
+}
+
+/// A Tappable Text with Changeable padding
+/// When using as a action button, do these configs: textSize: 14, fontWeight: FontWeight.normal.
+class TappableText extends StatefulWidget {
+  final String text;
+  final void Function() onTap;
+
+  /// Default padding is EdgeInsets.all(8.0).
+  final EdgeInsetsGeometry padding;
+  final double textSize;
+  final FontWeight fontWeight;
+  final String transparency;
+  TappableText(
+      {@required this.text,
+      @required this.onTap,
+      this.padding,
+      this.textSize,
+      this.fontWeight,
+      this.transparency = '0x99'});
+  @override
+  _TappableTextState createState() => _TappableTextState();
+}
+
+class _TappableTextState extends State<TappableText> {
+  bool _pressed;
+  void initState() {
+    _pressed = true;
+    super.initState();
+  }
+
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onHighlightChanged: ((_) {
+        setState(() {
+          _pressed = !_pressed;
+        });
+      }),
+      onTap: widget.onTap,
+      highlightColor: Colors.transparent,
+      child: Padding(
+        padding: widget.padding ?? const EdgeInsets.all(8.0),
+        child: Text(
+          widget.text,
+          style: TextStyle(
+            color: (widget.onTap == null || !_pressed)
+                ? Color(
+                    int.parse('${widget.transparency}3897f0'),
+                  )
+                : Color(0xff3897f0),
+            fontSize: widget.textSize ?? 12,
+            fontWeight: widget.fontWeight ?? FontWeight.bold,
+          ),
+        ),
+      ),
     );
   }
 }

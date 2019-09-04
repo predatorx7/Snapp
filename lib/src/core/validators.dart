@@ -33,6 +33,27 @@ class Validator3000 {
     }
   }
 
+// ^(?=.{8,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$
+//  └─────┬────┘└───┬──┘└─────┬─────┘└─────┬─────┘ └───┬───┘
+//        │         │         │            │           no _ or . at the end
+//        │         │         │            │
+//        │         │         │            allowed characters
+//        │         │         │
+//        │         │         no __ or _. or ._ or .. inside
+//        │         │
+//        │         no _ or . at the beginning
+//        │
+//        username is 8-20 characters long
+
+  bool isIdValid(String name) {
+    if (!RegExp(r'^(?=.{6,20}$)(?![.])[a-zA-Z0-9._]+(?<![.])$')
+        .hasMatch(name)) {
+      return false;
+      //'Username $name is invalid. Username can\'t start or end with a period & can only contain alphabets, numbers, periods or underscores';
+    } else
+      return true;
+  }
+
   bool isNumberValid(String number) {
     // Maybe useful?
     RegExp numberRegExp = RegExp(r'[!@#<>?":_`~;[\]\\|=+)(*&^%0-9-]');

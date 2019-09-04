@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:instagram/src/core/values.dart';
+import 'package:instagram/src/models/plain_models/user_repo.dart';
+import 'package:instagram/src/pages/dashboard.dart';
 import 'package:instagram/src/pages/signup.dart';
 import 'package:instagram/src/pages/widgets/buttons.dart';
+import 'package:provider/provider.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -11,6 +14,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   TextEditingController _usernameController, _passwordController;
+  GlobalKey<ScaffoldState> _key = GlobalKey<ScaffoldState>();
   bool _isButtonDisabled = true;
   @override
   void initState() {
@@ -28,7 +32,9 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserRepository>(context);
     return Scaffold(
+      key: _key,
       body: Stack(
         children: <Widget>[
           Container(
@@ -115,11 +121,18 @@ class _LoginPageState extends State<LoginPage> {
                         height: 46,
                         width: double.infinity,
                         child: ICFlatButton(
+                          conditionForProcessIndicator:
+                              user.status == Status.Authenticating,
                           text: 'Log In',
                           onPressed: _isButtonDisabled
                               ? null
-                              : () {
-                                  print('I work');
+                              : () async {
+                                  if (await user.signIn(
+                                      _usernameController.text,
+                                      _passwordController.text,
+                                      _key)) {
+                                    print('Logging in');
+                                  }
                                 },
                         ),
                       ),

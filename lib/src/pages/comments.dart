@@ -137,10 +137,13 @@ class _CommentsPageState extends State<CommentsPage> {
                     ),
                     Padding(
                       padding: const EdgeInsets.only(right: 8.0),
-                      child: ICTextButton(
+                      child: TappableText(
                         text: 'Post',
-                        width: 68,
-                        onPressed: _isButtonDisabled
+                        // width: 68,
+                        textSize: 14,
+                        transparency: '0x55',
+                        fontWeight: FontWeight.normal,
+                        onTap: _isButtonDisabled
                             ? null
                             : () {
                                 print('Posting');

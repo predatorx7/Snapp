@@ -10,6 +10,21 @@ InputBorder fieldInputBorder({Color borderColor}) => OutlineInputBorder(
     );
 
 Color notBlack = Color(0xff262626);
+TextStyle headStyle() => TextStyle(
+      fontWeight: FontWeight.bold,
+      color: notBlack,
+      fontSize: 14,
+    );
+TextStyle bodyStyle() => TextStyle(
+      fontWeight: FontWeight.bold,
+      color: notBlack,
+      fontSize: 14,
+    );
+TextStyle body2Style() => TextStyle(
+      fontWeight: FontWeight.normal,
+      color: Colors.grey,
+      fontSize: 14,
+    );
 
 InputDecoration outlineTextField({
   String hintText,

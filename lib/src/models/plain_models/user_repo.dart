@@ -93,6 +93,7 @@ class UserRepository with ChangeNotifier {
     try {
       _status = Status.CheckingEmail;
       notifyListeners();
+
       /// Using wrong password to check email existence.
       await _auth.signInWithEmailAndPassword(
           email: email, password: 'test_password');
@@ -164,13 +165,12 @@ class UserRepository with ChangeNotifier {
   /// Shows SnackBar on error with error message (That's why it needs Scaffold Key)
   Future<bool> signUp(
       String email, String password, GlobalKey<ScaffoldState> key) async {
-    var result;
     if (!email.contains('@')) email = email + 'instac.com';
     // CHECK FOR userID existence and get Email
     try {
       _status = Status.Registering;
       notifyListeners();
-      result = await _auth.createUserWithEmailAndPassword(
+      await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
       return true;
     } catch (error) {

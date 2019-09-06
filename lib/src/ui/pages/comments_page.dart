@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:instagram/src/ui/components/buttons.dart';
 
 class CommentsPage extends StatefulWidget {
+  final String userId, postId;
+  CommentsPage({this.postId, this.userId});
   @override
   _CommentsPageState createState() => _CommentsPageState();
 }

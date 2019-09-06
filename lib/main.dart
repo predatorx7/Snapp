@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:instagram/src/models/plain_models/user_repo.dart';
-import 'package:instagram/src/ui/pages/dashboard.dart';
 import 'package:instagram/src/ui/pages/register/signup.dart';
 import 'package:instagram/src/ui/pages/login.dart';
 import 'package:instagram/src/ui/pages/register/signup_choice_check.dart';
 import 'package:instagram/src/ui/pages/register/signup_success.dart';
+import 'package:instagram/src/ui/pages/instagram.dart';
 import 'package:provider/provider.dart';
+
+import 'src/models/view_models/feed.dart';
 
 void main() {
   /// To keep app in Portrait Mode
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+
+  // TODO: USE REDIRECTION
   runApp(MyApp());
 }
 
@@ -44,7 +48,10 @@ class MyApp extends StatelessWidget {
               case Status.Authenticating:
                 return LoginPage();
               case Status.Authenticated:
-                return Dashboard(user: user.user);
+                return ChangeNotifierProvider<FeedModel>(
+                  builder: (_) => FeedModel(),
+                  child: Instagram(),
+                );
               case Status.UnRegistered:
               case Status.Registering:
                 return FinalSignUpPage();
@@ -57,6 +64,7 @@ class MyApp extends StatelessWidget {
           },
         ),
       ),
+
       // home: TestPage(),
     );
   }

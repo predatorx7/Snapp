@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:instagram/src/core/services/profile_adapter.dart';
 
 enum Status {
   // Use for Authentication
@@ -19,9 +20,12 @@ enum Status {
 
 class UserRepository with ChangeNotifier {
   FirebaseAuth _auth;
+  FirebaseAuth _signUpAuth;
   FirebaseUser _user;
   Status _status = Status.Uninitialized;
   String _email;
+  String _username;
+  String _password;
 
   UserRepository.instance() : _auth = FirebaseAuth.instance {
     _auth.onAuthStateChanged.listen(_onAuthStateChanged);
@@ -30,6 +34,7 @@ class UserRepository with ChangeNotifier {
   Status get status => _status;
   FirebaseUser get user => _user;
   String get email => _email;
+  String get username => _username;
 
   /// Used for Signing in and providing authentication to UserRepo.
   /// Shows SnackBar on error with error message (That's why it needs Scaffold Key)
@@ -163,18 +168,23 @@ class UserRepository with ChangeNotifier {
 
   /// Use for Signing up and providing authentication to UserRepo.
   /// Shows SnackBar on error with error message (That's why it needs Scaffold Key)
-  Future<bool> signUp(
-      String email, String password, GlobalKey<ScaffoldState> key) async {
-    if (!email.contains('@')) email = email + 'instac.com';
-    // CHECK FOR userID existence and get Email
+  Future<bool> signUp(String email, String fullName, String password,
+      GlobalKey<ScaffoldState> key) async {
     try {
       _status = Status.Registering;
       notifyListeners();
+
       await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
+      _status = Status.Registered;
+      notifyListeners();
+      await ProfileAdapter().createProfile(fullName, user);
+      _password = password;
+
       return true;
     } catch (error) {
       var errorText;
+      print(error);
       switch (error.code) {
         case 'ERROR_INVALID_EMAIL':
           errorText = "Email or Username is invalid";
@@ -206,6 +216,12 @@ class UserRepository with ChangeNotifier {
     }
   }
 
+  Future nextOnSucess() async {
+    _status = Status.Authenticated;
+    notifyListeners();
+    return Future.delayed(Duration.zero);
+  }
+
   Future signOut() async {
     _auth.signOut();
     _status = Status.Unauthenticated;
@@ -222,6 +238,9 @@ class UserRepository with ChangeNotifier {
         (_status == Status.Registering || _status == Status.UnRegistered)) {
       // if Unauthenticated but in registration process.
       _status = Status.UnRegistered;
+    } else if (_status == Status.Registered) {
+      // if Unauthenticated but in registration process.
+      _status = Status.Registered;
     } else if (firebaseUser == null) {
       _status = Status.Unauthenticated;
     } else {

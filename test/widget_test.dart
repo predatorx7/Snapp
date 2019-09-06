@@ -98,3 +98,10 @@ signUpValidationTest() {
   //e.signUpPassword.text = '';
   //return Validator3000().isPasswordValid(password: e.signUpPassword.text);
 }
+
+// RaisedButton(
+//   onPressed: () {
+//     feedModel.messageCounter(feedModel.getMessageCount() + 1);
+//   },
+//   child: Text('Increase message'),
+// ),

@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:instagram/src/core/services/profile_adapter.dart';
+import 'package:instagram/src/core/utils/namegen.dart';
 import 'package:instagram/src/core/utils/validators.dart';
 import 'package:instagram/src/core/utils/styles.dart';
+import 'package:instagram/src/models/plain_models/profile.dart';
 import 'package:instagram/src/ui/components/buttons.dart';
 
 class ChangeUsername extends StatefulWidget {
-  final String userId;
-  ChangeUsername({this.userId = 'smushaheed'});
+  final Profile profileInformation;
+  ChangeUsername({Key key, @required this.profileInformation})
+      : super(key: key);
   @override
   _ChangeUsernameState createState() => _ChangeUsernameState();
 }
@@ -13,8 +17,10 @@ class ChangeUsername extends StatefulWidget {
 class _ChangeUsernameState extends State<ChangeUsername> {
   TextEditingController _usernameController;
   bool _isButtonDisabled = true, valid = true;
+  GlobalKey<ScaffoldState> _key = GlobalKey<ScaffoldState>();
   String _errorText;
   FocusNode _focusPassword;
+
   @override
   void initState() {
     super.initState();
@@ -31,7 +37,9 @@ class _ChangeUsernameState extends State<ChangeUsername> {
 
   @override
   Widget build(BuildContext context) {
+    Profile profileInformation = widget.profileInformation;
     return Scaffold(
+      key: _key,
       body: Padding(
         padding: const EdgeInsets.only(left: 28.0, right: 28.0),
         child: Column(
@@ -97,7 +105,29 @@ class _ChangeUsernameState extends State<ChangeUsername> {
                 onPressed: _isButtonDisabled
                     ? null
                     : () {
-                        print('Finished');
+                        if (GenerateUsername().checkAvailability(
+                                [_usernameController.text]) !=
+                            null) {
+                          profileInformation.username =
+                              _usernameController.text;
+                          print(profileInformation.username);
+                          _key.currentState.showSnackBar(
+                            SnackBar(
+                              backgroundColor: Colors.green,
+                              content: Text(
+                                  'Username changed to ${_usernameController.text}'),
+                            ),
+                          );
+                          ProfileAdapter().updateProfile(widget.profileInformation);
+                        } else {
+                          _key.currentState.showSnackBar(
+                            SnackBar(
+                              backgroundColor: Colors.red,
+                              content: Text(
+                                  'Username ${_usernameController.text} is already taken by someone else'),
+                            ),
+                          );
+                        }
                       },
               ),
             ),

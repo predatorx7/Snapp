@@ -143,12 +143,10 @@ class _FinalSignUpPageState extends State<FinalSignUpPage> {
                 text: 'Continue',
                 onPressed: _isButtonDisabled
                     ? null
-                    : () {
+                    : () async {
                         Validator3000 valValue = Validator3000();
                         print('I work');
                         var validity = true;
-
-                        /// TODO: STOP REGISTER ON INVALID NAME
                         if (valValue.isNameValid(_usernameController.text) !=
                             null) {
                           _key.currentState.showSnackBar(
@@ -162,7 +160,6 @@ class _FinalSignUpPageState extends State<FinalSignUpPage> {
                           );
                           validity = false;
                         }
-
                         if (_passwordController.text.length < 7) {
                           setState(() {
                             _showError = true;
@@ -170,8 +167,14 @@ class _FinalSignUpPageState extends State<FinalSignUpPage> {
                           validity = false;
                         }
                         if (validity) {
-                          user.signUp(
-                              user.email, _passwordController.text, _key);
+                          await user.signUp(
+                              user.email,
+                              _usernameController.text,
+                              _passwordController.text,
+                              _key);
+                          validity
+                              ? print('user created')
+                              : print('Something unexpected happened');
                         }
                       },
               ),

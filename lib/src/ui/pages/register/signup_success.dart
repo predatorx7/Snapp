@@ -1,19 +1,33 @@
+import 'dart:async';
+
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:instagram/src/core/services/profile_adapter.dart';
 import 'package:instagram/src/core/utils/styles.dart';
+import 'package:instagram/src/models/plain_models/profile.dart';
+import 'package:instagram/src/models/plain_models/user_repo.dart';
 import 'package:instagram/src/ui/pages/register/change_username.dart';
 import 'package:instagram/src/ui/components/buttons.dart';
+import 'package:provider/provider.dart';
 
 class SignUpSuccess extends StatefulWidget {
-  /// CHECK & Recieve USERID VIA PROVIDER
-  final String userId;
-  SignUpSuccess({this.userId = 'smushaheed'});
+  SignUpSuccess();
   @override
   _SignUpSuccessState createState() => _SignUpSuccessState();
 }
 
 class _SignUpSuccessState extends State<SignUpSuccess> {
+  String userId, userEmail;
+  Profile data;
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final userRepo = Provider.of<UserRepository>(context);
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.only(left: 28.0, right: 28.0),
@@ -28,9 +42,28 @@ class _SignUpSuccessState extends State<SignUpSuccess> {
             SizedBox(
               height: 2,
             ),
-            Text(
-              widget.userId,
-              style: bodyStyle(),
+            FutureBuilder(
+              future: ProfileAdapter().getProfileSnapshot(userRepo.user),
+              builder:
+                  (BuildContext context, AsyncSnapshot<DataSnapshot> snapshot) {
+                if (snapshot.hasData) {
+                  data = Profile.fromMap(snapshot.data, userRepo.user.uid);
+                  if (snapshot.data != null) {
+                    return new Text(
+                      data.username,
+                      style: bodyStyle(),
+                    );
+                  } else {
+                    return new CircularProgressIndicator();
+                  }
+                }
+                if (!snapshot.hasData) {
+                  Future.delayed(Duration(seconds: 1), () {
+                    setState(() {});
+                  });
+                }
+                return Text('No data on user\'s name');
+              },
             ),
             SizedBox(
               height: 2,
@@ -49,6 +82,7 @@ class _SignUpSuccessState extends State<SignUpSuccess> {
               child: ICFlatButton(
                 text: 'Next',
                 onPressed: () {
+                  userRepo.nextOnSucess();
                   print('Finished');
                 },
               ),
@@ -62,7 +96,10 @@ class _SignUpSuccessState extends State<SignUpSuccess> {
                 print('Change Username'),
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => ChangeUsername()),
+                  MaterialPageRoute(
+                      builder: (context) => ChangeUsername(
+                            profileInformation: data,
+                          )),
                 ),
               },
             ),

@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:instagram/src/core/utils/namegen.dart';
 import 'package:instagram/src/models/plain_models/profile.dart';
 
 /// Provides CRUD operations with profile info in database
@@ -7,24 +8,34 @@ class ProfileAdapter {
   FirebaseDatabase _database = new FirebaseDatabase();
 
   /// Creates a new user profile in database
-  createProfile(_fullName, _username, FirebaseUser user) {
+  Future createProfile(_fullName, FirebaseUser user) async {
+    print('Creating profile for $_fullName');
+    String _username;
+    var getAvailableUsername = GenerateUsername();
+    _username = await getAvailableUsername.getUserID(user.email, _fullName);
     Profile _profile = new Profile(
         email: user.email,
         fullName: _fullName,
         gender: 'Prefer Not to say',
         uid: user.uid,
         username: _username);
+
     print('Pushing profile to database: ${_profile.toJson()}');
 
     try {
-      _database.reference().child("profiles").push().set(_profile.toJson());
+      await _database
+          .reference()
+          .child("profiles")
+          .push()
+          .set(_profile.toJson());
+      print(
+          'Profile creation successful: username: $_username for ${user.email}');
     } catch (e) {
       print('An unexpected error occured.\nError: $e');
     }
   }
 
-  /// To retrieve user's whole profile from database
-  Future<Profile> getProfile(FirebaseUser user) async {
+  Future<DataSnapshot> getProfileSnapshot(FirebaseUser user) async {
     var _readData = await _database
         .reference()
         .child("profiles")
@@ -33,7 +44,8 @@ class ProfileAdapter {
         .once()
         .then((DataSnapshot snapshot) {
       if (snapshot.value != null) {
-        return Profile.fromMap(snapshot.value, user.uid);
+        return snapshot;
+        //use Profile.fromMap(snapshot.value, user.uid);
       } else {
         return null;
       }

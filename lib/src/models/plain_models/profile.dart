@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:firebase_database/firebase_database.dart';
 
 /// Serializes user profile information
@@ -39,6 +41,9 @@ class Profile {
   /// App username of this user.
   String username;
 
+  /// Raw data map
+  Map<dynamic, dynamic> dataMap;
+
   Profile(
       {this.bio,
       this.email,
@@ -52,19 +57,21 @@ class Profile {
       this.uid,
       this.username});
 
-  Profile.fromMap(DataSnapshot snapshot, String uid)
-      : key = snapshot.key,
-        uid = uid ?? '',
-        bio = snapshot.value['bio'] ?? '',
-        email = snapshot.value['email'] ?? '',
-        followers = snapshot.value['followers'] ?? '',
-        follows = snapshot.value['follows'] ?? '',
-        fullName = snapshot.value['fullName'] ?? '',
-        gender = snapshot.value['gender'] ?? '',
-        posts = snapshot.value['posts'] ?? '',
-        profileImage = snapshot.value['profileImage'] ?? '',
-        stories = snapshot.value['stories'] ?? '',
-        username = snapshot.value['username'] ?? '';
+  Profile.fromMap(DataSnapshot snapshotData, String uid) {
+    key = snapshotData.value.keys.first;
+    var mainData = snapshotData.value[key];
+    uid = uid ?? '';
+    bio = mainData['bio'] ?? '';
+    email = mainData['email'] ?? '';
+    followers = mainData['followers'] ?? [''];
+    follows = mainData['follows'] ?? [''];
+    fullName = mainData['fullName'] ?? '';
+    gender = mainData['gender'] ?? '';
+    posts = mainData['posts'] ?? [''];
+    profileImage = mainData['profileImage'] ?? '';
+    stories = mainData['stories'] ?? [''];
+    username = mainData['username'] ?? '';
+  }
 
   Map<String, dynamic> toJson() {
     return {

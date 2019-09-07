@@ -1,15 +1,3 @@
-import 'dart:convert' as JSON;
-
-// { "StudentID": "89296", "studentName": "XYZ", "lec": "python", "time": "0700:0900" }
-String jsonShow(jsonAsString) {
-  final scannedJson = JSON.jsonDecode(jsonAsString);
-  var studentId = scannedJson['StudentID'],
-      studentName = scannedJson['studentName'],
-      lec = scannedJson['lec'],
-      time = (scannedJson['time']).split(':');
-  return "Gr No.: $studentId\nName: $studentName\nTime: From ${time[0]} to ${time[1]}";
-}
-
 class Validator3000 {
   String isEmailValid(String email) {
     if (isNotEmptyOrNull(email)) {

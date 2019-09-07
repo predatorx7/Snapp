@@ -20,7 +20,6 @@ enum Status {
 
 class UserRepository with ChangeNotifier {
   FirebaseAuth _auth;
-  FirebaseAuth _signUpAuth;
   FirebaseUser _user;
   Status _status = Status.Uninitialized;
   String _email;

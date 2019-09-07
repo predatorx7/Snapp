@@ -3,11 +3,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:instagram/src/core/services/handle_snapshot.dart';
 import 'package:instagram/src/core/services/profile_adapter.dart';
-import 'package:instagram/src/core/utils/styles.dart';
 import 'package:instagram/src/models/plain_models/profile.dart';
 import 'package:instagram/src/models/plain_models/user_repo.dart';
 import 'package:instagram/src/models/view_models/feed.dart';
+import 'package:instagram/src/ui/pages/messages.dart';
+import 'package:instagram/src/ui/pages/upload.dart';
 import 'package:provider/provider.dart';
 
 class Instagram extends StatefulWidget {
@@ -65,40 +67,53 @@ class _InstagramState extends State<Instagram> {
             ),
           ),
           actions: <Widget>[
-            Stack(
-              alignment: Alignment.center,
-              children: <Widget>[
-                Container(
-                  height: 50,
-                  child: Image(
-                    image: AssetImage('assets/res_icons/directOutline.png'),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  CupertinoPageRoute(
+                    builder: (context) => MessagePage(
+                      // Gets data from async snapshot
+                      profileInformation: data,
+                    ),
                   ),
-                ),
-                Visibility(
-                  visible: feedModel.getMessageCount() != 0,
-                  child: Positioned(
-                    right: 5,
-                    top: 5,
-                    child: Container(
-                      padding: const EdgeInsets.all(5.0),
-                      decoration: BoxDecoration(
-                        color: Colors.redAccent,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Text(
-                        '${feedModel.getMessageCount()}',
-                        style: TextStyle(
-                          fontSize: 12,
+                );
+              },
+              child: Stack(
+                alignment: Alignment.center,
+                children: <Widget>[
+                  Container(
+                    height: 50,
+                    child: Image(
+                      image: AssetImage('assets/res_icons/directOutline.png'),
+                    ),
+                  ),
+                  Visibility(
+                    visible: feedModel.getMessageCount() != 0,
+                    child: Positioned(
+                      right: 5,
+                      top: 5,
+                      child: Container(
+                        padding: const EdgeInsets.all(5.0),
+                        decoration: BoxDecoration(
+                          color: Colors.redAccent,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Text(
+                          '${feedModel.getMessageCount()}',
+                          style: TextStyle(
+                            fontSize: 12,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),
-        body: ListView(
+        body: Column(
           children: <Widget>[
             SizedBox(
               height: 10,
@@ -114,28 +129,14 @@ class _InstagramState extends State<Instagram> {
                   "Status: ${userRepo.status}",
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
-                new FutureBuilder(
+                HandleSnapshot(
                   future: profileAdapter.getProfileSnapshot(userRepo.user),
                   builder: (BuildContext context,
                       AsyncSnapshot<DataSnapshot> snapshot) {
-                    switch (snapshot.connectionState) {
-                      case ConnectionState.waiting:
-                        return new Text('Loading....');
-                      case ConnectionState.active:
-                        return new Text('Result: ${snapshot.data}');
-                      case ConnectionState.none:
-                        return new Text('Result: ${snapshot.data}');
-                      default:
-                        if (snapshot.hasError)
-                          return new Text('Error: ${snapshot.error}');
-                        else {
-                          data =
-                              Profile.fromMap(snapshot.data, userRepo.user.uid);
-                          return new Text('Username: ${data.email}');
-                        }
-                    }
+                    data = Profile.fromMap(snapshot.data, userRepo.user.uid);
+                    return new Text('Username: ${data.email}');
                   },
-                )
+                ),
               ],
             ),
             ButtonBar(
@@ -152,13 +153,18 @@ class _InstagramState extends State<Instagram> {
             ),
           ],
         ),
-        bottomNavigationBar: NavigationBar(),
+        bottomNavigationBar: NavigationBar(
+          profiledata: data,
+        ),
       ),
     );
   }
 }
 
 class NavigationBar extends StatefulWidget {
+  final Profile profiledata;
+
+  const NavigationBar({Key key, this.profiledata}) : super(key: key);
   @override
   _NavigationBarState createState() => _NavigationBarState();
 }
@@ -219,7 +225,18 @@ class _NavigationBarState extends State<NavigationBar> {
             ),
             Expanded(
               child: GestureDetector(
-                onTap: () => setIndex(2),
+                onTap: () {
+                  setIndex(2);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => UploadPage(
+                        // Gets data from async snapshot
+                        profileData: widget.profiledata,
+                      ),
+                    ),
+                  );
+                },
                 child: Image(
                   image: AssetImage('assets/res_icons/newPost.png'),
                 ),

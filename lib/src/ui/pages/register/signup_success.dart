@@ -43,7 +43,7 @@ class _SignUpSuccessState extends State<SignUpSuccess> {
             SizedBox(
               height: 2,
             ),
-            FutureBuilder(
+            FutureBuilder( 
               future: profileAdapter.getProfileSnapshot(userRepo.user),
               builder:
                   (BuildContext context, AsyncSnapshot<DataSnapshot> snapshot) {

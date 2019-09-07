@@ -20,6 +20,7 @@ class SignUpSuccess extends StatefulWidget {
 class _SignUpSuccessState extends State<SignUpSuccess> {
   String userId, userEmail;
   Profile data;
+  ProfileAdapter profileAdapter = ProfileAdapter();
   @override
   void initState() {
     super.initState();
@@ -43,26 +44,35 @@ class _SignUpSuccessState extends State<SignUpSuccess> {
               height: 2,
             ),
             FutureBuilder(
-              future: ProfileAdapter().getProfileSnapshot(userRepo.user),
+              future: profileAdapter.getProfileSnapshot(userRepo.user),
               builder:
                   (BuildContext context, AsyncSnapshot<DataSnapshot> snapshot) {
-                if (snapshot.hasData) {
-                  data = Profile.fromMap(snapshot.data, userRepo.user.uid);
-                  if (snapshot.data != null) {
-                    return new Text(
-                      data.username,
-                      style: bodyStyle(),
-                    );
-                  } else {
-                    return new CircularProgressIndicator();
-                  }
+                switch (snapshot.connectionState) {
+                  case ConnectionState.waiting:
+                    return new Text('wait');
+                  case ConnectionState.active:
+                    return new Text('Result: ${snapshot.data}');
+                  case ConnectionState.none:
+                    return new Text('Result: ${snapshot.data}');
+                  default:
+                    if (snapshot.hasError)
+                      return new Text('Error: ${snapshot.error}');
+                    else {
+                      if (!snapshot.hasData) {
+                        Future.delayed(Duration(seconds: 1), () {
+                          setState(() {});
+                        });
+                        return Text(':(');
+                      } else {
+                        data =
+                            Profile.fromMap(snapshot.data, userRepo.user.uid);
+                        return new Text(
+                          data.username,
+                          style: bodyStyle(),
+                        );
+                      }
+                    }
                 }
-                if (!snapshot.hasData) {
-                  Future.delayed(Duration(seconds: 1), () {
-                    setState(() {});
-                  });
-                }
-                return Text('No data on user\'s name');
               },
             ),
             SizedBox(

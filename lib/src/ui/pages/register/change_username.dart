@@ -118,7 +118,8 @@ class _ChangeUsernameState extends State<ChangeUsername> {
                                   'Username changed to ${_usernameController.text}'),
                             ),
                           );
-                          ProfileAdapter().updateProfile(widget.profileInformation);
+                          ProfileAdapter()
+                              .updateProfile(widget.profileInformation);
                         } else {
                           _key.currentState.showSnackBar(
                             SnackBar(
@@ -127,6 +128,7 @@ class _ChangeUsernameState extends State<ChangeUsername> {
                                   'Username ${_usernameController.text} is already taken by someone else'),
                             ),
                           );
+                          Navigator.pop(context);
                         }
                       },
               ),

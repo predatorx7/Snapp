@@ -14,10 +14,10 @@ class Profile {
   String email;
 
   /// List of followers
-  List<String> followers;
+  List<dynamic> followers;
 
   /// List of people followed.
-  List<String> follows;
+  List<dynamic> follows;
 
   /// Full Name of User.
   String fullName;
@@ -27,10 +27,10 @@ class Profile {
   String gender;
 
   /// List of postIds of posts posted by this user.
-  List<String> posts;
+  List<dynamic> posts;
 
   /// List of storyId of stories by this user.
-  List<String> stories;
+  List<dynamic> stories;
 
   /// ProfileImageId for this user.
   String profileImage;
@@ -60,7 +60,7 @@ class Profile {
   Profile.fromMap(DataSnapshot snapshotData, String uid) {
     key = snapshotData.value.keys.first;
     var mainData = snapshotData.value[key];
-    uid = uid ?? '';
+    uid = mainData['uid'] ?? '';
     bio = mainData['bio'] ?? '';
     email = mainData['email'] ?? '';
     followers = mainData['followers'] ?? [''];

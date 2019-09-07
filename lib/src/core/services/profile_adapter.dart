@@ -36,18 +36,21 @@ class ProfileAdapter {
   }
 
   Future<DataSnapshot> getProfileSnapshot(FirebaseUser user) async {
+    print(user);
     var _readData = await _database
         .reference()
         .child("profiles")
-        .orderByChild("uid")
-        .equalTo(user.uid)
+        .orderByChild("email")
+        .equalTo(user.email)//.reference()
         .once()
         .then((DataSnapshot snapshot) {
       if (snapshot.value != null) {
+        print('Snapshot: ${snapshot.value}');
         return snapshot;
         //use Profile.fromMap(snapshot.value, user.uid);
       } else {
-        return null;
+        print('Snapshot: ${snapshot.value}');
+        return snapshot.value;
       }
     });
     return _readData;
@@ -55,6 +58,7 @@ class ProfileAdapter {
 
   /// Update changes to profile
   Future<void> updateProfile(Profile profile) async {
+    print('updating $profile');
     if (profile != null) {
       await _database
           .reference()

@@ -19,6 +19,8 @@ class Instagram extends StatefulWidget {
 }
 
 class _InstagramState extends State<Instagram> {
+  Profile data;
+  ProfileAdapter profileAdapter = ProfileAdapter();
   @override
   initState() {
     super.initState();
@@ -112,25 +114,28 @@ class _InstagramState extends State<Instagram> {
                   "Status: ${userRepo.status}",
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
-                FutureBuilder(
-                  future: ProfileAdapter().getProfileSnapshot(userRepo.user),
+                new FutureBuilder(
+                  future: profileAdapter.getProfileSnapshot(userRepo.user),
                   builder: (BuildContext context,
                       AsyncSnapshot<DataSnapshot> snapshot) {
-                    if (snapshot.hasData) {
-                      var data =
-                          Profile.fromMap(snapshot.data, userRepo.user.uid);
-                      if (snapshot.data != null) {
-                        return new Text(
-                          'Username: ${data.email}, \nInformation: ${snapshot.data.value}',
-                          style: bodyStyle(),
-                        );
-                      } else {
-                        return new CircularProgressIndicator();
-                      }
+                    switch (snapshot.connectionState) {
+                      case ConnectionState.waiting:
+                        return new Text('Loading....');
+                      case ConnectionState.active:
+                        return new Text('Result: ${snapshot.data}');
+                      case ConnectionState.none:
+                        return new Text('Result: ${snapshot.data}');
+                      default:
+                        if (snapshot.hasError)
+                          return new Text('Error: ${snapshot.error}');
+                        else {
+                          data =
+                              Profile.fromMap(snapshot.data, userRepo.user.uid);
+                          return new Text('Username: ${data.email}');
+                        }
                     }
-                    return Text('No data on user');
                   },
-                ),
+                )
               ],
             ),
             ButtonBar(

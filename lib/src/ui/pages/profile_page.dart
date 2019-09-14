@@ -7,13 +7,11 @@ class ProfilePage extends StatefulWidget {
 
   const ProfilePage({Key key, this.userInfo}) : super(key: key);
   @override
-  _ProfilePageState createState() => _ProfilePageState(userInfo);
+  _ProfilePageState createState() => _ProfilePageState();
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  Profile profile;
   bool gridView = true;
-  _ProfilePageState(this.profile);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,7 +20,7 @@ class _ProfilePageState extends State<ProfilePage> {
           CustomScrollView(
             slivers: <Widget>[
               SliverAppBar(
-                title: Text(profile.username),
+                title: Text(widget.userInfo.username),
                 backgroundColor: Colors.white,
                 expandedHeight: 200.0,
                 flexibleSpace: FlexibleSpaceBar(
@@ -53,23 +51,23 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ),
               ),
-              new GridView.builder(
-                itemCount: profile.posts.length,
-                gridDelegate: new SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: (gridView) ? 3 : 1),
-                itemBuilder: (BuildContext context, int index) {
-                  String url = (profile.posts[index]);
-                  return new Card(
-                    child: new GridTile(
-                      footer: new Text(profile.posts[index]),
-                      child: new Text('Image'
-                          // data[index]['image'],
-                          ), //just for testing, will fill with image later
-                    ),
-                  );
-                },
-              ),
             ],
+          ),
+          new GridView.builder(
+            itemCount: widget.userInfo.posts.length,
+            gridDelegate: new SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: (gridView) ? 3 : 1),
+            itemBuilder: (BuildContext context, int index) {
+              String url = (widget.userInfo.posts[index]);
+              return new Card(
+                child: new GridTile(
+                  footer: new Text(widget.userInfo.posts[index]),
+                  child: new Text('Image'
+                      // data[index]['image'],
+                      ), //just for testing, will fill with image later
+                ),
+              );
+            },
           ),
         ],
       ),

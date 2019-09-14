@@ -12,6 +12,8 @@ import 'package:instagram/src/ui/pages/messages.dart';
 import 'package:instagram/src/ui/pages/upload.dart';
 import 'package:provider/provider.dart';
 
+import 'profile_page.dart';
+
 class Instagram extends StatefulWidget {
   final FirebaseUser user;
 
@@ -253,7 +255,18 @@ class _NavigationBarState extends State<NavigationBar> {
             ),
             Expanded(
               child: GestureDetector(
-                onTap: () => setIndex(4),
+                onTap: () {
+                  setIndex(4);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ProfilePage(
+                        // Gets data from async snapshot
+                        userInfo: widget.profiledata,
+                      ),
+                    ),
+                  );
+                },
                 child: Image(
                   image: AssetImage(
                       'assets/res_icons/user${isOutlineOrFilled(4)}.png'),

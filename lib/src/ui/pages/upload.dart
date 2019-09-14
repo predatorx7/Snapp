@@ -28,7 +28,7 @@ class _UploadPageState extends State<UploadPage> {
   }
 
   dispose() {
-    _image.delete();
+    if (_image != null) _image.delete();
     super.dispose();
   }
 
@@ -224,8 +224,8 @@ class _UploadMediaState extends State<UploadMedia> {
         ),
         actions: <Widget>[
           TappableText(
-            onTap: () {
-              uploadFile(
+            onTap: () async {
+              await uploadFile(
                   widget.imageFile, userRepo.user, captionController.text);
               // Upload and await here
               Navigator.push(
@@ -240,33 +240,37 @@ class _UploadMediaState extends State<UploadMedia> {
           ),
         ],
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      body: ListView(
+        // mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Row(
-            children: <Widget>[
-              // Profile Photo
-              CircleAvatar(),
-              TextField(
-                controller: captionController,
-                textInputAction: TextInputAction.newline,
-                maxLength: 150,
-                decoration: InputDecoration(
-                  hintText: 'Write a caption...',
-                  hintStyle: TextStyle(
-                    color: Colors.grey[500],
-                  ),
+          Container(
+            padding: EdgeInsets.all(15),
+            height: 300,
+            // width: 300,
+            child: Image.file(
+              widget.imageFile,
+              fit: BoxFit.fitWidth,
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.all(15),
+            child: TextField(
+              minLines: 1,
+              maxLines: 20,
+              controller: captionController,
+              textInputAction: TextInputAction.newline,
+              maxLength: 150,
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                icon: CircleAvatar(
+                  child: Icon(Icons.person_outline),
+                ),
+                hintText: 'Write a caption...',
+                hintStyle: TextStyle(
+                  color: Colors.grey[400],
                 ),
               ),
-              Container(
-                height: 100,
-                width: 100,
-                child: Image.file(
-                  widget.imageFile,
-                  fit: BoxFit.fitWidth,
-                ),
-              ),
-            ],
+            ),
           ),
         ],
       ),

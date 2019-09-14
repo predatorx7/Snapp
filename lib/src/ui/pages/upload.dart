@@ -114,9 +114,10 @@ class _UploadPageState extends State<UploadPage> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => UploadMedia(
-                                        imageFile: _image,
-                                      )),
+                                builder: (context) => UploadMedia(
+                                  imageFile: _image,
+                                ),
+                              ),
                             );
                           }
                         : null,

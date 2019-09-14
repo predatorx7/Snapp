@@ -10,8 +10,9 @@ class PostAdapter {
   FirebaseDatabase _database = new FirebaseDatabase();
 
   /// Creates a new user post in database
-  createPost(_imageURL, FirebaseUser user, String caption) async {
-    Post _post = new Post(imageURL: _imageURL, publisher: user.uid, description: caption);
+  void createPost(_imageURL, FirebaseUser user, String caption) async {
+    Post _post = new Post(
+        imageURL: _imageURL, publisher: user.uid, description: caption);
     print('Pushing post to database: ${_post.toJson()}');
 
     try {

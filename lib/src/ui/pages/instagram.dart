@@ -9,6 +9,7 @@ import 'package:instagram/src/models/plain_models/profile.dart';
 import 'package:instagram/src/models/plain_models/user_repo.dart';
 import 'package:instagram/src/models/view_models/feed.dart';
 import 'package:instagram/src/ui/pages/messages.dart';
+import 'package:instagram/src/ui/pages/story.dart';
 import 'package:instagram/src/ui/pages/upload.dart';
 import 'package:provider/provider.dart';
 
@@ -55,6 +56,14 @@ class _InstagramState extends State<Instagram> {
             child: Row(
               children: <Widget>[
                 GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      CupertinoPageRoute(
+                        builder: (context) => StoryPick(),
+                      ),
+                    );
+                  },
                   child: Image(
                     image: AssetImage('assets/res_icons/cameraOutline.png'),
                   ),

@@ -55,7 +55,7 @@ class Profile {
       this.uid,
       this.username});
 
-  Profile.fromMap(DataSnapshot snapshotData, String uid) {
+  Profile.fromMap(DataSnapshot snapshotData) {
     key = snapshotData.value.keys.first;
     var mainData = snapshotData.value[key];
     uid = mainData['uid'] ?? '';

@@ -4,7 +4,7 @@ import 'package:meta/meta.dart';
 class Post {
   /// Timestamp of post creation (UNIX Epoch Milliseconds) optional
   int creationTime;
-
+ 
   // Post description or Caption
   String description;
 

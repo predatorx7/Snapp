@@ -11,7 +11,7 @@ class CommentAdapter {
     Comment _comment = new Comment(
       postKey: _postKey,
       comment: _commentIs,
-      publisher: user.uid,
+      publisher: user.email,
     );
     print('Pushing comment to database: ${_comment.toJson()}');
 
@@ -28,6 +28,7 @@ class CommentAdapter {
         .reference()
         .child("comments")
         .orderByChild("publisher")
+        .orderByChild('creationTime')
         .equalTo(user.uid)
         .once()
         .then((DataSnapshot snapshot) {

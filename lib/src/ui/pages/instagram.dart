@@ -144,7 +144,7 @@ class _InstagramState extends State<Instagram> {
                   future: profileAdapter.getProfileSnapshot(userRepo.user),
                   builder: (BuildContext context,
                       AsyncSnapshot<DataSnapshot> snapshot) {
-                    data = Profile.fromMap(snapshot.data, userRepo.user.uid);
+                    data = Profile.fromMap(snapshot.data);
                     return new Text('Username: ${data.email}');
                   },
                 ),

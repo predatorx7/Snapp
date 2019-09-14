@@ -25,8 +25,7 @@ class ProfileAdapter {
     try {
       await _database
           .reference()
-          .child("profiles")
-          .push()
+          .child("profiles/${user.email}")
           .set(_profile.toJson());
       print(
           'Profile creation successful: username: $_username for ${user.email}');

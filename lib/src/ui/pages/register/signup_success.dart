@@ -65,7 +65,7 @@ class _SignUpSuccessState extends State<SignUpSuccess> {
                         return Text(':(');
                       } else {
                         data =
-                            Profile.fromMap(snapshot.data, userRepo.user.uid);
+                            Profile.fromMap(snapshot.data);
                         return new Text(
                           data.username,
                           style: bodyStyle(),

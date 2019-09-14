@@ -12,14 +12,14 @@ class StoryAdapter {
   createStory(_imageURL, String _storyIs, FirebaseUser user) async {
     Story _story = new Story(
       imageURL: _imageURL,
-      publisher: user.uid,
+      publisher: user.email,
     );
     print('Pushing story to database: ${_story.toJson()}');
 
     try {
       _database.reference().child("storys").push().set(_story.toJson());
       DataSnapshot snapshot = await ProfileAdapter().getProfileSnapshot(user);
-      Profile data = Profile.fromMap(snapshot, user.uid);
+      Profile data = Profile.fromMap(snapshot);
       data.stories.add(_imageURL);
       ProfileAdapter().updateProfile(data);
     } catch (e) {
@@ -33,11 +33,11 @@ class StoryAdapter {
         .reference()
         .child("storys")
         .orderByChild("publisher")
-        .equalTo(user.uid)
+        .equalTo(user.email)
         .once()
         .then((DataSnapshot snapshot) {
       if (snapshot.value != null) {
-        return Story.fromMap(snapshot.value, user.uid);
+        return Story.fromMap(snapshot.value, user.email);
       } else {
         print('Couldn\'t get story');
         return null;

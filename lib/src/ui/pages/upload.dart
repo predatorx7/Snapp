@@ -1,9 +1,16 @@
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:instagram/src/models/plain_models/profile.dart';
 import 'package:instagram/src/ui/components/buttons.dart';
+import 'package:provider/provider.dart';
+
+import '../../core/services/post_adapter.dart';
+import '../../models/plain_models/user_repo.dart';
+import 'instagram.dart';
 
 class UploadPage extends StatefulWidget {
   final Profile profileData;
@@ -193,15 +200,87 @@ class UploadMedia extends StatefulWidget {
 }
 
 class _UploadMediaState extends State<UploadMedia> {
+  TextEditingController captionController;
+  @override
+  void initState() {
+    captionController = TextEditingController();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    captionController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final userRepo = Provider.of<UserRepository>(context);
     return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'New Post',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+        ),
+        actions: <Widget>[
+          TappableText(
+            onTap: () {
+              uploadFile(
+                  widget.imageFile, userRepo.user, captionController.text);
+              // Upload and await here
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => Instagram(),
+                ),
+              );
+            },
+            text: 'Share',
+            textSize: 16,
+          ),
+        ],
+      ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Image.file(widget.imageFile)
+          Row(
+            children: <Widget>[
+              // Profile Photo
+              CircleAvatar(),
+              TextField(
+                controller: captionController,
+                textInputAction: TextInputAction.newline,
+                maxLength: 150,
+                decoration: InputDecoration(
+                  hintText: 'Write a caption...',
+                  hintStyle: TextStyle(
+                    color: Colors.grey[500],
+                  ),
+                ),
+              ),
+              Container(
+                height: 100,
+                width: 100,
+                child: Image.file(
+                  widget.imageFile,
+                  fit: BoxFit.fitWidth,
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
   }
+}
+
+Future uploadFile(File _image, FirebaseUser user, String caption) async {
+  StorageReference storageReference =
+      FirebaseStorage.instance.ref().child('profiles/${user.email}/posts');
+  StorageUploadTask uploadTask = storageReference.putFile(_image);
+  await uploadTask.onComplete;
+  print('File Uploaded');
+  storageReference.getDownloadURL().then((fileURL) {
+    PostAdapter().createPost(fileURL, user, caption);
+  });
 }

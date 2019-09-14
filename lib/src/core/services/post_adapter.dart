@@ -1,18 +1,25 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:instagram/src/core/services/profile_adapter.dart';
 import 'package:instagram/src/models/plain_models/post.dart';
+
+import '../../models/plain_models/profile.dart';
 
 /// Provides CRUD operations with post info in database
 class PostAdapter {
   FirebaseDatabase _database = new FirebaseDatabase();
 
   /// Creates a new user post in database
-  createPost(_imageURL, _username, FirebaseUser user) {
-    Post _post = new Post(imageURL: _imageURL, publisher: user.uid);
+  createPost(_imageURL, FirebaseUser user, String caption) async {
+    Post _post = new Post(imageURL: _imageURL, publisher: user.uid, description: caption);
     print('Pushing post to database: ${_post.toJson()}');
 
     try {
       _database.reference().child("posts").push().set(_post.toJson());
+      DataSnapshot snapshot = await ProfileAdapter().getProfileSnapshot(user);
+      Profile data = Profile.fromMap(snapshot, user.uid);
+      data.posts.add(_imageURL);
+      ProfileAdapter().updateProfile(data);
     } catch (e) {
       print('An unexpected error occured.\nError: $e');
     }

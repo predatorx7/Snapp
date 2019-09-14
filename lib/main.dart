@@ -13,8 +13,6 @@ import 'src/models/view_models/feed.dart';
 void main() {
   /// To keep app in Portrait Mode
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-
-  // TODO: USE REDIRECTION
   runApp(MyApp());
 }
 
@@ -64,7 +62,6 @@ class MyApp extends StatelessWidget {
           },
         ),
       ),
-
       // home: TestPage(),
     );
   }

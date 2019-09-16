@@ -12,7 +12,7 @@ class StoryAdapter {
   createStory(_imageURL, String _storyIs, FirebaseUser user) async {
     Story _story = new Story(
       imageURL: _imageURL,
-      publisher: user.email,
+      publisher: user.uid,
     );
     print('Pushing story to database: ${_story.toJson()}');
 
@@ -33,7 +33,7 @@ class StoryAdapter {
         .reference()
         .child("storys")
         .orderByChild("publisher")
-        .equalTo(user.email)
+        .equalTo(user.uid)
         .once()
         .then((DataSnapshot snapshot) {
       if (snapshot.value != null) {

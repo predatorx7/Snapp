@@ -1,7 +1,7 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
-class HandleSnapshot extends StatefulWidget{
+class HandleSnapshot extends StatefulWidget {
   final Future<DataSnapshot> future;
   final Widget Function(BuildContext, AsyncSnapshot<DataSnapshot>) builder;
 
@@ -14,32 +14,33 @@ class HandleSnapshot extends StatefulWidget{
 class _HandleSnapshotState extends State<HandleSnapshot> {
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder( 
-              future: widget.future,
-              builder:
-                  (BuildContext context, AsyncSnapshot<DataSnapshot> snapshot) {
-                switch (snapshot.connectionState) {
-                  case ConnectionState.waiting:
-                    return new Text('wait');
-                  case ConnectionState.active:
-                    return new Text('Result: ${snapshot.data}');
-                  case ConnectionState.none:
-                    return new Text('Result: ${snapshot.data}');
-                  default:
-                    if (snapshot.hasError)
-                      return new Text('Error: ${snapshot.error}');
-                    else {
-                      if (!snapshot.hasData) {
-                        Future.delayed(Duration(seconds: 1), () {
-                          setState(() {});
-                        });
-                        return Text(':(');
-                      } else {
-                        return widget.builder(context, snapshot);
-                      }
-                    }
-                }
-              },
+    return FutureBuilder(
+      future: widget.future,
+      builder: (BuildContext context, AsyncSnapshot<DataSnapshot> snapshot) {
+        switch (snapshot.connectionState) {
+          case ConnectionState.waiting:
+            return new Center(
+              child: CircularProgressIndicator(),
             );
+          case ConnectionState.active:
+            return new Text('Result: ${snapshot.data}');
+          case ConnectionState.none:
+            return new Text('Result: ${snapshot.data}');
+          default:
+            if (snapshot.hasError)
+              return new Text('Error: ${snapshot.error}');
+            else {
+              if (!snapshot.hasData) {
+                Future.delayed(Duration(seconds: 1), () {
+                  setState(() {});
+                });
+                return Text(':(');
+              } else {
+                return widget.builder(context, snapshot);
+              }
+            }
+        }
+      },
+    );
   }
 }

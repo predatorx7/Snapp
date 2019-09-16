@@ -104,7 +104,7 @@ class _UploadStoryStageState extends State<UploadStoryStage> {
 
 Future uploadStory(File _image, FirebaseUser user) async {
   StorageReference storageReference = FirebaseStorage.instance.ref().child(
-      'stories/${user.email}/${DateTime.now().millisecondsSinceEpoch}');
+      'stories/${user.uid}/${DateTime.now().millisecondsSinceEpoch}');
   StorageUploadTask uploadTask = storageReference.putFile(_image);
   await uploadTask.onComplete;
   print('Story Uploaded');

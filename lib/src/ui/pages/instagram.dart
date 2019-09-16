@@ -8,6 +8,8 @@ import 'package:instagram/src/core/services/profile_adapter.dart';
 import 'package:instagram/src/models/plain_models/profile.dart';
 import 'package:instagram/src/models/plain_models/user_repo.dart';
 import 'package:instagram/src/models/view_models/feed.dart';
+import 'package:instagram/src/ui/components/handle_view_show.dart';
+import 'package:instagram/src/ui/pages/home_page.dart';
 import 'package:instagram/src/ui/pages/messages.dart';
 import 'package:instagram/src/ui/pages/story.dart';
 import 'package:instagram/src/ui/pages/upload.dart';
@@ -25,10 +27,46 @@ class Instagram extends StatefulWidget {
 
 class _InstagramState extends State<Instagram> {
   Profile data;
+  bool loaded = false;
+  var i;
+  DatabaseReference _databaseReference = new FirebaseDatabase().reference();
+  List<String> followerList;
   ProfileAdapter profileAdapter = ProfileAdapter();
   @override
   initState() {
     super.initState();
+  }
+
+  Widget homePage(BuildContext context) {
+    if (data.followers.isNotEmpty ) {
+      // && data.followers[1].isNotEmpty
+      followerList = data.followers;
+      return ListView.builder(
+        itemBuilder: (BuildContext context, int index) {
+          return HandleViewSnapshot(
+            future: _databaseReference
+                .child(
+                    'posts/${followerList[index].isNotEmpty ? followerList[index] : followerList[index + 1]}')
+                .orderByChild("creationTime")
+                .onValue
+                .last
+                .then(
+              (Event onValue) {
+                return onValue.snapshot;
+              },
+            ),
+            builder: (BuildContext context,
+                AsyncSnapshot<DataSnapshot> asyncSnapshot) {
+              return Text(asyncSnapshot.data.value);
+            },
+          );
+        },
+      );
+    } else {
+      return Center(
+        child: Text('You are not following anyone'),
+      );
+    }
   }
 
   @override
@@ -124,46 +162,67 @@ class _InstagramState extends State<Instagram> {
             ),
           ],
         ),
-        body: Column(
-          children: <Widget>[
-            SizedBox(
-              height: 10,
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text(
-                  "Email: ${userRepo.user.email}",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  "Status: ${userRepo.status}",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                HandleSnapshot(
-                  future: profileAdapter.getProfileSnapshot(userRepo.user),
-                  builder: (BuildContext context,
-                      AsyncSnapshot<DataSnapshot> snapshot) {
-                    data = Profile.fromMap(snapshot.data);
-                    return new Text('Username: ${data.email}');
-                  },
-                ),
-              ],
-            ),
-            ButtonBar(
-              children: <Widget>[
-                OutlineButton(
-                  borderSide: BorderSide(color: Colors.red),
-                  highlightedBorderColor: Colors.redAccent,
-                  textColor: Colors.red,
-                  child: Text("SIGN OUT"),
-                  onPressed: () =>
-                      Provider.of<UserRepository>(context).signOut(),
-                )
-              ],
-            ),
-          ],
+        body: HandleSnapshot(
+          future: profileAdapter.getProfileSnapshot(userRepo.user),
+          builder:
+              (BuildContext context, AsyncSnapshot<DataSnapshot> snapshot) {
+            loaded = true;
+            data = Profile.fromMap(snapshot.data);
+            if (data != null) {
+              return homePage(context);
+            } else {
+              return Text('There\'s an issue');
+            }
+          },
         ),
+
+        // body: Column(
+        //   children: <Widget>[
+        //     SizedBox(
+        //       height: 10,
+        //     ),
+        //     Column(
+        //       mainAxisAlignment: MainAxisAlignment.center,
+        //       children: <Widget>[
+        //         Text(
+        //           "Email: ${userRepo.user.email}",
+        //           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        //         ),
+        //         Text(
+        //           "Status: ${userRepo.status}",
+        //           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        //         ),
+        // HandleSnapshot(
+        //   future: profileAdapter.getProfileSnapshot(userRepo.user),
+        //   builder: (BuildContext context,
+        //       AsyncSnapshot<DataSnapshot> snapshot) {
+        //     loaded = true;
+        //     data = Profile.fromMap(snapshot.data);
+        //     for (i = 0; data == null && i < 10; i++) {
+        //       Future.delayed(Duration(seconds: 1), () {
+        //         setState(() {});
+        //       });
+        //     }
+        //     return new Text('Username: ${data.email}');
+        //   },
+        // ),
+        //       ],
+        //     ),
+        //     ButtonBar(
+        //       children: <Widget>[
+        //         OutlineButton(
+        //           borderSide: BorderSide(color: Colors.red),
+        //           highlightedBorderColor: Colors.redAccent,
+        //           textColor: Colors.red,
+        //           child: Text("SIGN OUT"),
+        //           onPressed: () =>
+        //               Provider.of<UserRepository>(context).signOut(),
+        //         )
+        //       ],
+        //     ),
+        //     (data != null) ? homePage(context) : Text('There\'s an issue'),
+        //   ],
+        // ),
         bottomNavigationBar: NavigationBar(
           profiledata: data,
         ),

@@ -11,7 +11,7 @@ class CommentAdapter {
     Comment _comment = new Comment(
       postKey: _postKey,
       comment: _commentIs,
-      publisher: user.email,
+      publisher: user.uid,
     );
     print('Pushing comment to database: ${_comment.toJson()}');
 

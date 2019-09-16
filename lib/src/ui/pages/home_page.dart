@@ -17,24 +17,30 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    followerList = widget.profile.followers;
-    return ListView.builder(
-      itemBuilder: (BuildContext context, int index) {
-        return HandleViewSnapshot(
-          future: _databaseReference
-              .child('posts/${followerList[index]}')
-              .orderByChild("creationTime")
-              .onValue
-              .last
-              .then((Event onValue) {
-            return onValue.snapshot;
-          }),
-          builder: (BuildContext context,
-              AsyncSnapshot<DataSnapshot> asyncSnapshot) {
-            return Text(asyncSnapshot.data.value);
-          },
-        );
-      },
-    );
+    if (widget.profile == null) {
+      return Center(
+        child: Text('No Posts'),
+      );
+    } else {
+      followerList = widget.profile.followers;
+      return ListView.builder(
+        itemBuilder: (BuildContext context, int index) {
+          return HandleViewSnapshot(
+            future: _databaseReference
+                .child('posts/${followerList[index]}')
+                .orderByChild("creationTime")
+                .onValue
+                .last
+                .then((Event onValue) {
+              return onValue.snapshot;
+            }),
+            builder: (BuildContext context,
+                AsyncSnapshot<DataSnapshot> asyncSnapshot) {
+              return Text(asyncSnapshot.data.value);
+            },
+          );
+        },
+      );
+    }
   }
 }

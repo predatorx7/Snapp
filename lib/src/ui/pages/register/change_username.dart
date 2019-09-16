@@ -104,13 +104,18 @@ class _ChangeUsernameState extends State<ChangeUsername> {
                 text: 'Next',
                 onPressed: _isButtonDisabled
                     ? null
-                    : () {
+                    : () async {
                         if (GenerateUsername().checkAvailability(
                                 [_usernameController.text]) !=
                             null) {
                           profileInformation.username =
                               _usernameController.text;
                           print(profileInformation.username);
+                          setState(() {
+                            _isButtonDisabled = true;
+                          });
+                          await ProfileAdapter()
+                              .updateProfile(profileInformation);
                           _key.currentState.showSnackBar(
                             SnackBar(
                               backgroundColor: Colors.green,
@@ -118,8 +123,7 @@ class _ChangeUsernameState extends State<ChangeUsername> {
                                   'Username changed to ${_usernameController.text}'),
                             ),
                           );
-                          ProfileAdapter()
-                              .updateProfile(widget.profileInformation);
+                          Navigator.pop(context);
                         } else {
                           _key.currentState.showSnackBar(
                             SnackBar(
@@ -128,7 +132,6 @@ class _ChangeUsernameState extends State<ChangeUsername> {
                                   'Username ${_usernameController.text} is already taken by someone else'),
                             ),
                           );
-                          Navigator.pop(context);
                         }
                       },
               ),

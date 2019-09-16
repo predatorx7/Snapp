@@ -12,11 +12,11 @@ class PostAdapter {
   /// Creates a new user post in database
   void createPost(_imageURL, FirebaseUser user, String caption) async {
     Post _post = new Post(
-        imageURL: _imageURL, publisher: user.email, description: caption);
+        imageURL: _imageURL, publisher: user.uid, description: caption);
     print('Pushing post to database: ${_post.toJson()}');
 
     try {
-      _database.reference().child("posts/${user.email}").push().set(_post.toJson());
+      _database.reference().child("posts/${user.uid}").push().set(_post.toJson());
       DataSnapshot snapshot = await ProfileAdapter().getProfileSnapshot(user);
       Profile data = Profile.fromMap(snapshot);
       data.posts.add(_imageURL);
@@ -32,11 +32,11 @@ class PostAdapter {
         .reference()
         .child("posts")
         .orderByChild("publisher")
-        .equalTo(user.email)
+        .equalTo(user.uid)
         .once()
         .then((DataSnapshot snapshot) {
       if (snapshot.value != null) {
-        return Post.fromMap(snapshot.value, user.email);
+        return Post.fromMap(snapshot.value, user.uid);
       } else {
         print('Couldn\'t get post');
         return null;

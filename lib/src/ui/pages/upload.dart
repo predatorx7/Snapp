@@ -281,7 +281,7 @@ class _UploadMediaState extends State<UploadMedia> {
 
 Future uploadFile(File _image, FirebaseUser user, String caption) async {
   StorageReference storageReference = FirebaseStorage.instance.ref().child(
-      'posts/${user.email}/${DateTime.now().millisecondsSinceEpoch}');
+      'posts/${user.uid}/${DateTime.now().millisecondsSinceEpoch}');
   StorageUploadTask uploadTask = storageReference.putFile(_image);
   await uploadTask.onComplete;
   print('File Uploaded');

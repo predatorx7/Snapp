@@ -33,7 +33,7 @@ class _UploadPageState extends State<UploadPage> {
   }
 
   Future getImage(ImageSource source) async {
-    var image = await ImagePicker.pickImage(source: source);
+    var image = await ImagePicker.pickImage(source: source, imageQuality: 60);
 
     setState(() {
       _image = image;
@@ -202,14 +202,18 @@ class UploadMedia extends StatefulWidget {
 
 class _UploadMediaState extends State<UploadMedia> {
   TextEditingController captionController;
+  bool _isLoading = false;
+  FocusNode captionFocus;
   @override
   void initState() {
+    captionFocus = FocusNode();
     captionController = TextEditingController();
     super.initState();
   }
 
   @override
   void dispose() {
+    captionFocus.dispose();
     captionController.dispose();
     super.dispose();
   }
@@ -224,26 +228,38 @@ class _UploadMediaState extends State<UploadMedia> {
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
         ),
         actions: <Widget>[
-          TappableText(
-            onTap: () async {
-              await uploadFile(
-                  widget.imageFile, userRepo.user, captionController.text);
-              // Upload and await here
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => Instagram(),
-                ),
-              );
-            },
-            text: 'Share',
-            textSize: 16,
+          Center(
+            child: TappableText(
+              onTap: _isLoading
+                  ? null
+                  : () async {
+                      setState(() {
+                        _isLoading = true;
+                      });
+                      captionFocus.unfocus();
+                      await uploadFile(widget.imageFile, userRepo.user,
+                          captionController.text);
+                      // Upload and await here
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Instagram(),
+                        ),
+                      );
+                    },
+              text: 'Share',
+              textSize: 16,
+            ),
           ),
         ],
       ),
       body: ListView(
         // mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
+          Visibility(
+            visible: _isLoading,
+            child: LinearProgressIndicator(),
+          ),
           Container(
             padding: EdgeInsets.all(15),
             height: 300,
@@ -256,6 +272,7 @@ class _UploadMediaState extends State<UploadMedia> {
           Container(
             padding: EdgeInsets.all(15),
             child: TextField(
+              focusNode: captionFocus,
               minLines: 1,
               maxLines: 20,
               controller: captionController,
@@ -280,8 +297,9 @@ class _UploadMediaState extends State<UploadMedia> {
 }
 
 Future uploadFile(File _image, FirebaseUser user, String caption) async {
-  StorageReference storageReference = FirebaseStorage.instance.ref().child(
-      'posts/${user.uid}/${DateTime.now().millisecondsSinceEpoch}');
+  StorageReference storageReference = FirebaseStorage.instance
+      .ref()
+      .child('posts/${user.uid}/${DateTime.now().millisecondsSinceEpoch}');
   StorageUploadTask uploadTask = storageReference.putFile(_image);
   await uploadTask.onComplete;
   print('File Uploaded');

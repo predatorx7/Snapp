@@ -1,3 +1,29 @@
+// // if (data == null) {
+// //       Future.delayed(Duration.zero, () {
+// //         setState(() {});
+// //       });
+// //       return Text(':(');
+// //     }
+
+//  WidgetsBinding.instance.addPostFrameCallback((_) {
+//         if (mounted) {
+//           profileAdapter
+//         .getProfileSnapshot(userRepo.user)
+//         .then((DataSnapshot snapshot) {
+//       newData = Profile.fromMap(snapshot.value);
+//       print('New Data: ${newData.toJson()}');
+//       if (data.toJson() != newData.toJson()) {
+//         heightOfFlexSpace = flexibleSpaceHeight.withText(text: data.bio);
+//         print('Height of flex: $heightOfFlexSpace');
+//         if (mounted)
+//           setState(() {
+//             data = newData;
+//           });
+//       }
+//     });
+//         }
+//       });
+
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -22,7 +48,7 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage>
     with SingleTickerProviderStateMixin/*<-- This is for the controllers*/ {
-  Profile data, newData;
+  Profile data;
   bool loaded = false;
   bool gridView = true;
   String url;
@@ -37,6 +63,7 @@ class _ProfilePageState extends State<ProfilePage>
   @override
   void initState() {
     super.initState();
+    data = data;
     _tabController = TabController(vsync: this, length: 2);
     _scrollViewController = ScrollController();
   }
@@ -175,137 +202,131 @@ class _ProfilePageState extends State<ProfilePage>
 
   @override
   Widget build(BuildContext context) {
-    data = widget.userInfo;
     final userRepo = Provider.of<UserRepository>(context);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        profileAdapter
-            .getProfileSnapshot(userRepo.user)
-            .then((DataSnapshot snapshot) {
-          newData = Profile.fromMap(snapshot.value);
-          print('New Data: ${newData.toJson()}');
-          if (data.toJson() != newData.toJson()) {
-            heightOfFlexSpace = flexibleSpaceHeight.withText(text: data.bio);
-            print('Height of flex: $heightOfFlexSpace');
-            if (mounted)
-              setState(() {
-                data = newData;
-              });
-          }
-        });
-      }
-    });
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        title: Text(
-          data.username,
-          style: TextStyle(fontSize: 16),
-        ),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.menu),
-            onPressed: () {
-              print('menu');
-              Navigator.push(
-                context,
-                CupertinoPageRoute(
-                  builder: (context) => Menu(
-                    userInfo: widget.userInfo,
-                  ),
-                ),
-              );
-            },
-          )
-        ],
-        backgroundColor: Colors.white,
-      ),
-      body: NestedScrollView(
-        controller: _scrollViewController,
-        headerSliverBuilder: (BuildContext context, bool boxIsScrolled) {
-          return <Widget>[
-            SliverAppBar(
-              automaticallyImplyLeading: false,
-              backgroundColor: Colors.white,
-              floating: true,
-              pinned: true,
-              snap: true,
-              expandedHeight: heightOfFlexSpace,
-              flexibleSpace: FlexibleSpaceBar(
-                collapseMode: CollapseMode.pin,
-                background: profileWidget(context, data),
+    return HandleSnapshot(
+      future: profileAdapter.getProfileSnapshot(userRepo.user),
+      builder: (BuildContext context, AsyncSnapshot<DataSnapshot> snapshot) {
+        loaded = true;
+        data = Profile.fromMap(snapshot.data);
+        heightOfFlexSpace = flexibleSpaceHeight.withText(text: data.bio);
+        print('Height of flex: $heightOfFlexSpace');
+        if (data == null) {
+          return Text('There\'s an issue');
+        } else {
+          return Scaffold(
+            appBar: AppBar(
+              elevation: 0,
+              title: Text(
+                data.username,
+                style: TextStyle(fontSize: 16),
               ),
-              bottom: TabBar(
-                tabs: <Widget>[
-                  Tab(
-                    icon: Icon(
-                      Icons.grid_on,
-                      color: Colors.black,
+              actions: <Widget>[
+                IconButton(
+                  icon: Icon(Icons.menu),
+                  onPressed: () {
+                    print('menu');
+                    Navigator.push(
+                      context,
+                      CupertinoPageRoute(
+                        builder: (context) => Menu(
+                          userInfo: widget.userInfo,
+                        ),
+                      ),
+                    );
+                  },
+                )
+              ],
+              backgroundColor: Colors.white,
+            ),
+            body: NestedScrollView(
+              controller: _scrollViewController,
+              headerSliverBuilder: (BuildContext context, bool boxIsScrolled) {
+                return <Widget>[
+                  SliverAppBar(
+                    automaticallyImplyLeading: false,
+                    backgroundColor: Colors.white,
+                    floating: true,
+                    pinned: true,
+                    snap: true,
+                    expandedHeight: heightOfFlexSpace,
+                    flexibleSpace: FlexibleSpaceBar(
+                      collapseMode: CollapseMode.pin,
+                      background: profileWidget(context, data),
+                    ),
+                    bottom: TabBar(
+                      tabs: <Widget>[
+                        Tab(
+                          icon: Icon(
+                            Icons.grid_on,
+                            color: Colors.black,
+                          ),
+                        ),
+                        Tab(
+                          icon: Icon(
+                            Icons.image,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ],
+                      controller: _tabController,
                     ),
                   ),
-                  Tab(
-                    icon: Icon(
-                      Icons.image,
-                      color: Colors.black,
-                    ),
-                  ),
-                ],
-                controller: _tabController,
+                ];
+              },
+              body: Visibility(
+                visible: (widget.userInfo != null),
+                child: (widget.userInfo.posts.isNotEmpty)
+                    ? TabBarView(
+                        controller: _tabController,
+                        children: <Widget>[
+                          new GridView.builder(
+                            physics: AlwaysScrollableScrollPhysics(
+                                parent: BouncingScrollPhysics()),
+                            itemCount: widget.userInfo.posts.length ?? 0,
+                            gridDelegate:
+                                new SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 3),
+                            itemBuilder: (BuildContext context, int index) {
+                              url = (widget.userInfo.posts[index]);
+                              return new Card(
+                                child: new GridTile(
+                                  footer: Text('Caption'),
+                                  child: Container(
+                                    child: new Image.network(
+                                      widget.userInfo.posts[index],
+                                      fit: BoxFit.fitWidth,
+                                    ),
+                                  ), //just for testing, will fill with image later
+                                ),
+                              );
+                            },
+                          ),
+                          GridView.builder(
+                            itemCount: widget.userInfo.posts.length,
+                            gridDelegate:
+                                new SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 1),
+                            itemBuilder: (BuildContext context, int index) {
+                              String url = (widget.userInfo.posts[index]);
+                              return new Card(
+                                child: new GridTile(
+                                  footer: Text('Caption'),
+                                  child: new Image.network(
+                                    widget.userInfo.posts[index],
+                                    fit: BoxFit.fitWidth,
+                                  ), //just for testing, will fill with image later
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      )
+                    : SizedBox(),
               ),
             ),
-          ];
-        },
-        body: Visibility(
-          visible: (widget.userInfo != null),
-          child: (data.posts.isNotEmpty)
-              ? TabBarView(
-                  controller: _tabController,
-                  children: <Widget>[
-                    new GridView.builder(
-                      physics: AlwaysScrollableScrollPhysics(
-                          parent: BouncingScrollPhysics()),
-                      itemCount: data.posts.length ?? 0,
-                      gridDelegate:
-                          new SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 3),
-                      itemBuilder: (BuildContext context, int index) {
-                        url = (data.posts[index]);
-                        return new Card(
-                          child: new GridTile(
-                            footer: Text('Caption'),
-                            child: Container(
-                              child: new Image.network(
-                                data.posts[index],
-                                fit: BoxFit.fitWidth,
-                              ),
-                            ), //just for testing, will fill with image later
-                          ),
-                        );
-                      },
-                    ),
-                    GridView.builder(
-                      itemCount: data.posts.length,
-                      gridDelegate:
-                          new SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 1),
-                      itemBuilder: (BuildContext context, int index) {
-                        String url = (data.posts[index]);
-                        return new Card(
-                          child: new GridTile(
-                            footer: Text('Caption'),
-                            child: new Image.network(
-                              data.posts[index],
-                              fit: BoxFit.fitWidth,
-                            ), //just for testing, will fill with image later
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                )
-              : SizedBox(),
-        ),
-      ),
+          );
+        }
+      },
     );
   }
 }

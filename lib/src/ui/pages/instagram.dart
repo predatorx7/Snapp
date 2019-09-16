@@ -9,11 +9,13 @@ import 'package:instagram/src/models/plain_models/profile.dart';
 import 'package:instagram/src/models/plain_models/user_repo.dart';
 import 'package:instagram/src/models/view_models/feed.dart';
 import 'package:instagram/src/ui/components/handle_view_show.dart';
+import 'package:instagram/src/ui/components/refresher.dart';
 import 'package:instagram/src/ui/pages/home_page.dart';
 import 'package:instagram/src/ui/pages/messages.dart';
 import 'package:instagram/src/ui/pages/story.dart';
 import 'package:instagram/src/ui/pages/upload.dart';
 import 'package:provider/provider.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import 'profile_page.dart';
 
@@ -30,6 +32,8 @@ class _InstagramState extends State<Instagram> {
   bool loaded = false;
   var i;
   DatabaseReference _databaseReference = new FirebaseDatabase().reference();
+  RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
   List<String> followerList;
   ProfileAdapter profileAdapter = ProfileAdapter();
   @override
@@ -38,7 +42,7 @@ class _InstagramState extends State<Instagram> {
   }
 
   Widget homePage(BuildContext context) {
-    if (data.followers.isNotEmpty ) {
+    if (data.followers.isNotEmpty) {
       // && data.followers[1].isNotEmpty
       followerList = data.followers;
       return ListView.builder(
@@ -73,6 +77,7 @@ class _InstagramState extends State<Instagram> {
   Widget build(BuildContext context) {
     final feedModel = Provider.of<FeedModel>(context);
     final userRepo = Provider.of<UserRepository>(context);
+
     return MaterialApp(
       theme: ThemeData(
         cursorColor: Colors.teal,
@@ -175,59 +180,17 @@ class _InstagramState extends State<Instagram> {
             }
           },
         ),
-
-        // body: Column(
-        //   children: <Widget>[
-        //     SizedBox(
-        //       height: 10,
-        //     ),
-        //     Column(
-        //       mainAxisAlignment: MainAxisAlignment.center,
-        //       children: <Widget>[
-        //         Text(
-        //           "Email: ${userRepo.user.email}",
-        //           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        //         ),
-        //         Text(
-        //           "Status: ${userRepo.status}",
-        //           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        //         ),
-        // HandleSnapshot(
-        //   future: profileAdapter.getProfileSnapshot(userRepo.user),
-        //   builder: (BuildContext context,
-        //       AsyncSnapshot<DataSnapshot> snapshot) {
-        //     loaded = true;
-        //     data = Profile.fromMap(snapshot.data);
-        //     for (i = 0; data == null && i < 10; i++) {
-        //       Future.delayed(Duration(seconds: 1), () {
-        //         setState(() {});
-        //       });
-        //     }
-        //     return new Text('Username: ${data.email}');
-        //   },
-        // ),
-        //       ],
-        //     ),
-        //     ButtonBar(
-        //       children: <Widget>[
-        //         OutlineButton(
-        //           borderSide: BorderSide(color: Colors.red),
-        //           highlightedBorderColor: Colors.redAccent,
-        //           textColor: Colors.red,
-        //           child: Text("SIGN OUT"),
-        //           onPressed: () =>
-        //               Provider.of<UserRepository>(context).signOut(),
-        //         )
-        //       ],
-        //     ),
-        //     (data != null) ? homePage(context) : Text('There\'s an issue'),
-        //   ],
-        // ),
         bottomNavigationBar: NavigationBar(
           profiledata: data,
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _refreshController.dispose();
+    super.dispose();
   }
 }
 
@@ -325,6 +288,10 @@ class _NavigationBarState extends State<NavigationBar> {
               child: GestureDetector(
                 onTap: () {
                   setIndex(4);
+                  if (mounted) {
+                    setState(() {});
+                    print('Did setState');
+                  }
                   Navigator.push(
                     context,
                     MaterialPageRoute(

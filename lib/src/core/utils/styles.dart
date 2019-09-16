@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:instagram/src/core/utils/Adapt_widget.dart';
 
 int actionColor = 0xff3897f0;
 
 Color notBlack = Color(0xff262626);
+
+Adapt flexibleSpaceHeight = Adapt(size: 300);
 
 TextStyle headStyle() => TextStyle(
       fontWeight: FontWeight.bold,

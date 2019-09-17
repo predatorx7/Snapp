@@ -61,13 +61,13 @@ class Profile {
     uid = mainData['uid'] ?? '';
     bio = mainData['bio'] ?? '';
     email = mainData['email'] ?? '';
-    followers = mainData['followers'] ?? [];
-    follows = mainData['follows'] ?? [];
+    followers = mainData['followers'] ?? [''];
+    follows = mainData['follows'] ?? [''];
     fullName = mainData['fullName'] ?? '';
     gender = mainData['gender'] ?? '';
     posts = mainData['posts'] ?? [];
     profileImage = mainData['profileImage'] ?? '';
-    stories = mainData['stories'] ?? [];
+    stories = mainData['stories'] ?? [''];
     username = mainData['username'] ?? '';
   }
 

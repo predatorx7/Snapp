@@ -20,8 +20,6 @@ class _StoryPickState extends State<StoryPick> {
   bool hasResult = false;
   void initState() {
     super.initState();
-    WidgetsBinding.instance
-        .addPostFrameCallback((_) => getImage(ImageSource.camera));
   }
 
   dispose() {
@@ -40,17 +38,26 @@ class _StoryPickState extends State<StoryPick> {
 
   @override
   Widget build(BuildContext context) {
-    if (hasResult && _image == null) {
-      Navigator.pop(context);
-      return null;
-    } else {
-      return ChangeNotifierProvider(
-        builder: (_) => UserRepository.instance(),
-        child: UploadStoryStage(
-          image: _image,
+    return ChangeNotifierProvider(
+      builder: (_) => UserRepository.instance(),
+      child: Scaffold(
+        body: (hasResult && _image == null)
+            ? Center(
+                child: Text('Snap a photo for story'),
+              )
+            : UploadStoryStage(
+                image: _image,
+              ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            getImage(ImageSource.camera);
+          },
+          child: Icon(
+            Icons.camera,
+          ),
         ),
-      );
-    }
+      ),
+    );
   }
 }
 

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:instagram/src/models/plain_models/profile.dart';
+import 'package:instagram/src/models/plain_models/information.dart';
+import 'package:provider/provider.dart';
 
 class MessagePage extends StatefulWidget {
-  final Profile profileInformation;
-  const MessagePage({Key key, this.profileInformation})
-      : super(key: key);
+  const MessagePage({Key key}) : super(key: key);
   @override
   _MessagePageState createState() => _MessagePageState();
 }
@@ -12,8 +11,11 @@ class MessagePage extends StatefulWidget {
 class _MessagePageState extends State<MessagePage> {
   @override
   Widget build(BuildContext context) {
+    final _infoProvider = Provider.of<InfoModel>(context);
     return Scaffold(
-      body: Center(child: Text('${widget.profileInformation.email}')),
+      body: Center(
+        child: Text('${_infoProvider.info.email}'),
+      ),
     );
   }
 }

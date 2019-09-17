@@ -1,33 +1,45 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:instagram/src/core/services/handle_snapshot.dart';
 import 'package:instagram/src/core/services/profile_adapter.dart';
 import 'package:instagram/src/core/utils/styles.dart';
+import 'package:instagram/src/models/plain_models/information.dart';
 import 'package:instagram/src/models/plain_models/user_repo.dart';
-import 'package:instagram/src/ui/components/refresher.dart';
-import 'package:instagram/src/ui/components/restart_widget.dart';
 import 'package:provider/provider.dart';
-import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../../models/plain_models/profile.dart';
 
 class ProfilePage extends StatefulWidget {
-  final Profile userInfo;
-
-  const ProfilePage({Key key, this.userInfo}) : super(key: key);
+  const ProfilePage({Key key}) : super(key: key);
   @override
   _ProfilePageState createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage>
+class _ProfilePageState extends State<ProfilePage> {
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      builder: (_) => InfoModel(),
+      child: ChangeNotifierProvider(
+        builder: (_) => UserRepository.instance(),
+        child: ProfileView(),
+      ),
+    );
+  }
+}
+
+class ProfileView extends StatefulWidget {
+  const ProfileView({Key key}) : super(key: key);
+  @override
+  _ProfileViewState createState() => _ProfileViewState();
+}
+
+class _ProfileViewState extends State<ProfileView>
     with SingleTickerProviderStateMixin/*<-- This is for the controllers*/ {
-  Profile data, newData;
+  Profile newData;
   bool loaded = false;
   bool gridView = true;
   String url;
-  RefreshController _refreshController =
-      RefreshController(initialRefresh: false);
   TabController _tabController; // To control switching tabs
   ScrollController _scrollViewController; // To control scrolling
   TextStyle stateful = TextStyle(fontWeight: FontWeight.bold, fontSize: 16);
@@ -49,7 +61,8 @@ class _ProfilePageState extends State<ProfilePage>
   }
 
   Widget profileWidget(BuildContext context, Profile data) {
-    if (widget.userInfo == null) {
+    final _data = Provider.of<InfoModel>(context);
+    if (_data.info == null) {
       return Text(':(');
     }
     print(data.bio);
@@ -175,31 +188,30 @@ class _ProfilePageState extends State<ProfilePage>
 
   @override
   Widget build(BuildContext context) {
-    data = widget.userInfo;
+    final _data = Provider.of<InfoModel>(context);
     final userRepo = Provider.of<UserRepository>(context);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        profileAdapter
-            .getProfileSnapshot(userRepo.user)
-            .then((DataSnapshot snapshot) {
-          newData = Profile.fromMap(snapshot.value);
-          print('New Data: ${newData.toJson()}');
-          if (data.toJson() != newData.toJson()) {
-            heightOfFlexSpace = flexibleSpaceHeight.withText(text: data.bio);
-            print('Height of flex: $heightOfFlexSpace');
-            if (mounted)
-              setState(() {
-                data = newData;
-              });
-          }
-        });
-      }
-    });
+    
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   if (mounted) {
+    //     profileAdapter
+    //         .getProfileSnapshot(userRepo.user)
+    //         .then((DataSnapshot snapshot) {
+    //       newData = Profile.fromMap(snapshot);
+    //       print('New Data: ${newData.toJson()}');
+    //       if (_data.info.toJson() != newData.toJson()) {
+    //         heightOfFlexSpace =
+    //             flexibleSpaceHeight.withText(text: _data.info.bio);
+    //         print('Height of flex: $heightOfFlexSpace');
+    //         _data.modifyInfo(newData);
+    //       }
+    //     });
+    //   }
+    // });
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
         title: Text(
-          data.username,
+          _data.info.username,
           style: TextStyle(fontSize: 16),
         ),
         actions: <Widget>[
@@ -211,7 +223,7 @@ class _ProfilePageState extends State<ProfilePage>
                 context,
                 CupertinoPageRoute(
                   builder: (context) => Menu(
-                    userInfo: widget.userInfo,
+                    userInfo: _data.info,
                   ),
                 ),
               );
@@ -233,7 +245,7 @@ class _ProfilePageState extends State<ProfilePage>
               expandedHeight: heightOfFlexSpace,
               flexibleSpace: FlexibleSpaceBar(
                 collapseMode: CollapseMode.pin,
-                background: profileWidget(context, data),
+                background: profileWidget(context, _data.info),
               ),
               bottom: TabBar(
                 tabs: <Widget>[
@@ -256,26 +268,27 @@ class _ProfilePageState extends State<ProfilePage>
           ];
         },
         body: Visibility(
-          visible: (widget.userInfo != null),
-          child: (data.posts.isNotEmpty)
+          visible: (_data.info != null),
+          child: (_data.info.posts.isNotEmpty)
               ? TabBarView(
                   controller: _tabController,
                   children: <Widget>[
                     new GridView.builder(
                       physics: AlwaysScrollableScrollPhysics(
                           parent: BouncingScrollPhysics()),
-                      itemCount: data.posts.length ?? 0,
+                      itemCount: _data.info.posts.length ?? 0,
                       gridDelegate:
                           new SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 3),
                       itemBuilder: (BuildContext context, int index) {
-                        url = (data.posts[index]);
-                        return new Card(
+                        // url = (data.posts[index]);
+                        url = (_data.info.posts.asMap().toString());
+                        return new Material(
                           child: new GridTile(
                             footer: Text('Caption'),
                             child: Container(
                               child: new Image.network(
-                                data.posts[index],
+                                _data.info.posts[index],
                                 fit: BoxFit.fitWidth,
                               ),
                             ), //just for testing, will fill with image later
@@ -283,18 +296,15 @@ class _ProfilePageState extends State<ProfilePage>
                         );
                       },
                     ),
-                    GridView.builder(
-                      itemCount: data.posts.length,
-                      gridDelegate:
-                          new SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 1),
+                    ListView.builder(
+                      itemCount: _data.info.posts.length,
                       itemBuilder: (BuildContext context, int index) {
-                        String url = (data.posts[index]);
-                        return new Card(
+                        String url = (_data.info.posts.asMap().toString());
+                        return new Material(
                           child: new GridTile(
                             footer: Text('Caption'),
                             child: new Image.network(
-                              data.posts[index],
+                              _data.info.posts[index],
                               fit: BoxFit.fitWidth,
                             ), //just for testing, will fill with image later
                           ),

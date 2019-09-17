@@ -4,7 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:instagram/src/models/plain_models/profile.dart';
 import 'package:instagram/src/ui/components/buttons.dart';
 import 'package:provider/provider.dart';
 
@@ -13,8 +12,7 @@ import '../../models/plain_models/user_repo.dart';
 import 'instagram.dart';
 
 class UploadPage extends StatefulWidget {
-  final Profile profileData;
-  const UploadPage({Key key, this.profileData}) : super(key: key);
+  const UploadPage({Key key}) : super(key: key);
   @override
   _UploadPageState createState() => _UploadPageState();
 }

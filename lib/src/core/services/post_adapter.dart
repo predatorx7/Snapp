@@ -8,6 +8,7 @@ import '../../models/plain_models/profile.dart';
 /// Provides CRUD operations with post info in database
 class PostAdapter {
   FirebaseDatabase _database = new FirebaseDatabase();
+
   /// Creates a new user post in database
   void createPost(_imageURL, FirebaseUser user, String caption) async {
     Post _post = new Post(
@@ -32,7 +33,8 @@ class PostAdapter {
             .child("profiles")
             .child(data.key)
             .child('posts')
-            .set(postList.asMap());
+            .push()
+            .set(_imageURL);
         // .set(data.toJson());
       }
     } catch (e) {
@@ -48,14 +50,16 @@ class PostAdapter {
         .orderByChild("publisher")
         .equalTo(user.uid)
         .once()
-        .then((DataSnapshot snapshot) {
-      if (snapshot.value != null) {
-        return Post.fromMap(snapshot.value, user.uid);
-      } else {
-        print('Couldn\'t get post');
-        return null;
-      }
-    });
+        .then(
+      (DataSnapshot snapshot) {
+        if (snapshot.value != null) {
+          return Post.fromMap(snapshot.value, user.uid);
+        } else {
+          print('Couldn\'t get post');
+          return null;
+        }
+      },
+    );
     return _readData;
   }
 

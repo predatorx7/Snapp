@@ -34,6 +34,7 @@ dependencies:
   pull_to_refresh: 1.5.6
   # for Profile information View
   flutter_sticky_header: 0.3.4
+  shared_preferences: ^0.5.3+4
   # incompatible
   # flutter_video_compress: ^0.3.7+8
 

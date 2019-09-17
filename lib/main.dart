@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:instagram/src/models/plain_models/information.dart';
 import 'package:instagram/src/models/plain_models/user_repo.dart';
 import 'package:instagram/src/ui/pages/register/signup.dart';
 import 'package:instagram/src/ui/pages/login.dart';
@@ -46,9 +47,12 @@ class MyApp extends StatelessWidget {
               case Status.Authenticating:
                 return LoginPage();
               case Status.Authenticated:
-                return ChangeNotifierProvider<FeedModel>(
-                  builder: (_) => FeedModel(),
-                  child: Instagram(),
+                return ChangeNotifierProvider(
+                  builder: (_) => InfoModel(),
+                  child: ChangeNotifierProvider<FeedModel>(
+                    builder: (_) => FeedModel(),
+                    child: Instagram(),
+                  ),
                 );
               case Status.UnRegistered:
               case Status.Registering:

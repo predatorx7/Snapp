@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:instagram/src/core/services/profile_adapter.dart';
-import 'package:instagram/src/core/utils/namegen.dart';
-import 'package:instagram/src/core/utils/validators.dart';
-import 'package:instagram/src/core/utils/styles.dart';
-import 'package:instagram/src/models/plain_models/profile.dart';
-import 'package:instagram/src/ui/components/buttons.dart';
+import 'package:instagram/commons/styles.dart';
+import '../../../core/services/profile.dart';
+import '../../../core/utils/namegen.dart';
+import '../../components/buttons.dart';
+import '../../../models/plain_models/profile.dart';
+import '../../../core/utils/validators.dart';
 
 class ChangeUsername extends StatefulWidget {
   final Profile profileInformation;
@@ -114,7 +114,7 @@ class _ChangeUsernameState extends State<ChangeUsername> {
                           setState(() {
                             _isButtonDisabled = true;
                           });
-                          await ProfileAdapter()
+                          await ProfileService()
                               .updateProfile(profileInformation);
                           _key.currentState.showSnackBar(
                             SnackBar(

@@ -2,10 +2,8 @@ import 'dart:math';
 
 import 'package:firebase_database/firebase_database.dart';
 
-// void main() {
-//   print(genUserID('smushaheed@outlook.com', 'Syed Mushaheed'));
-// }
 class GenerateUsername {
+  /// Uses Random collision resolution to generate Usernames (inefficient but works fine, should do this on backend instead)
   Query _databaseUsernameQuery =
       FirebaseDatabase().reference().child("profiles").orderByChild("username");
 

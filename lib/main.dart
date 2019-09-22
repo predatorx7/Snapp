@@ -1,21 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:instagram_clone/models/plain_models/auth.dart';
+import 'package:instagram/commons/routes.dart';
+import 'package:instagram/commons/styles.dart';
+import 'package:instagram/ui/screens/login.dart';
+import 'package:instagram/ui/screens/registeration/signup_choice_check.dart';
 import 'package:provider/provider.dart';
+import 'models/plain_models/auth.dart';
 
 void main() {
   /// To keep app in Portrait Mode
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-  runApp(MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(builder: (context) => AuthNotifier.instance()),
+      ],
+      child: Root(),
+    ),
+  );
 }
 
-class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+class Root extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      builder: (_) => AuthNotifier.instance(),
-      child: Consumer(
+    return MaterialApp(
+      theme: mainTheme,
+      // initialRoute: '/',
+      onGenerateRoute: generateRoute,
+      home: Consumer(
         builder: (context, AuthNotifier user, _) {
           switch (user.status) {
             case Status.Uninitialized:
@@ -23,10 +35,13 @@ class MyApp extends StatelessWidget {
               break;
             case Status.Unauthenticated:
             case Status.Authenticating:
+              return LoginPage();
               break;
             case Status.Authenticated:
+              return SignUpPage();
               break;
             default:
+              return Splash();
           }
         },
       ),
@@ -37,12 +52,12 @@ class MyApp extends StatelessWidget {
 class Splash extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Material(
-      child: Column(
+    return Scaffold(
+      body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           Text(
-            "WELCOME",
+            "wait",
             style: TextStyle(
                 color: Colors.grey, fontWeight: FontWeight.w900, fontSize: 40),
           ),

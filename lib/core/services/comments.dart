@@ -1,9 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:instagram/src/models/plain_models/comments.dart';
+import '../../models/plain_models/comments.dart';
 
 /// Provides CRUD operations with comment info in database
-class CommentAdapter {
+class CommentService {
   FirebaseDatabase _database = new FirebaseDatabase();
 
   /// Creates a new user comment in database

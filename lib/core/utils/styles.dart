@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:instagram/src/core/utils/Adapt_widget.dart';
+import 'Adapt_widget.dart';
 
 int actionColor = 0xff3897f0;
 

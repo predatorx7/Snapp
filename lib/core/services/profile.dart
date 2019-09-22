@@ -1,10 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:instagram/src/core/utils/namegen.dart';
-import 'package:instagram/src/models/plain_models/profile.dart';
+import '../utils/namegen.dart';
+import '../../models/plain_models/profile.dart';
 
 /// Provides CRUD operations with profile info in database
-class ProfileAdapter {
+class ProfileService {
   FirebaseDatabase _database = new FirebaseDatabase();
 
   /// Creates a new user profile in database

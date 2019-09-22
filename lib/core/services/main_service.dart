@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:instagram/src/core/services/profile_adapter.dart';
+import 'profile.dart';
 
 enum Status {
   // Use for Authentication
@@ -164,7 +164,7 @@ class UserRepository with ChangeNotifier {
       default:
     }
   }
-
+  
   /// Use for Signing up and providing authentication to UserRepo.
   /// Shows SnackBar on error with error message (That's why it needs Scaffold Key)
   Future<bool> signUp(String email, String fullName, String password,
@@ -177,7 +177,7 @@ class UserRepository with ChangeNotifier {
           email: email, password: password);
       _status = Status.Registered;
       notifyListeners();
-      await ProfileAdapter().createProfile(fullName, user);
+      await ProfileService().createProfile(fullName, user);
       _password = password;
 
       return true;

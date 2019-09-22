@@ -1,12 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:instagram/src/core/services/profile_adapter.dart';
-import 'package:instagram/src/models/plain_models/post.dart';
+import 'profile.dart';
+import '../../models/plain_models/post.dart';
 
 import '../../models/plain_models/profile.dart';
 
 /// Provides CRUD operations with post info in database
-class PostAdapter {
+class PostService {
   FirebaseDatabase _database = new FirebaseDatabase();
 
   /// Creates a new user post in database
@@ -21,12 +21,12 @@ class PostAdapter {
           .child("posts/${user.uid}")
           .push()
           .set(_post.toJson());
-      DataSnapshot snapshot = await ProfileAdapter().getProfileSnapshot(user);
+      DataSnapshot snapshot = await ProfileService().getProfileSnapshot(user);
       Profile data = Profile.fromMap(snapshot);
       print(data.posts);
       var postList = data.posts;
       postList.add(_imageURL);
-      ProfileAdapter().updateProfile(data);
+      ProfileService().updateProfile(data);
       if (data != null) {
         await _database
             .reference()

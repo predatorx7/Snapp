@@ -1,3 +1,4 @@
+/// This Adapt Util will give values to the Sliver to Adapt with data in FlexBar
 class Adapt {
   double size;
   Adapt({this.size = 0});

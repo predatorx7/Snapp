@@ -1,4 +1,4 @@
-package org.kootumb_assignment.instagram
+package org.kootumb_assignment.instagram_clone
 
 import android.os.Bundle
 

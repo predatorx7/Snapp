@@ -13,6 +13,7 @@ import 'package:instagram/src/ui/components/handle_view_show.dart';
 import 'package:instagram/src/ui/pages/messages.dart';
 import 'package:instagram/src/ui/pages/story.dart';
 import 'package:instagram/src/ui/pages/upload.dart';
+import 'package:instagram_clone/core/services/profile.dart';
 import 'package:provider/provider.dart';
 
 import 'profile_page.dart';
@@ -27,7 +28,7 @@ class Instagram extends StatefulWidget {
 
 class _InstagramState extends State<Instagram> {
   PageController _page1Controller, _page2Controller;
-  ProfileAdapter profileAdapter = ProfileAdapter();
+  ProfileService profileService = ProfileService();
   int _buttonIndex = 0;
   bool loaded = false;
 
@@ -75,7 +76,7 @@ class _InstagramState extends State<Instagram> {
           controller: _page2Controller,
           children: <Widget>[
             HandleSnapshot(
-              future: profileAdapter.getProfileSnapshot(_userRepo.user),
+              future: profileService.getProfileSnapshot(_userRepo.user),
               builder:
                   (BuildContext context, AsyncSnapshot<DataSnapshot> snapshot) {
                 loaded = true;

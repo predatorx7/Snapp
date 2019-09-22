@@ -1,11 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:instagram/src/core/services/profile_adapter.dart';
-import 'package:instagram/src/models/plain_models/profile.dart';
-import 'package:instagram/src/models/plain_models/story.dart';
+import 'profile.dart';
+import '../../models/plain_models/profile.dart';
+import '../../models/plain_models/story.dart';
 
 /// Provides CRUD operations with story info in database
-class StoryAdapter {
+class StoryService {
   FirebaseDatabase _database = new FirebaseDatabase();
 
   /// Creates a new user story in database
@@ -18,10 +18,10 @@ class StoryAdapter {
 
     try {
       _database.reference().child("storys").push().set(_story.toJson());
-      DataSnapshot snapshot = await ProfileAdapter().getProfileSnapshot(user);
+      DataSnapshot snapshot = await ProfileService().getProfileSnapshot(user);
       Profile data = Profile.fromMap(snapshot);
       data.stories.add(_imageURL);
-      ProfileAdapter().updateProfile(data);
+      ProfileService().updateProfile(data);
     } catch (e) {
       print('An unexpected error occured.\nError: $e');
     }

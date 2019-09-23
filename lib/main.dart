@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:instagram/commons/routes.dart';
 import 'package:instagram/commons/styles.dart';
+import 'package:instagram/models/view_models/signup_page.dart';
+import 'package:instagram/ui/screens/instagram.dart';
 import 'package:instagram/ui/screens/login.dart';
-import 'package:instagram/ui/screens/registeration/signup_choice_check.dart';
 import 'package:provider/provider.dart';
 import 'models/plain_models/auth.dart';
+import 'models/plain_models/information.dart';
+import 'ui/screens/registeration/signup_page.dart';
 
 void main() {
   /// To keep app in Portrait Mode
@@ -14,6 +17,9 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(builder: (context) => AuthNotifier.instance()),
+        ChangeNotifierProvider(builder: (context) => InfoModel()),
+        // Needed for not letting new users go directly to the home
+        ChangeNotifierProvider(builder: (context) => SignUpModel()),
       ],
       child: Root(),
     ),
@@ -23,6 +29,7 @@ void main() {
 class Root extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    var signUp = Provider.of<SignUpModel>(context);
     return MaterialApp(
       theme: mainTheme,
       // initialRoute: '/',
@@ -38,7 +45,11 @@ class Root extends StatelessWidget {
               return LoginPage();
               break;
             case Status.Authenticated:
-              return SignUpPage();
+              if (signUp.signUpStatus == SignUpStatus.Uninitialized) {
+                return Instagram();
+              } else {
+                return SignStep3();
+              }
               break;
             default:
               return Splash();

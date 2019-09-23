@@ -2,7 +2,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:instagram/src/models/plain_models/user_repo.dart';
+import '../../models/plain_models/auth.dart';
 import 'package:provider/provider.dart';
 
 class Dashboard extends StatefulWidget {
@@ -36,7 +36,6 @@ class _DashboardState extends State<Dashboard> {
             ],
           ),
           // Row(children: <Widget>[Text("User ID: ${widget.user.uid}", style: TextStyle(),),],),
-
           ButtonBar(
             children: <Widget>[
               OutlineButton(
@@ -44,7 +43,7 @@ class _DashboardState extends State<Dashboard> {
                 highlightedBorderColor: Colors.redAccent,
                 textColor: Colors.red,
                 child: Text("SIGN OUT"),
-                onPressed: () => Provider.of<UserRepository>(context).signOut(),
+                onPressed: () => Provider.of<AuthNotifier>(context).signOut(),
               )
             ],
           ),

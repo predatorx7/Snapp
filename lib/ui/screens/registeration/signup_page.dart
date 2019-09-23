@@ -125,7 +125,6 @@ class __SignStep1State extends State<_SignStep1> {
 
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<AuthNotifier>(context);
     final signUp = Provider.of<SignUpModel>(context);
     return Scaffold(
       // key: _key,
@@ -225,7 +224,8 @@ class __SignStep1State extends State<_SignStep1> {
                                       email: _usernameController.text,
                                       context: context);
                               if (!emailExists) {
-                                Navigator.pushNamed(context, SignUpStep2Route);
+                                Navigator.pushNamed(context, SignUpStep2Route,
+                                    arguments: _usernameController.text);
                               }
                             }
                           },
@@ -264,6 +264,9 @@ class __SignStep1State extends State<_SignStep1> {
 }
 
 class SignStep2 extends StatefulWidget {
+  final String email;
+
+  const SignStep2({Key key, this.email}) : super(key: key);
   @override
   _SignStep2State createState() => _SignStep2State();
 }
@@ -426,7 +429,7 @@ class _SignStep2State extends State<SignStep2> {
                         }
                         if (validity) {
                           bool result = await RegisterService().signUp(
-                              _signUp.email,
+                              widget.email,
                               _usernameController.text,
                               _passwordController.text,
                               context,

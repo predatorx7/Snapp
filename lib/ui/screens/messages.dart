@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:instagram/src/models/plain_models/information.dart';
+import '../../models/plain_models/information.dart';
 import 'package:provider/provider.dart';
 
 class MessagePage extends StatefulWidget {

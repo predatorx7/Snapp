@@ -4,11 +4,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:instagram/src/ui/components/buttons.dart';
+import '../../core/services/posts.dart';
+import '../../models/plain_models/auth.dart';
+import '../components/buttons.dart';
 import 'package:provider/provider.dart';
-
-import '../../core/services/post_adapter.dart';
-import '../../models/plain_models/user_repo.dart';
 import 'instagram.dart';
 
 class UploadPage extends StatefulWidget {
@@ -218,7 +217,7 @@ class _UploadMediaState extends State<UploadMedia> {
 
   @override
   Widget build(BuildContext context) {
-    final userRepo = Provider.of<UserRepository>(context);
+    final userRepo = Provider.of<AuthNotifier>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -302,6 +301,6 @@ Future uploadFile(File _image, FirebaseUser user, String caption) async {
   await uploadTask.onComplete;
   print('File Uploaded');
   storageReference.getDownloadURL().then((fileURL) {
-    PostAdapter().createPost(fileURL, user, caption);
+    PostService().createPost(fileURL, user, caption);
   });
 }

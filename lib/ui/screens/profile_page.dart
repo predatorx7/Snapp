@@ -1,10 +1,9 @@
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:instagram/src/core/services/profile_adapter.dart';
-import 'package:instagram/src/core/utils/styles.dart';
-import 'package:instagram/src/models/plain_models/information.dart';
-import 'package:instagram/src/models/plain_models/user_repo.dart';
+import '../../commons/styles.dart';
+import '../../core/services/profile.dart';
+import '../../models/plain_models/auth.dart';
+import '../../models/plain_models/information.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/plain_models/profile.dart';
@@ -15,26 +14,7 @@ class ProfilePage extends StatefulWidget {
   _ProfilePageState createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
-  @override
-  Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      builder: (_) => InfoModel(),
-      child: ChangeNotifierProvider(
-        builder: (_) => UserRepository.instance(),
-        child: ProfileView(),
-      ),
-    );
-  }
-}
-
-class ProfileView extends StatefulWidget {
-  const ProfileView({Key key}) : super(key: key);
-  @override
-  _ProfileViewState createState() => _ProfileViewState();
-}
-
-class _ProfileViewState extends State<ProfileView>
+class _ProfilePageState extends State<ProfilePage>
     with SingleTickerProviderStateMixin/*<-- This is for the controllers*/ {
   Profile newData;
   bool loaded = false;
@@ -45,7 +25,7 @@ class _ProfileViewState extends State<ProfileView>
   TextStyle stateful = TextStyle(fontWeight: FontWeight.bold, fontSize: 16);
   TextStyle stateless = TextStyle();
   double heightOfFlexSpace;
-  ProfileAdapter profileAdapter = ProfileAdapter();
+  ProfileService profileAdapter = ProfileService();
   @override
   void initState() {
     super.initState();
@@ -189,8 +169,7 @@ class _ProfileViewState extends State<ProfileView>
   @override
   Widget build(BuildContext context) {
     final _data = Provider.of<InfoModel>(context);
-    final userRepo = Provider.of<UserRepository>(context);
-    
+
     // WidgetsBinding.instance.addPostFrameCallback((_) {
     //   if (mounted) {
     //     profileAdapter
@@ -330,7 +309,7 @@ class Menu extends StatelessWidget {
       body: ListView(
         children: <Widget>[
           ListTile(
-            onTap: () => Provider.of<UserRepository>(context).signOut(),
+            onTap: () => Provider.of<AuthNotifier>(context).signOut(),
             title: Text(
               'Log out of ${userInfo.username}',
               style: TextStyle(

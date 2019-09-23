@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 
-class FeedModel with ChangeNotifier {
+class MessageNotificationModel with ChangeNotifier {
   int _messages = 0;
 
   int getMessageCount() => _messages;

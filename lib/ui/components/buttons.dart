@@ -25,8 +25,8 @@ class _ICFlatButtonState extends State<ICFlatButton> {
       textColor: Colors.white,
       child: widget.conditionForProcessIndicator
           ? CircularProgressIndicator(
-              strokeWidth: 3,
-              backgroundColor: Colors.white,
+              // strokeWidth: 3,
+              // backgroundColor: Colors.white,
               // value: 0,
               // valueColor: new AlwaysStoppedAnimation<Color>(Colors.transparent),
             )

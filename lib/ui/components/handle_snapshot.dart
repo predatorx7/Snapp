@@ -1,10 +1,11 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
+/// Handles Snapshot with custom configurations as a StreamBuilder
 class HandleSnapshot extends StatefulWidget {
-  final Stream<DataSnapshot> future;
+  /// The Future to Handle. (Will convert future to a new single-subscription stream.)
+  final Future<DataSnapshot> future;
   final Widget Function(BuildContext, AsyncSnapshot<DataSnapshot>) builder;
-
   const HandleSnapshot({Key key, this.future, this.builder}) : super(key: key);
 
   @override
@@ -15,7 +16,7 @@ class _HandleSnapshotState extends State<HandleSnapshot> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: widget.future,
+      stream: Stream.fromFuture(widget.future),
       builder: (BuildContext context, AsyncSnapshot<DataSnapshot> snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.waiting:

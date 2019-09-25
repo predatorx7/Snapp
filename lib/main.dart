@@ -9,6 +9,7 @@ import 'package:instagram/ui/screens/login.dart';
 import 'package:provider/provider.dart';
 import 'models/plain_models/auth.dart';
 import 'models/plain_models/information.dart';
+import 'models/view_models/login_page.dart';
 
 void main() {
   /// To keep app in Portrait Mode
@@ -51,7 +52,10 @@ class Root extends StatelessWidget {
               if (snapshot.hasData) {
                 return new Instagram(user: snapshot.data);
               } else {
-                return new LoginPage();
+                return ChangeNotifierProvider(
+                  builder: (context) => LoginPageViewModel(),
+                  child: new LoginPage(),
+                );
               }
               break;
             default:
@@ -77,7 +81,7 @@ class Splash extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             Text(
-              "wait",
+              "Welcome",
               style: TextStyle(
                   color: Colors.grey,
                   fontWeight: FontWeight.w900,
@@ -87,7 +91,7 @@ class Splash extends StatelessWidget {
               padding: const EdgeInsets.only(top: 8.0, bottom: 5),
               child: CircularProgressIndicator(),
             ),
-            Text(data.data.toString()),
+            Text('wait')
           ],
         ),
       ),

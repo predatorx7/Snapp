@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:instagram/commons/routing_constants.dart';
+import 'package:instagram/models/view_models/login_page.dart';
 import '../../commons/styles.dart';
 import '../../models/plain_models/auth.dart';
 import '../components/buttons.dart';
@@ -14,7 +15,8 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   TextEditingController _usernameController, _passwordController;
   GlobalKey<ScaffoldState> _key = GlobalKey<ScaffoldState>();
-  bool _isButtonDisabled = true;
+  AuthNotifier user;
+  LoginPageViewModel view;
   @override
   void initState() {
     super.initState();
@@ -24,6 +26,8 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void dispose() {
+    user.dispose();
+    view.dispose();
     _usernameController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -31,7 +35,8 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<AuthNotifier>(context);
+    user = Provider.of<AuthNotifier>(context);
+    view = Provider.of<LoginPageViewModel>(context, listen: false);
     return Scaffold(
       key: _key,
       body: Stack(
@@ -75,13 +80,9 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         controller: _usernameController,
                         onChanged: (value) {
-                          if (value.isNotEmpty &&
-                              _passwordController.text.isNotEmpty) {
-                            if (_isButtonDisabled)
-                              setState(() => _isButtonDisabled = false);
-                          } else if (!_isButtonDisabled) {
-                            setState(() => _isButtonDisabled = true);
-                          }
+                          view.validateInput(
+                              value: value,
+                              textController: _passwordController);
                         },
                         cursorWidth: 0.75,
                         cursorColor: Colors.grey,
@@ -100,13 +101,9 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         controller: _passwordController,
                         onChanged: (value) {
-                          if (value.isNotEmpty &&
-                              _usernameController.text.isNotEmpty) {
-                            if (_isButtonDisabled)
-                              setState(() => _isButtonDisabled = false);
-                          } else if (!_isButtonDisabled) {
-                            setState(() => _isButtonDisabled = true);
-                          }
+                          view.validateInput(
+                              value: value,
+                              textController: _usernameController);
                         },
                         obscureText: true,
                         cursorWidth: 0.75,
@@ -119,22 +116,32 @@ class _LoginPageState extends State<LoginPage> {
                       Container(
                         height: 46,
                         width: double.infinity,
-                        child: ICFlatButton(
-                          conditionForProcessIndicator:
-                              user.status == Status.Authenticating,
-                          text: 'Log In',
-                          onPressed: _isButtonDisabled
-                              ? null
-                              : () async {
-                                  if (await user.signIn(
-                                      _usernameController.text,
-                                      _passwordController.text,
-                                      _key)) {
-                                    print('[Success] Logging in');
-                                    Navigator.pushReplacementNamed(
-                                        context, HomeRoute);
-                                  }
-                                },
+                        child: Consumer<LoginPageViewModel>(
+                          builder: (BuildContext context,
+                              LoginPageViewModel _view, _) {
+                            return ICFlatButton(
+                              conditionForProcessIndicator:
+                                  user.status == Status.Authenticating,
+                              text: 'Log In',
+                              onPressed: _view.isButtonDisabled
+                                  ? null
+                                  : () async {
+                                      if (await user.signIn(
+                                          _usernameController.text,
+                                          _passwordController.text,
+                                          _key)) {
+                                        print('[Success] Logging in');
+                                        Scaffold.of(context).showSnackBar(
+                                          SnackBar(
+                                            content: Text('Signed in'),
+                                          ),
+                                        );
+                                        // Navigator.pushReplacementNamed(
+                                        //     context, HomeRoute);
+                                      }
+                                    },
+                            );
+                          },
                         ),
                       ),
                       SizedBox(

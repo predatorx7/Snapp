@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:instagram/commons/routing_constants.dart';
 import 'package:instagram/models/plain_models/information.dart';
+import 'package:instagram/models/view_models/login_page.dart';
 import 'package:instagram/models/view_models/message_notification.dart';
 import 'package:instagram/ui/screens/instagram.dart';
 import 'package:instagram/ui/screens/login.dart';
@@ -16,7 +17,12 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case '/':
       return MaterialPageRoute(builder: (context) => Root());
     case LoginRoute:
-      return MaterialPageRoute(builder: (context) => LoginPage());
+      return MaterialPageRoute(
+        builder: (context) => ChangeNotifierProvider(
+          builder: (context) => LoginPageViewModel(),
+          child: new LoginPage(),
+        ),
+      );
     case HomeRoute:
       return MaterialPageRoute(
         builder: (context) => ChangeNotifierProvider(

@@ -8,6 +8,8 @@ import 'package:instagram/commons/styles.dart';
 import 'package:instagram/models/plain_models/auth.dart';
 import 'package:instagram/models/plain_models/information.dart';
 import 'package:instagram/models/plain_models/profile.dart';
+import 'package:instagram/ui/components/noback.dart';
+import 'package:instagram/ui/screens/profile_page.dart';
 import '../../ui/components/handle_snapshot.dart';
 import '../../core/services/profile.dart';
 import 'package:provider/provider.dart';
@@ -24,11 +26,17 @@ class Instagram extends StatefulWidget {
 
 class _InstagramState extends State<Instagram> {
   PageController _pageController;
-  ProfileService profileService = ProfileService();
+  ProfileService profileService;
   Widget widgetForBody = HomeView();
   // Change with Profile Page and Back to HomeView()
   int _buttonIndex = 0;
-  bool loaded = false;
+
+  @override
+  void initState() {
+    _pageController = PageController();
+    profileService = ProfileService();
+    super.initState();
+  }
 
   _setIndex(int index) {
     setState(() {
@@ -52,12 +60,9 @@ class _InstagramState extends State<Instagram> {
       theme: mainTheme,
       home: Scaffold(
         body: HandleSnapshot(
-          future: Stream.fromFuture(
-            profileService.getProfileSnapshot(_userRepo.user),
-          ),
+          future: profileService.getProfileSnapshot(_userRepo.user),
           builder:
               (BuildContext context, AsyncSnapshot<DataSnapshot> snapshot) {
-            loaded = true;
             data.info = Profile.fromMap(snapshot.data);
             if (data != null) {
               return widgetForBody;
@@ -95,6 +100,9 @@ class _InstagramState extends State<Instagram> {
                 Expanded(
                   child: GestureDetector(
                     onTap: () => _setIndex(1),
+                    onLongPress: () {
+                      _userRepo.signOut();
+                    },
                     child: Image(
                       image: AssetImage(
                           'assets/res_icons/search${_isOutlineOrFilled(1)}.png'),
@@ -145,5 +153,66 @@ class _InstagramState extends State<Instagram> {
   void dispose() {
     _pageController.dispose();
     super.dispose();
+  }
+}
+
+class _InstagramStateX extends State<Instagram>
+    with SingleTickerProviderStateMixin {
+  TabController _viewController;
+  ProfileService profileService;
+  @override
+  void initState() {
+    _viewController = TabController(vsync: this, length: 2);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _viewController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final _userRepo = Provider.of<AuthNotifier>(context);
+    final data = Provider.of<InfoModel>(context);
+    return MaterialApp(
+      theme: mainTheme,
+      home: NoBack(
+        child: Scaffold(
+          body: HandleSnapshot(
+            future: profileService.getProfileSnapshot(_userRepo.user),
+            builder:
+                (BuildContext context, AsyncSnapshot<DataSnapshot> snapshot) {
+              data.info = Profile.fromMap(snapshot.data);
+              if (data != null) {
+                return TabBarView(
+                  controller: _viewController,
+                  children: <Widget>[
+                    HomeView(),
+                    ProfilePage(),
+                  ],
+                );
+              } else {
+                return Text('There\'s an issue');
+              }
+            },
+          ),
+          bottomNavigationBar: BottomNavigationBar(
+            items: [
+              BottomNavigationBarItem(
+                /// TODO: ADD NAVBAR ITEMS
+                icon: Image(
+                  image: AssetImage('assets/res_icons/homeOutline.png'),
+                ),
+                activeIcon: Image(
+                  image: AssetImage('assets/res_icons/homeFilled.png'),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

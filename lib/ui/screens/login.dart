@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:instagram/commons/routing_constants.dart';
 import '../../commons/styles.dart';
 import '../../models/plain_models/auth.dart';
 import '../components/buttons.dart';
@@ -125,13 +126,14 @@ class _LoginPageState extends State<LoginPage> {
                           onPressed: _isButtonDisabled
                               ? null
                               : () async {
-                                  // TODO
-                                  // if (await user.signIn(
-                                  //     _usernameController.text,
-                                  //     _passwordController.text,
-                                  //     _key)) {
-                                  //   print('Logging in');
-                                  // }
+                                  if (await user.signIn(
+                                      _usernameController.text,
+                                      _passwordController.text,
+                                      _key)) {
+                                    print('[Success] Logging in');
+                                    Navigator.pushReplacementNamed(
+                                        context, HomeRoute);
+                                  }
                                 },
                         ),
                       ),

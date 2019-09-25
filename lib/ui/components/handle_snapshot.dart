@@ -2,7 +2,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
 class HandleSnapshot extends StatefulWidget {
-  final Future<DataSnapshot> future;
+  final Stream<DataSnapshot> future;
   final Widget Function(BuildContext, AsyncSnapshot<DataSnapshot>) builder;
 
   const HandleSnapshot({Key key, this.future, this.builder}) : super(key: key);
@@ -14,8 +14,8 @@ class HandleSnapshot extends StatefulWidget {
 class _HandleSnapshotState extends State<HandleSnapshot> {
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: widget.future,
+    return StreamBuilder(
+      stream: widget.future,
       builder: (BuildContext context, AsyncSnapshot<DataSnapshot> snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.waiting:
@@ -31,9 +31,6 @@ class _HandleSnapshotState extends State<HandleSnapshot> {
               return new Text('Error: ${snapshot.error}');
             else {
               if (!snapshot.hasData) {
-                Future.delayed(Duration(seconds: 1), () {
-                  setState(() {});
-                });
                 return Text(':(');
               } else {
                 return widget.builder(context, snapshot);

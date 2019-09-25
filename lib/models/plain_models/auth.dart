@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -15,13 +16,61 @@ class AuthNotifier with ChangeNotifier {
   Status get status => _status;
   FirebaseUser get user => _user;
 
-  Future<bool> signIn(String email, String password) async {
+  /// Update Auth Status Manually
+  void setAuthStatus(Status authStatus) {
+    _status = authStatus;
+    notifyListeners();
+  }
+
+  /// Used for Signing in and providing authentication to UserRepo.
+  /// Shows SnackBar on error with error message (That's why it needs Scaffold Key)
+  Future<bool> signIn(
+      String email, String password, GlobalKey<ScaffoldState> key) async {
+    /// Check for userIds in database. Get it's email and use that to login. Else, follow.
+    if (!email.contains('@')) email = email + '@instac.com';
+    print('$email : $password');
     try {
+      // Starting Authentication
       _status = Status.Authenticating;
       notifyListeners();
       await _auth.signInWithEmailAndPassword(email: email, password: password);
+      // Will not return if error caught.
       return true;
-    } catch (e) {
+    } catch (error) {
+      var errorText;
+      print(error);
+      switch (error.code) {
+        case 'ERROR_INVALID_EMAIL':
+          errorText = "Email or Username is invalid";
+          break;
+        case 'ERROR_WRONG_PASSWORD':
+          errorText = "Password is wrong";
+          break;
+        case 'ERROR_USER_NOT_FOUND':
+          errorText = "Cannot find user";
+          break;
+        case 'ERROR_USER_DISABLED':
+          errorText = "Account disabled";
+          break;
+        case 'ERROR_TOO_MANY_REQUESTS':
+          errorText = "Too many requests";
+          break;
+        case 'ERROR_OPERATION_NOT_ALLOWED':
+          errorText = "Operation not allowed";
+          break;
+        default:
+          errorText = "Something went wrong";
+      }
+      key.currentState.showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.red,
+          content: Text(
+            errorText,
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+      );
+      // Authentication failed
       _status = Status.Unauthenticated;
       notifyListeners();
       return false;
@@ -32,6 +81,7 @@ class AuthNotifier with ChangeNotifier {
     _auth.signOut();
     _status = Status.Unauthenticated;
     notifyListeners();
+    // Returning a future to allow await to let the listeners work properly.
     return Future.delayed(Duration.zero);
   }
 

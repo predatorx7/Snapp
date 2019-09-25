@@ -85,7 +85,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final _feedModel = Provider.of<MessageNotificationModel>(context);
     return Scaffold(
       appBar: AppBar(
         title: Container(
@@ -133,24 +132,32 @@ class _HomePageState extends State<HomePage> {
                     image: AssetImage('assets/res_icons/directOutline.png'),
                   ),
                 ),
-                Visibility(
-                  visible: _feedModel.getMessageCount() != 0,
-                  child: Positioned(
-                    right: 5,
-                    top: 5,
-                    child: Container(
-                      padding: const EdgeInsets.all(5.0),
-                      decoration: BoxDecoration(
-                        color: Colors.redAccent,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Text(
-                        '${_feedModel.getMessageCount()}',
-                        style: TextStyle(
-                          fontSize: 12,
+                ChangeNotifierProvider(
+                  builder: (context) => MessageNotificationModel(),
+                  child: Consumer(
+                    builder: (BuildContext context,
+                        MessageNotificationModel _feedModel, _) {
+                      return Visibility(
+                        visible: _feedModel.getMessageCount() != 0,
+                        child: Positioned(
+                          right: 5,
+                          top: 5,
+                          child: Container(
+                            padding: const EdgeInsets.all(5.0),
+                            decoration: BoxDecoration(
+                              color: Colors.redAccent,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Text(
+                              '${_feedModel.getMessageCount()}',
+                              style: TextStyle(
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
+                      );
+                    },
                   ),
                 ),
               ],

@@ -52,7 +52,9 @@ class _InstagramState extends State<Instagram> {
       theme: mainTheme,
       home: Scaffold(
         body: HandleSnapshot(
-          future: profileService.getProfileSnapshot(_userRepo.user),
+          future: Stream.fromFuture(
+            profileService.getProfileSnapshot(_userRepo.user),
+          ),
           builder:
               (BuildContext context, AsyncSnapshot<DataSnapshot> snapshot) {
             loaded = true;

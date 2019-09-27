@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:instagram/commons/routing_constants.dart';
-import 'package:instagram/models/plain_models/information.dart';
-import 'package:instagram/models/view_models/login_page.dart';
-import 'package:instagram/models/view_models/message_notification.dart';
-import 'package:instagram/ui/screens/instagram.dart';
-import 'package:instagram/ui/screens/login.dart';
-import 'package:instagram/ui/screens/profile_page.dart';
-import 'package:instagram/ui/screens/registeration/signup_page.dart';
-import 'package:instagram/ui/screens/upload.dart';
+import 'routing_constants.dart';
+import '../models/plain_models/information.dart';
+import '../models/view_models/login_page.dart';
+import '../models/view_models/message_notification.dart';
+import '../models/view_models/signup_page.dart';
+import '../ui/screens/instagram.dart';
+import '../ui/screens/login.dart';
+import '../ui/screens/profile_page.dart';
+import '../ui/screens/registeration/signup_page.dart';
+import '../ui/screens/upload.dart';
 import 'package:provider/provider.dart';
 
 import '../main.dart';
@@ -31,7 +32,12 @@ Route<dynamic> generateRoute(RouteSettings settings) {
         ),
       );
     case SignUpRoute:
-      return MaterialPageRoute(builder: (context) => SignUpPage());
+      return MaterialPageRoute(
+        builder: (context) => ChangeNotifierProvider(
+          builder: (context) => SignUpViewModel(),
+          child: new SignUpPage(),
+        ),
+      );
     case SignUpStep2Route:
       return MaterialPageRoute(
         builder: (context) => SignStep2(

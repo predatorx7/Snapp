@@ -125,7 +125,7 @@ class __SignStep1State extends State<_SignStep1> {
 
   @override
   Widget build(BuildContext context) {
-    final signUp = Provider.of<SignUpModel>(context);
+    final signUp = Provider.of<SignUpViewModel>(context);
     return Scaffold(
       // key: _key,
       body: Stack(
@@ -294,7 +294,7 @@ class _SignStep2State extends State<SignStep2> {
 
   @override
   Widget build(BuildContext context) {
-    final _signUp = Provider.of<SignUpModel>(context);
+    final _signUp = Provider.of<SignUpViewModel>(context);
     final _auth = Provider.of<AuthNotifier>(context);
     return Scaffold(
       key: _key,

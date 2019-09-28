@@ -8,6 +8,7 @@ import 'package:instagram/commons/styles.dart';
 import 'package:instagram/models/plain_models/auth.dart';
 import 'package:instagram/models/plain_models/information.dart';
 import 'package:instagram/models/plain_models/profile.dart';
+import 'package:instagram/ui/components/custom_bottomnavbar_item.dart';
 import 'package:instagram/ui/components/noback.dart';
 import 'package:instagram/ui/screens/profile_page.dart';
 import '../../ui/components/handle_snapshot.dart';
@@ -24,7 +25,7 @@ class Instagram extends StatefulWidget {
   _InstagramState createState() => _InstagramState();
 }
 
-class _InstagramState extends State<Instagram> {
+class _InstagramStateX extends State<Instagram> {
   PageController _pageController;
   ProfileService profileService;
   Widget widgetForBody = HomeView();
@@ -156,19 +157,16 @@ class _InstagramState extends State<Instagram> {
   }
 }
 
-class _InstagramStateX extends State<Instagram>
+class _InstagramState extends State<Instagram>
     with SingleTickerProviderStateMixin {
-  TabController _viewController;
-  ProfileService profileService;
+  int _viewIndex = 0;
   @override
   void initState() {
-    _viewController = TabController(vsync: this, length: 2);
     super.initState();
   }
 
   @override
   void dispose() {
-    _viewController.dispose();
     super.dispose();
   }
 
@@ -176,21 +174,55 @@ class _InstagramStateX extends State<Instagram>
   Widget build(BuildContext context) {
     final _userRepo = Provider.of<AuthNotifier>(context);
     final data = Provider.of<InfoModel>(context);
+    print('[Instagram] ${_userRepo.user}');
     return MaterialApp(
       theme: mainTheme,
       home: NoBack(
         child: Scaffold(
           body: HandleSnapshot(
-            future: profileService.getProfileSnapshot(_userRepo.user),
+            future: ProfileService().getProfileSnapshot(_userRepo.user),
             builder:
                 (BuildContext context, AsyncSnapshot<DataSnapshot> snapshot) {
               data.info = Profile.fromMap(snapshot.data);
               if (data != null) {
-                return TabBarView(
-                  controller: _viewController,
+                return Stack(
                   children: <Widget>[
-                    HomeView(),
-                    ProfilePage(),
+                    new Offstage(
+                      offstage: _viewIndex != 0,
+                      child: new TickerMode(
+                        enabled: _viewIndex == 0,
+                        child: new HomeView(),
+                      ),
+                    ),
+                    new Offstage(
+                      offstage: _viewIndex != 1,
+                      child: new TickerMode(
+                        enabled: _viewIndex == 1,
+                        child: new MaterialApp(
+                          home: new Center(
+                            child: Text('Search Page'),
+                          ),
+                        ),
+                      ),
+                    ),
+                    new Offstage(
+                      offstage: _viewIndex != 3,
+                      child: new TickerMode(
+                        enabled: _viewIndex == 3,
+                        child: new MaterialApp(
+                          home: new Center(
+                            child: Text('Notification Page'),
+                          ),
+                        ),
+                      ),
+                    ),
+                    new Offstage(
+                      offstage: _viewIndex != 4,
+                      child: new TickerMode(
+                        enabled: _viewIndex == 4,
+                        child: new ProfilePage(),
+                      ),
+                    ),
                   ],
                 );
               } else {
@@ -199,16 +231,58 @@ class _InstagramStateX extends State<Instagram>
             },
           ),
           bottomNavigationBar: BottomNavigationBar(
+            currentIndex: _viewIndex,
+            showSelectedLabels: false,
+            showUnselectedLabels: false,
+            onTap: (indexOfNavBarItem) {
+              switch (indexOfNavBarItem) {
+                case 0:
+                  setState(() {
+                    _viewIndex = 0;
+                  });
+                  break;
+                case 1:
+                  setState(() {
+                    _viewIndex = 1;
+                  });
+                  break;
+                case 2:
+                  Navigator.of(context).pushNamed(UploadPostRoute);
+                  break;
+                case 3:
+                  setState(() {
+                    _viewIndex = 2;
+                  });
+                  break;
+                case 4:
+                  setState(() {
+                    _viewIndex = 3;
+                  });
+                  break;
+                default:
+              }
+            },
             items: [
+              icBottomNavBarItem(
+                  iconImageAddress: 'assets/res_icons/homeOutline.png',
+                  activeIconImageAddress: 'assets/res_icons/homeFilled.png'),
+              icBottomNavBarItem(
+                  iconImageAddress: 'assets/res_icons/searchOutline.png',
+                  activeIconImageAddress: 'assets/res_icons/searchFilled.png'),
               BottomNavigationBarItem(
-                /// TODO: ADD NAVBAR ITEMS
-                icon: Image(
-                  image: AssetImage('assets/res_icons/homeOutline.png'),
+                title: Container(
+                  height: 0,
                 ),
-                activeIcon: Image(
-                  image: AssetImage('assets/res_icons/homeFilled.png'),
+                icon: Image(
+                  image: AssetImage('assets/res_icons/newPost.png'),
                 ),
               ),
+              icBottomNavBarItem(
+                  iconImageAddress: 'assets/res_icons/heartOutline.png',
+                  activeIconImageAddress: 'assets/res_icons/heartFilled.png'),
+              icBottomNavBarItem(
+                  iconImageAddress: 'assets/res_icons/userOutline.png',
+                  activeIconImageAddress: 'assets/res_icons/userFilled.png'),
             ],
           ),
         ),

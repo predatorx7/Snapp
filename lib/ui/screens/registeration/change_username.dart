@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:instagram/commons/styles.dart';
+import 'package:instagram/models/view_models/change_username.dart';
+import 'package:instagram/models/view_models/signup_page.dart';
+import 'package:provider/provider.dart';
 import '../../../core/services/profile.dart';
 import '../../../core/utils/namegen.dart';
 import '../../components/buttons.dart';
@@ -7,29 +10,44 @@ import '../../../models/plain_models/profile.dart';
 import '../../../core/utils/validators.dart';
 
 class ChangeUsername extends StatefulWidget {
-  final Profile profileInformation;
-  ChangeUsername({Key key, @required this.profileInformation})
-      : super(key: key);
+  final bool authenticated;
+  ChangeUsername({Key key, this.authenticated = false}) : super(key: key);
   @override
   _ChangeUsernameState createState() => _ChangeUsernameState();
 }
 
 class _ChangeUsernameState extends State<ChangeUsername> {
   TextEditingController _usernameController;
-  bool _isButtonDisabled = true, valid = true;
   GlobalKey<ScaffoldState> _key = GlobalKey<ScaffoldState>();
-  String _errorText;
   FocusNode _focusPassword;
+  SignUp3ViewModel _fromSignUp;
+  ChangeUsernameViewModel _view;
+  bool updatedUsername = false;
 
   @override
   void initState() {
-    super.initState();
     _usernameController = new TextEditingController();
     _focusPassword = FocusNode();
+    super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    _fromSignUp = Provider.of<SignUp3ViewModel>(context);
+    _view = Provider.of<ChangeUsernameViewModel>(context);
+    if (!updatedUsername) {
+      if (!widget.authenticated) {
+        _view.setUsername(_fromSignUp.username);
+      }
+      updatedUsername = true;
+    }
+    super.didChangeDependencies();
   }
 
   @override
   void dispose() {
+    _fromSignUp.dispose();
+    _view.dispose();
     _usernameController.dispose();
     _focusPassword.dispose();
     super.dispose();
@@ -37,7 +55,8 @@ class _ChangeUsernameState extends State<ChangeUsername> {
 
   @override
   Widget build(BuildContext context) {
-    Profile profileInformation = widget.profileInformation;
+    // Profile profileUsername = widget.profileUsername;
+
     return Scaffold(
       key: _key,
       body: Padding(
@@ -71,27 +90,26 @@ class _ChangeUsernameState extends State<ChangeUsername> {
               controller: _usernameController,
               onChanged: (value) {
                 if (value.length <= 6) {
-                  valid = false;
-                  if (!_isButtonDisabled)
-                    setState(() => _isButtonDisabled = true);
+                  _view.setValidity(false);
+                  if (!_view.isButtonDisabled) _view.toggleButton(true);
                 } else if (!Validator3000().isIdValid(value)) {
-                  valid = false;
-                  if (!_isButtonDisabled)
-                    setState(() => {
-                          _errorText = 'Username $value is invalid.',
-                          _isButtonDisabled = true
-                        });
+                  _view.setValidity(false);
+                  if (!_view.isButtonDisabled) {
+                    _view.setErrorText('Username $value is invalid.');
+                    _view.toggleButton(true);
+                  }
                 } else {
-                  if (_isButtonDisabled)
-                    setState(
-                        () => {_errorText = null, _isButtonDisabled = false});
+                  if (_view.isButtonDisabled) {
+                    _view.setErrorText(null);
+                    _view.toggleButton(false);
+                  }
                 }
               },
               cursorWidth: 0.75,
               cursorColor: Colors.grey,
               decoration: outlineTextField(
                 hintText: 'Username',
-                errorText: _errorText,
+                errorText: _view.errorText,
               ),
             ),
             SizedBox(
@@ -102,34 +120,50 @@ class _ChangeUsernameState extends State<ChangeUsername> {
               width: double.infinity,
               child: ICFlatButton(
                 text: 'Next',
-                onPressed: _isButtonDisabled
+                onPressed: _view.isButtonDisabled
                     ? null
                     : () async {
+                        // Checking Username availability
                         if (GenerateUsername().checkAvailability(
                                 [_usernameController.text]) !=
                             null) {
-                          profileInformation.username =
-                              _usernameController.text;
-                          print(profileInformation.username);
-                          setState(() {
-                            _isButtonDisabled = true;
-                          });
-                          await ProfileService()
-                              .updateProfile(profileInformation);
-                          _key.currentState.showSnackBar(
-                            SnackBar(
-                              backgroundColor: Colors.green,
-                              content: Text(
-                                  'Username changed to ${_usernameController.text}'),
-                            ),
-                          );
+                          // Username available
+                          _view.setUsername(_usernameController.text);
+                          print(_view.username);
+                          _view.toggleButton(true);
+                          if (widget.authenticated) {
+                            print(
+                                '[Change Username Page] Authenticated user: Updating Username');
+                            await ProfileService().updateProfile(
+                                Profile(username: _view.username));
+                            _key.currentState.showSnackBar(
+                              SnackBar(
+                                backgroundColor: Colors.green,
+                                content: Text(
+                                    'Username updated to ${_usernameController.text}'),
+                              ),
+                            );
+                          } else {
+                            print(
+                                '[Change Username Page] Unauthenticated user: Changing Username');
+                            _fromSignUp.setUsername(_usernameController.text);
+                            _key.currentState.showSnackBar(
+                              SnackBar(
+                                backgroundColor: Colors.green,
+                                content: Text(
+                                  'Username changed to ${_usernameController.text}',
+                                ),
+                              ),
+                            );
+                          }
                           Navigator.pop(context);
                         } else {
                           _key.currentState.showSnackBar(
                             SnackBar(
                               backgroundColor: Colors.red,
                               content: Text(
-                                  'Username ${_usernameController.text} is already taken by someone else'),
+                                'Username ${_usernameController.text} is already taken by someone else',
+                              ),
                             ),
                           );
                         }

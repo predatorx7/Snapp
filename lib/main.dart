@@ -25,7 +25,7 @@ void main() {
         ),
         // Needed for not letting new users go directly to the home
         ChangeNotifierProvider(
-          builder: (context) => SignUpModel(),
+          builder: (context) => SignUpViewModel(),
         ),
       ],
       child: Root(),
@@ -41,29 +41,47 @@ class Root extends StatelessWidget {
       // Specify Initial route
       // initialRoute: '/',
       onGenerateRoute: generateRoute,
-      home: StreamBuilder(
-        stream: FirebaseAuth.instance.onAuthStateChanged,
-        builder: (BuildContext context, AsyncSnapshot<FirebaseUser> snapshot) {
-          switch (snapshot.connectionState) {
-            // When uninitialized
-            case ConnectionState.waiting:
-              return new Splash(data: snapshot);
-            case ConnectionState.active:
-              if (snapshot.hasData) {
-                return new Instagram(user: snapshot.data);
-              } else {
-                return ChangeNotifierProvider(
+      home: Consumer(
+        builder: (context, AuthNotifier userAuth, _) {
+          switch (userAuth.status) {
+            case Status.Uninitialized:
+              return Splash();
+            case Status.Unauthenticated:
+            case Status.Authenticating:
+              return ChangeNotifierProvider(
                   builder: (context) => LoginPageViewModel(),
                   child: new LoginPage(),
                 );
-              }
-              break;
+            case Status.Authenticated:
+              return Instagram(user: userAuth.user);
             default:
-              // Snapshot has Error
-              return new Text('Error: ${snapshot.error}');
+            return new Text('Error');
           }
         },
       ),
+      // home: StreamBuilder(
+      //   stream: FirebaseAuth.instance.onAuthStateChanged,
+      //   builder: (BuildContext context, AsyncSnapshot<FirebaseUser> snapshot) {
+      //     switch (snapshot.connectionState) {
+      //       // When uninitialized
+      //       case ConnectionState.waiting:
+      //         return new Splash(data: snapshot);
+      //       case ConnectionState.active:
+      //         if (snapshot.hasData) {
+      //           return new Instagram(user: snapshot.data);
+      //         } else {
+      //           return ChangeNotifierProvider(
+      //             builder: (context) => LoginPageViewModel(),
+      //             child: new LoginPage(),
+      //           );
+      //         }
+      //         break;
+      //       default:
+      //         // Snapshot has Error
+      //         return new Text('Error: ${snapshot.error}');
+      //     }
+      //   },
+      // ),
     );
   }
 }

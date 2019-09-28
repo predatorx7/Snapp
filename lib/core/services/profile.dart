@@ -6,13 +6,13 @@ import '../../models/plain_models/profile.dart';
 /// Provides CRUD operations with profile info in database
 class ProfileService {
   FirebaseDatabase _database = new FirebaseDatabase();
-
+  FirebaseUser _user;
   /// Creates a new user profile in database
-  Future createProfile(_fullName, FirebaseUser user) async {
-    print('Creating profile for $_fullName');
-    String _username;
-    var getAvailableUsername = GenerateUsername();
-    _username = await getAvailableUsername.getUserID(user.email, _fullName);
+  Future createProfile(
+      String _fullName, FirebaseUser user, String _username) async {
+    print(
+        '[Profile Service] Creating profile for Full Name: $_fullName, username: $_username');
+
     Profile _profile = new Profile(
         email: user.email,
         fullName: _fullName,
@@ -20,7 +20,7 @@ class ProfileService {
         uid: user.uid,
         username: _username);
 
-    print('Pushing profile to database: ${_profile.toJson()}');
+    print('[Profile Service] Pushing profile to database: ${_profile.toJson()}');
 
     try {
       await _database
@@ -28,10 +28,17 @@ class ProfileService {
           .child("profiles/${user.uid}")
           .set(_profile.toJson());
       print(
-          'Profile creation successful: username: $_username for ${user.email}');
+          '[Profile Service] Profile creation successful: username: $_username for ${user.email}');
     } catch (e) {
-      print('An unexpected error occured.\nError: $e');
+      print('[Profile Service] An unexpected error occured.\nError: $e');
     }
+  }
+
+  Future<String> autoUsername(String email, String fullName) async {
+    String _username;
+    var getAvailableUsername = GenerateUsername();
+    _username = await getAvailableUsername.getUserID(email, fullName);
+    return _username;
   }
 
   Future<DataSnapshot> getProfileSnapshot(FirebaseUser user) async {
@@ -40,7 +47,7 @@ class ProfileService {
         .reference()
         .child("profiles")
         .orderByChild("email")
-        .equalTo(user.email)//.reference()
+        .equalTo(user.email) //.reference()
         .once()
         .then((DataSnapshot snapshot) {
       if (snapshot.value != null) {

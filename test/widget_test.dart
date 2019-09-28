@@ -44,9 +44,29 @@
 ///```
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter/material.dart';
+import 'package:instagram/main.dart' as prefix1;
 
 void main() {
   //setUp(EntryState().enableSignUpButton());
+  testWidgets('smoke test', (WidgetTester tester) async {
+    // Build our app and trigger a frame.
+    await tester.pumpWidget((prefix1.Root()));
+    // Iterable<Element> ele = tester.allElements;
+
+    print(tester.allWidgets);
+    await tester.pump();
+    // print(ele);
+    // await tester.tap(find.byType(RaisedButton));
+    // await tester.pump();
+    // expect(find.text('New text'), findsOneWidget);
+    // await tester.enterText(find.byType(TextField), 'I am a text');
+    // await tester.pump();
+    // expect(find.text('I am a test'), findsOneWidget);
+    // await tester.tap(find.byType(RaisedButton));
+    // await tester.pump();
+    // expect(find.text('New text'), findsOneWidget);
+  });
   /*
   testWidgets('smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.

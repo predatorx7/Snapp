@@ -1,9 +1,7 @@
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:instagram/commons/routing_constants.dart';
-import 'package:instagram/core/services/registration_service.dart';
+import '../../../commons/routing_constants.dart';
+import '../../../core/services/registration_service.dart';
 import '../../../core/services/profile.dart';
-import '../../../models/plain_models/profile.dart';
 import '../../../models/view_models/signup_page.dart';
 import '../../components/buttons.dart';
 import 'package:provider/provider.dart';
@@ -28,7 +26,7 @@ class _SignStep1 extends StatefulWidget {
 class __SignStep1State extends State<_SignStep1> {
   TextEditingController _usernameController;
 
-  bool _isButtonDisabled = true, _isTapped = false, _showError = false;
+  // bool _isButtonDisabled = true, _isTapped = false, _showError = false;
 
   FocusNode _focusEmail;
 
@@ -81,18 +79,15 @@ class __SignStep1State extends State<_SignStep1> {
   }
 
   Widget _emailButton(BuildContext context) {
+    final view = Provider.of<SignUpViewModel>(context);
     return GestureDetector(
       onTap: () {
-        if (!_isTapped) {
-          setState(() => {
-                _isTapped = true,
-                FocusScope.of(context).requestFocus(_focusEmail),
-              });
+        if (!view.isTapped) {
+          view.setTap(true);
+          FocusScope.of(context).requestFocus(_focusEmail);
           print('IsTapped now True');
         } else {
-          setState(() => {
-                _isTapped = false,
-              });
+          view.setTap(false);
           print('IsTapped now False');
         }
       },
@@ -104,18 +99,18 @@ class __SignStep1State extends State<_SignStep1> {
             'EMAIL ADDRESS',
             style: TextStyle(
               fontWeight: FontWeight.bold,
-              color: _isTapped ? Colors.black : Colors.grey,
+              color: view.isTapped ? Colors.black : Colors.grey,
             ),
           ),
           SizedBox(
-            height: _isTapped ? 14.5 : 15,
+            height: view.isTapped ? 14.5 : 15,
           ),
           Container(
-            height: _isTapped ? 1.5 : 1,
+            height: view.isTapped ? 1.5 : 1,
             width: 200,
             margin: EdgeInsetsDirectional.only(start: 0, end: 0),
             decoration: BoxDecoration(
-              color: _isTapped ? Colors.black : Colors.grey,
+              color: view.isTapped ? Colors.black : Colors.grey,
             ),
           ),
         ],
@@ -125,120 +120,106 @@ class __SignStep1State extends State<_SignStep1> {
 
   @override
   Widget build(BuildContext context) {
-    final signUp = Provider.of<SignUpViewModel>(context);
+    final view = Provider.of<SignUpViewModel>(context);
     return Scaffold(
       // key: _key,
-      body: Stack(
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.all(30.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                _icon(),
-                SizedBox(
-                  height: 20,
-                ),
-                _emailButton(context),
-                SizedBox(
-                  height: 15,
-                ),
-                TextField(
-                  focusNode: _focusEmail,
-                  onTap: () {
-                    !_isTapped
-                        ? setState(() {
-                            _isTapped = true;
-                          })
-                        : null;
-                  },
-                  style: TextStyle(
-                    color: notBlack,
-                    fontSize: 12,
-                    height: 1.34,
-                  ),
-                  controller: _usernameController,
-                  onChanged: (value) {
-                    if (_showError)
-                      setState(() {
-                        _showError = false;
-                      });
-                    if (value.isNotEmpty) {
-                      if (_isButtonDisabled)
-                        setState(() => _isButtonDisabled = false);
-                    } else if (!_isButtonDisabled) {
-                      setState(() => _isButtonDisabled = true);
-                    }
-                  },
-                  cursorWidth: 0.75,
-                  cursorColor: Colors.grey,
-                  decoration: outlineTextField(
-                    hintText: 'Email address',
-                    errorText: _showError
-                        ? 'Please enter a valid email address'
-                        : null,
-                    suffixIcon: Visibility(
-                      visible: _showError,
-                      child: IconButton(
-                        icon: Icon(
-                          Icons.clear,
-                          color: Colors.grey,
-                        ),
-                        onPressed: () {
-                          setState(
-                            () {
-                              _usernameController.text = '';
-                            },
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 15,
-                ),
-                Container(
-                  height: 46,
-                  width: double.infinity,
-                  child: ICFlatButton(
-                    conditionForProcessIndicator:
-                        signUp.signUpStatus == SignUpStatus.Running,
-                    text: 'Next',
-                    onPressed: _isButtonDisabled
-                        ? null
-                        : () async {
-                            bool emailExists;
-                            Validator3000 valValue = Validator3000();
-                            print('I work');
-                            var textIs =
-                                valValue.isEmailValid(_usernameController.text);
-                            if (textIs != null) {
-                              setState(() {
-                                _showError = true;
-                              });
-                            } else {
-                              emailExists = await RegisterService()
-                                  .doesEmailExist(
-                                      email: _usernameController.text,
-                                      context: context);
-                              if (!emailExists) {
-                                Navigator.pushNamed(context, SignUpStep2Route,
-                                    arguments: _usernameController.text);
-                              }
-                            }
-                          },
-                  ),
-                ),
-              ],
+      body: Padding(
+        padding: const EdgeInsets.only(left: 30.0, right: 30.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            _icon(),
+            SizedBox(
+              height: 20,
             ),
-          ),
-          Positioned(
-            bottom: 0.0,
-            left: 0.0,
-            right: 0.0,
-            child: Column(
+            _emailButton(context),
+            SizedBox(
+              height: 15,
+            ),
+            TextField(
+              focusNode: _focusEmail,
+              onTap: () {
+                if (view.isTapped) view.setTap(true);
+              },
+              style: TextStyle(
+                color: notBlack,
+                fontSize: 12,
+                height: 1.34,
+              ),
+              controller: _usernameController,
+              onChanged: (value) {
+                if (view.showError) view.setError(false);
+                if (value.isNotEmpty) {
+                  if (view.isButtonDisabled) view.setButton(false);
+                } else if (!view.isButtonDisabled) {
+                  view.setButton(true);
+                }
+              },
+              cursorWidth: 0.75,
+              cursorColor: Colors.grey,
+              decoration: outlineTextField(
+                hintText: 'Email address',
+                errorText: view.showError
+                    ? 'Please enter a valid email address'
+                    : null,
+                suffixIcon: Visibility(
+                  visible: view.showError,
+                  child: IconButton(
+                    icon: Icon(
+                      Icons.clear,
+                      color: Colors.grey,
+                    ),
+                    onPressed: () {
+                      setState(
+                        () {
+                          _usernameController.text = '';
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            Container(
+              height: 46,
+              width: double.infinity,
+              child: ICFlatButton(
+                conditionForProcessIndicator:
+                    view.signUpStatus == SignUpStatus.Running,
+                text: 'Next',
+                onPressed: view.isButtonDisabled
+                    ? null
+                    : () async {
+                        bool emailExists;
+                        Validator3000 valValue = Validator3000();
+                        print('I work');
+                        var textIs =
+                            valValue.isEmailValid(_usernameController.text);
+                        if (textIs != null) {
+                          view.setError(true);
+                        } else {
+                          emailExists = await RegisterService().doesEmailExist(
+                              email: _usernameController.text,
+                              context: context);
+                          if (!emailExists) {
+                            Navigator.pushNamed(context, SignUpStep2Route,
+                                arguments: _usernameController.text);
+                          }
+                        }
+                      },
+              ),
+            ),
+          ],
+        ),
+      ),
+      bottomNavigationBar: BottomAppBar(
+        child: Wrap(
+          children: [
+            Column(
               verticalDirection: VerticalDirection.up,
               children: <Widget>[
                 Padding(
@@ -256,8 +237,8 @@ class __SignStep1State extends State<_SignStep1> {
                 ),
               ],
             ),
-          )
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -272,8 +253,9 @@ class SignStep2 extends StatefulWidget {
 }
 
 class _SignStep2State extends State<SignStep2> {
+  // TODO Here
   TextEditingController _usernameController, _passwordController;
-  bool _isButtonDisabled = true, _isTapped = false, _showError = false;
+  // bool _isButtonDisabled = true, _isTapped = false, _showError = false;
   GlobalKey<ScaffoldState> _key = GlobalKey<ScaffoldState>();
   FocusNode _focusPassword;
   @override
@@ -294,8 +276,7 @@ class _SignStep2State extends State<SignStep2> {
 
   @override
   Widget build(BuildContext context) {
-    final _signUp = Provider.of<SignUpViewModel>(context);
-    final _auth = Provider.of<AuthNotifier>(context);
+    final _signUp = Provider.of<SignUp2ViewModel>(context);
     return Scaffold(
       key: _key,
       body: Padding(
@@ -316,11 +297,7 @@ class _SignStep2State extends State<SignStep2> {
             TextField(
               autofocus: true,
               onTap: () {
-                !_isTapped
-                    ? setState(() {
-                        _isTapped = true;
-                      })
-                    : null;
+                if (!_signUp.isTapped) _signUp.setTap(true);
               },
               style: TextStyle(
                 color: notBlack,
@@ -330,10 +307,9 @@ class _SignStep2State extends State<SignStep2> {
               controller: _usernameController,
               onChanged: (value) {
                 if (value.isNotEmpty && _passwordController.text.isNotEmpty) {
-                  if (_isButtonDisabled)
-                    setState(() => _isButtonDisabled = false);
-                } else if (!_isButtonDisabled) {
-                  setState(() => _isButtonDisabled = true);
+                  if (_signUp.isButtonDisabled) _signUp.setButton(false);
+                } else if (!_signUp.isButtonDisabled) {
+                  _signUp.setButton(true);
                 }
               },
               onEditingComplete: () {
@@ -351,11 +327,7 @@ class _SignStep2State extends State<SignStep2> {
             TextField(
               focusNode: _focusPassword,
               onTap: () {
-                !_isTapped
-                    ? setState(() {
-                        _isTapped = true;
-                      })
-                    : null;
+                if (!_signUp.isTapped) _signUp.setTap(true);
               },
               style: TextStyle(
                 color: notBlack,
@@ -364,30 +336,19 @@ class _SignStep2State extends State<SignStep2> {
               ),
               controller: _passwordController,
               onChanged: (value) {
-                if (_showError) {
-                  setState(() {
-                    _showError = false;
-                  });
-                }
-                if (value.isNotEmpty && _usernameController.text.isNotEmpty) {
-                  if (_isButtonDisabled)
-                    setState(() => _isButtonDisabled = false);
-                } else if (!_isButtonDisabled) {
-                  setState(() => _isButtonDisabled = true);
-                }
+                if (_signUp.showError) _signUp.setError(false);
+                _signUp.validateInput(
+                    value: value, textController: _usernameController);
               },
               onSubmitted: (text) {
-                if (text.length < 7)
-                  setState(() {
-                    _showError = true;
-                  });
+                if (text.length < 7) _signUp.setError(true);
               },
               cursorWidth: 0.75,
               cursorColor: Colors.grey,
               obscureText: true,
               decoration: outlineTextField(
                 hintText: 'Password',
-                errorText: _showError
+                errorText: _signUp.showError
                     ? 'Password must be at least 6 characters long'
                     : null,
               ),
@@ -400,9 +361,9 @@ class _SignStep2State extends State<SignStep2> {
               width: double.infinity,
               child: ICFlatButton(
                 conditionForProcessIndicator:
-                    _signUp.signUpStatus == SignUpStatus.Running,
+                    _signUp.signUpStatus == SignUp2Status.Running,
                 text: 'Continue',
-                onPressed: _isButtonDisabled
+                onPressed: _signUp.isButtonDisabled
                     ? null
                     : () async {
                         Validator3000 valValue = Validator3000();
@@ -422,70 +383,101 @@ class _SignStep2State extends State<SignStep2> {
                           validity = false;
                         }
                         if (_passwordController.text.length < 7) {
-                          setState(() {
-                            _showError = true;
-                          });
+                          _signUp.setError(true);
                           validity = false;
                         }
                         if (validity) {
-                          bool result = await RegisterService().signUp(
-                              widget.email,
-                              _usernameController.text,
-                              _passwordController.text,
-                              context,
-                              _auth.user);
-                          result
-                              ? print('user created')
-                              : print('Something unexpected happened');
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => MultiProvider(
+                                providers: [
+                                  ChangeNotifierProvider(
+                                    builder: (context) => SignUp3ViewModel(),
+                                  ),
+                                  ChangeNotifierProvider.value(
+                                    value: AuthNotifier.instance(),
+                                  ),
+                                ],
+                                child: new SignStep3(
+                                  email: widget.email,
+                                  fullName: _usernameController.text,
+                                  password: _passwordController.text,
+                                ),
+                              ),
+                            ),
+                          );
                         }
                       },
               ),
             ),
-            Spacer(),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(8, 0, 8, 30),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Icon(
-                    Icons.info_outline,
-                    color: Colors.red[200],
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Text(
-                    'Please check your mail for verification email after completing the registration process.',
-                    style: TextStyle(color: Colors.red[200]),
-                  ),
-                ],
-              ),
-            )
           ],
         ),
+      ),
+      bottomNavigationBar: Wrap(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(
+              left: 15,
+              bottom: 15,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Icon(
+                  Icons.info_outline,
+                  color: Colors.red[200],
+                ),
+                SizedBox(
+                  height: 5,
+                ),
+                Text(
+                  'Please check your mail for verification email after completing the registration process.',
+                  style: TextStyle(color: Colors.red[200]),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
 class SignStep3 extends StatefulWidget {
-  SignStep3();
+  final String email, fullName, password;
+  SignStep3({this.email, this.fullName, this.password});
   @override
   _SignStep3State createState() => _SignStep3State();
 }
 
 class _SignStep3State extends State<SignStep3> {
   String userId, userEmail;
-  Profile data;
+  SignUp3ViewModel _view;
   ProfileService profileAdapter = ProfileService();
+  AuthNotifier userAuth;
   @override
   void initState() {
     super.initState();
   }
 
   @override
+  void didChangeDependencies() {
+    userAuth = Provider.of<AuthNotifier>(context);
+    _view = Provider.of<SignUp3ViewModel>(context);
+    if (!_view.hasUsername) {
+      _view.provideUsername(widget.email, widget.fullName);
+    }
+    super.didChangeDependencies();
+  }
+
+  @override
+  void dispose() {
+    _view.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final userRepo = Provider.of<AuthNotifier>(context);
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.only(left: 28.0, right: 28.0),
@@ -500,36 +492,9 @@ class _SignStep3State extends State<SignStep3> {
             SizedBox(
               height: 2,
             ),
-            FutureBuilder(
-              future: profileAdapter.getProfileSnapshot(userRepo.user),
-              builder:
-                  (BuildContext context, AsyncSnapshot<DataSnapshot> snapshot) {
-                switch (snapshot.connectionState) {
-                  case ConnectionState.waiting:
-                    return new Text('wait');
-                  case ConnectionState.active:
-                    return new Text('Result: ${snapshot.data}');
-                  case ConnectionState.none:
-                    return new Text('Result: ${snapshot.data}');
-                  default:
-                    if (snapshot.hasError)
-                      return new Text('Error: ${snapshot.error}');
-                    else {
-                      if (!snapshot.hasData) {
-                        Future.delayed(Duration(seconds: 1), () {
-                          setState(() {});
-                        });
-                        return Text(':(');
-                      } else {
-                        data = Profile.fromMap(snapshot.data);
-                        return new Text(
-                          data.username,
-                          style: bodyStyle(),
-                        );
-                      }
-                    }
-                }
-              },
+            Text(
+              _view.username ?? 'wait',
+              style: bodyStyle(),
             ),
             SizedBox(
               height: 2,
@@ -547,10 +512,22 @@ class _SignStep3State extends State<SignStep3> {
               width: double.infinity,
               child: ICFlatButton(
                 text: 'Next',
-                onPressed: () {
-                  // userRepo.nextOnSucess();
-                  print('Finished');
-                },
+                onPressed: (_view.username == null)
+                    ? null
+                    : () async {
+                      /// TODO test
+                        bool result = await userAuth.signUp(
+                            widget.email,
+                            widget.fullName,
+                            widget.password,
+                            context,
+                            _view.username);
+                        result
+                            ? print('user created')
+                            : print('Something unexpected happened');
+                        // userRepo.nextOnSucess();
+                        print('Finished');
+                      },
               ),
             ),
             SizedBox(
@@ -558,17 +535,12 @@ class _SignStep3State extends State<SignStep3> {
             ),
             TappableText(
               text: 'Change username',
-              onTap: () => {
-                print('Change Username'),
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ChangeUsername(
-                      profileInformation: data,
-                    ),
-                  ),
-                ),
-              },
+              onTap: (_view.username == null)
+                  ? null
+                  : () => {
+                        print('[SignUp Page] Change Username'),
+                        Navigator.pushNamed(context, ChangeUsernameRoute),
+                      },
             ),
           ],
         ),

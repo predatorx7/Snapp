@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:instagram/models/view_models/change_username.dart';
+import '../ui/screens/registeration/change_username.dart';
 import 'routing_constants.dart';
 import '../models/plain_models/information.dart';
 import '../models/view_models/login_page.dart';
@@ -33,19 +35,65 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       );
     case SignUpRoute:
       return MaterialPageRoute(
-        builder: (context) => ChangeNotifierProvider(
-          builder: (context) => SignUpViewModel(),
+        settings: RouteSettings(isInitialRoute: true),
+        builder: (context) => MultiProvider(
+          providers: [
+            ChangeNotifierProvider(
+              builder: (context) => SignUpViewModel(),
+            ),
+            ChangeNotifierProvider(
+              builder: (context) => SignUp2ViewModel(),
+            ),
+            ChangeNotifierProvider(
+              builder: (context) => SignUp3ViewModel(),
+            ),
+          ],
           child: new SignUpPage(),
+        ),
+      );
+    case ChangeUsernameRoute:
+      return MaterialPageRoute(
+        builder: (context) => MultiProvider(
+          providers: [
+            ChangeNotifierProvider.value(
+              value: SignUp3ViewModel(),
+            ),
+            
+            ChangeNotifierProvider(
+              builder: (context) => ChangeUsernameViewModel(),
+            ),
+          ],
+          child: new ChangeUsername(
+            authenticated: settings.arguments ?? false,
+          ),
         ),
       );
     case SignUpStep2Route:
       return MaterialPageRoute(
-        builder: (context) => SignStep2(
-          email: settings.arguments,
+        settings: RouteSettings(isInitialRoute: true),
+        builder: (context) => MultiProvider(
+          providers: [
+            ChangeNotifierProvider(
+              builder: (context) => SignUp2ViewModel(),
+            ),
+            ChangeNotifierProvider(
+              builder: (context) => ChangeUsernameViewModel(),
+            ),
+          ],
+          child: new SignStep2(
+            email: settings.arguments,
+          ),
         ),
       );
     case UploadPostRoute:
-      return MaterialPageRoute(builder: (context) => UploadPage());
+      return MaterialPageRoute(
+        builder: (context) => MultiProvider(
+          providers: [
+            ChangeNotifierProvider(builder: (_) => SignUpViewModel()),
+          ],
+          child: UploadPage(),
+        ),
+      );
     case ProfilePageRoute:
       return MaterialPageRoute(
         builder: (context) => MultiProvider(

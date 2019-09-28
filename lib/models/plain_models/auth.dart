@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:instagram/core/services/registration_service.dart';
 
 enum Status { Uninitialized, Authenticated, Authenticating, Unauthenticated }
 
@@ -12,7 +13,7 @@ class AuthNotifier with ChangeNotifier {
   AuthNotifier.instance() : _auth = FirebaseAuth.instance {
     _auth.onAuthStateChanged.listen(_onAuthStateChanged);
   }
-
+  FirebaseAuth get authInfo => _auth;
   Status get status => _status;
   FirebaseUser get user => _user;
 
@@ -77,6 +78,14 @@ class AuthNotifier with ChangeNotifier {
     }
   }
 
+  Future<bool> signUp(email, fullName, password, context, username) async {
+    bool result = await RegisterService()
+        .signUp(email, fullName, password, context, username);
+    result ? print('user created') : print('Something unexpected happened');
+    notifyListeners();
+    return true;
+  }
+
   Future signOut() async {
     _auth.signOut();
     _status = Status.Unauthenticated;
@@ -86,6 +95,7 @@ class AuthNotifier with ChangeNotifier {
   }
 
   Future<void> _onAuthStateChanged(FirebaseUser firebaseUser) async {
+    print('[Auth] Noticed Auth Changes: ${firebaseUser.toString()}');
     if (firebaseUser == null) {
       _status = Status.Unauthenticated;
     } else {

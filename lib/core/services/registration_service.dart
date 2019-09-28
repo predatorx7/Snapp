@@ -4,11 +4,12 @@ import 'package:flutter/widgets.dart';
 import 'profile.dart';
 
 class RegisterService {
-  FirebaseAuth _auth;
+  FirebaseAuth _auth = FirebaseAuth.instance;
   Future<bool> doesEmailExist({String email, BuildContext context}) async {
     print('Testing $email');
     try {
       /// Using wrong password to check email existence.
+      print('[Register Service] _auth: ${_auth.toString()}');
       await _auth.signInWithEmailAndPassword(
           email: email, password: 'test_password');
       print(_auth.app.name);
@@ -21,6 +22,8 @@ class RegisterService {
         case 'ERROR_USER_NOT_FOUND':
           // User not found! This email can be used for registration.
           errorText = 'User not found';
+          print(
+              '[Register Service] $errorText, $email can be used for registration');
           return false;
           break;
         case 'ERROR_WRONG_PASSWORD':
@@ -57,11 +60,14 @@ class RegisterService {
   /// Use for Signing up and providing authentication to UserRepo.
   /// Shows SnackBar on error with error message (That's why it needs Scaffold Key)
   Future<bool> signUp(String email, String fullName, String password,
-      BuildContext context, FirebaseUser user) async {
+      BuildContext context, String username) async {
     try {
+      print('[Register Service] _auth: ${_auth.toString()}');
       await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
-      await ProfileService().createProfile(fullName, user);
+      print('[Registration Service] Account created, Auth may change');
+      FirebaseUser _user = await _auth.currentUser();
+      await ProfileService().createProfile(fullName, _user, username);
       return true;
     } catch (error) {
       var errorText;

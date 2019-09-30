@@ -27,6 +27,9 @@ void main() {
         ChangeNotifierProvider(
           builder: (context) => SignUpViewModel(),
         ),
+        ChangeNotifierProvider(
+          builder: (context) => LoginPageViewModel(),
+        )
       ],
       child: Root(),
     ),
@@ -48,12 +51,9 @@ class Root extends StatelessWidget {
               return Splash();
             case Status.Unauthenticated:
             case Status.Authenticating:
-              return ChangeNotifierProvider(
-                builder: (context) => LoginPageViewModel(),
-                child: new LoginPage(),
-              );
+              return LoginPage();
             case Status.Authenticated:
-              return Instagram();
+              return Instagram(user: userAuth.user);
             default:
               return new Text('Error');
           }

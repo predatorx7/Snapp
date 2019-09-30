@@ -25,7 +25,7 @@ class _SignStep1 extends StatefulWidget {
 
 class __SignStep1State extends State<_SignStep1> {
   TextEditingController _usernameController;
-
+  GlobalKey _key = GlobalKey<ScaffoldState>();
   // bool _isButtonDisabled = true, _isTapped = false, _showError = false;
 
   FocusNode _focusEmail;
@@ -122,7 +122,7 @@ class __SignStep1State extends State<_SignStep1> {
   Widget build(BuildContext context) {
     final view = Provider.of<SignUpViewModel>(context);
     return Scaffold(
-      // key: _key,
+      key: _key,
       body: Padding(
         padding: const EdgeInsets.only(left: 30.0, right: 30.0),
         child: Column(
@@ -187,30 +187,35 @@ class __SignStep1State extends State<_SignStep1> {
             Container(
               height: 46,
               width: double.infinity,
-              child: ICFlatButton(
-                conditionForProcessIndicator:
-                    view.signUpStatus == SignUpStatus.Running,
-                text: 'Next',
-                onPressed: view.isButtonDisabled
-                    ? null
-                    : () async {
-                        bool emailExists;
-                        Validator3000 valValue = Validator3000();
-                        print('I work');
-                        var textIs =
-                            valValue.isEmailValid(_usernameController.text);
-                        if (textIs != null) {
-                          view.setError(true);
-                        } else {
-                          emailExists = await RegisterService().doesEmailExist(
-                              email: _usernameController.text,
-                              context: context);
-                          if (!emailExists) {
-                            Navigator.pushNamed(context, SignUpStep2Route,
-                                arguments: _usernameController.text);
-                          }
-                        }
-                      },
+              child: Builder(
+                builder: (builtContext) {
+                  return ICFlatButton(
+                    conditionForProcessIndicator:
+                        view.signUpStatus == SignUpStatus.Running,
+                    text: 'Next',
+                    onPressed: view.isButtonDisabled
+                        ? null
+                        : () async {
+                            bool emailExists;
+                            Validator3000 valValue = Validator3000();
+                            print('I work');
+                            var textIs =
+                                valValue.isEmailValid(_usernameController.text);
+                            if (textIs != null) {
+                              view.setError(true);
+                            } else {
+                              emailExists = await RegisterService()
+                                  .doesEmailExist(
+                                      email: _usernameController.text,
+                                      context: builtContext);
+                              if (!emailExists) {
+                                Navigator.pushNamed(context, SignUpStep2Route,
+                                    arguments: _usernameController.text);
+                              }
+                            }
+                          },
+                  );
+                },
               ),
             ),
           ],

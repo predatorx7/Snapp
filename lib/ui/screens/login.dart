@@ -39,6 +39,7 @@ class _LoginPageState extends State<LoginPage> {
     view = Provider.of<LoginPageViewModel>(context, listen: false);
     return Scaffold(
       key: _key,
+      resizeToAvoidBottomInset: false,
       body: Container(
         child: Padding(
           padding: const EdgeInsets.all(30.0),
@@ -124,14 +125,6 @@ class _LoginPageState extends State<LoginPage> {
                                       _usernameController.text,
                                       _passwordController.text,
                                       _key)) {
-                                    print('[Success] Logging in');
-                                    Scaffold.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text('Signed in'),
-                                      ),
-                                    );
-                                    // Navigator.pushReplacementNamed(
-                                    //     context, HomeRoute);
                                   }
                                 },
                         );

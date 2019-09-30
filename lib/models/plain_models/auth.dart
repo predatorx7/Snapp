@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:instagram/commons/styles.dart';
 import 'package:instagram/core/services/registration_service.dart';
 
 enum Status { Uninitialized, Authenticated, Authenticating, Unauthenticated }
@@ -49,7 +50,7 @@ class AuthNotifier with ChangeNotifier {
           errorText = "Email or Username is invalid";
           break;
         case 'ERROR_WRONG_PASSWORD':
-          errorText = "Password is wrong";
+          errorText = "Forgotten password for $email?";
           break;
         case 'ERROR_USER_NOT_FOUND':
           errorText = "Cannot find user";
@@ -66,14 +67,48 @@ class AuthNotifier with ChangeNotifier {
         default:
           errorText = "Something went wrong";
       }
-      key.currentState.showSnackBar(
-        SnackBar(
-          backgroundColor: Colors.red,
-          content: Text(
-            errorText,
-            style: TextStyle(color: Colors.white),
-          ),
-        ),
+      showDialog(
+        context: key.currentContext,
+        builder: (BuildContext context) {
+          return Dialog(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Text(
+                      errorText,
+                      style: actionTitleStyle(),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    print('[Alert Box] Popping Alert Box');
+                    Navigator.pop(context);
+                  },
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Divider(),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10, bottom: 20),
+                        child: new Text(
+                          'Try Again',
+                          style: actionTapStyle(),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
       );
       // Authentication failed
       _status = Status.Unauthenticated;
@@ -90,9 +125,7 @@ class AuthNotifier with ChangeNotifier {
   }
 
   Future signOut() async {
-    _auth.signOut();
-    _status = Status.Unauthenticated;
-    notifyListeners();
+    await _auth.signOut();
     // Returning a future to allow await to let the listeners work properly.
     return Future.delayed(Duration.zero);
   }

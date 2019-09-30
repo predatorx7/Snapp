@@ -159,9 +159,7 @@ class _FeedViewState extends State<_FeedView> {
     print('[Home\'s List View] Setting up Posts');
     List followerList = widget.data.info.followers;
     print('[FeedView] Info: ${widget.data.info.toJson().toString()}');
-    isListNotEmpty = followerList.isNotEmpty;
-    // if (false) {
-    if (isListNotEmpty ? followerList[0].isNotEmpty : true) {
+    if (followerList.isNotEmpty) {
       return ListView.builder(
         itemBuilder: (BuildContext context, int index) {
           return HandleViewSnapshot(

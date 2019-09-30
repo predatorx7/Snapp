@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../../commons/styles.dart';
@@ -291,15 +292,23 @@ class _ProfilePageState extends State<ProfilePage>
 
 class Menu extends StatelessWidget {
   final Profile userInfo;
-
-  const Menu({Key key, this.userInfo}) : super(key: key);
+  FirebaseUser user;
+  FirebaseAuth auth;
+  Menu({Key key, this.userInfo}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: ListView(
         children: <Widget>[
           ListTile(
-            onTap: () => Provider.of<AuthNotifier>(context).signOut(),
+            onTap: () async {
+              user = await Provider.of<AuthNotifier>(context)
+                  .authInfo
+                  .currentUser();
+              // user = await auth.currentUser();
+              print('Users Found: ${user.email}');
+              Provider.of<AuthNotifier>(context).authInfo.signOut();
+            },
             title: Text(
               'Log out of ${userInfo.username}',
               style: TextStyle(

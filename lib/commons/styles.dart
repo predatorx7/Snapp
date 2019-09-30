@@ -24,6 +24,16 @@ TextStyle headStyle() => TextStyle(
       fontSize: 14,
     );
 
+TextStyle actionTitleStyle() => TextStyle(
+      fontWeight: FontWeight.normal,
+      color: notBlack,
+      fontSize: 16,
+    );
+TextStyle actionTapStyle() => TextStyle(
+      fontWeight: FontWeight.bold,
+      color: Color(actionColor),
+      fontSize: 14,
+    );
 TextStyle bodyStyle() => TextStyle(
       fontWeight: FontWeight.bold,
       color: notBlack,

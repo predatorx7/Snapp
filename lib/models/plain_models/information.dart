@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:instagram/core/utils/Adapt_widget.dart';
 import 'profile.dart';
 
 class InfoModel with ChangeNotifier {
   Profile _info = Profile();
+  double _heightOfFlexSpace;
+
+  double get heightOfFlexSpace => _heightOfFlexSpace;
+
+  Adapt _flexibleSpaceHeight = Adapt(size: 250);
   InfoModel();
   Profile get info => _info;
 
-  set info(Profile information) => _info;
-
-  void setInfo(Profile infoDetails) {
-    _info = infoDetails;
+  void setInfo(Profile information) {
+    _info = information;
+    _heightOfFlexSpace = _flexibleSpaceHeight.withText(text: _info.bio);
     notifyListeners();
   }
 }

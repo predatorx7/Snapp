@@ -15,22 +15,29 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage>
-    with SingleTickerProviderStateMixin/*<-- This is for the controllers*/ {
+    with SingleTickerProviderStateMixin {
   Profile newData;
   bool loaded = false;
   bool gridView = true;
   String url;
+  bool firstTime = true;
+  InfoModel _data;
   TabController _tabController; // To control switching tabs
   ScrollController _scrollViewController; // To control scrolling
   TextStyle stateful = TextStyle(fontWeight: FontWeight.bold, fontSize: 16);
   TextStyle stateless = TextStyle();
-  double heightOfFlexSpace;
   ProfileService profileAdapter = ProfileService();
   @override
   void initState() {
     super.initState();
     _tabController = TabController(vsync: this, length: 2);
     _scrollViewController = ScrollController();
+  }
+
+  @override
+  void didChangeDependencies() {
+    _data = Provider.of<InfoModel>(context);
+    super.didChangeDependencies();
   }
 
   @override
@@ -41,8 +48,7 @@ class _ProfilePageState extends State<ProfilePage>
   }
 
   Widget profileWidget(BuildContext context, Profile data) {
-    final _data = Provider.of<InfoModel>(context);
-    if (_data.info == null) {
+    if (_data.info.email == null) {
       return Text(':(');
     }
     print(data.bio);
@@ -168,26 +174,10 @@ class _ProfilePageState extends State<ProfilePage>
 
   @override
   Widget build(BuildContext context) {
-    final _data = Provider.of<InfoModel>(context);
-
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    //   if (mounted) {
-    //     profileAdapter
-    //         .getProfileSnapshot(userRepo.user)
-    //         .then((DataSnapshot snapshot) {
-    //       newData = Profile.fromMap(snapshot);
-    //       print('New Data: ${newData.toJson()}');
-    //       if (_data.info.toJson() != newData.toJson()) {
-    //         heightOfFlexSpace =
-    //             flexibleSpaceHeight.withText(text: _data.info.bio);
-    //         print('Height of flex: $heightOfFlexSpace');
-    //         _data.modifyInfo(newData);
-    //       }
-    //     });
-    //   }
-    // });
+    print('[Profile] Height of Flex Space: ${_data.heightOfFlexSpace}');
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         elevation: 0,
         title: Text(
           _data.info.username,
@@ -221,7 +211,7 @@ class _ProfilePageState extends State<ProfilePage>
               floating: true,
               pinned: true,
               snap: true,
-              expandedHeight: heightOfFlexSpace,
+              expandedHeight: _data.heightOfFlexSpace,
               flexibleSpace: FlexibleSpaceBar(
                 collapseMode: CollapseMode.pin,
                 background: profileWidget(context, _data.info),

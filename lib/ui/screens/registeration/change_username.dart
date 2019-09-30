@@ -119,21 +119,24 @@ class _ChangeUsernameState extends State<ChangeUsername> {
               height: 46,
               width: double.infinity,
               child: ICFlatButton(
+                conditionForProcessIndicator:
+                    _view.status == ChangeUsernameStatus.Working,
                 text: 'Next',
                 onPressed: _view.isButtonDisabled
                     ? null
                     : () async {
                         // Checking Username availability
-                        if (GenerateUsername().checkAvailability(
-                                [_usernameController.text]) !=
-                            null) {
+                        _view.setStatus(ChangeUsernameStatus.Working);
+                        var futureString = await GenerateUsername()
+                            .checkAvailability([_usernameController.text]);
+                        if (futureString != null) {
                           // Username available
                           _view.setUsername(_usernameController.text);
                           print(_view.username);
                           _view.toggleButton(true);
                           if (widget.authenticated) {
                             print(
-                                '[Change Username Page] Authenticated user: Updating Username');
+                                '[Change Username Page] Authenticated user: Updating Username ${_view.username}');
                             await ProfileService().updateProfile(
                                 Profile(username: _view.username));
                             _key.currentState.showSnackBar(
@@ -143,21 +146,17 @@ class _ChangeUsernameState extends State<ChangeUsername> {
                                     'Username updated to ${_usernameController.text}'),
                               ),
                             );
+                            _view.setStatus(ChangeUsernameStatus.Standby);
                           } else {
                             print(
                                 '[Change Username Page] Unauthenticated user: Changing Username');
-                            _fromSignUp.setUsername(_usernameController.text);
-                            _key.currentState.showSnackBar(
-                              SnackBar(
-                                backgroundColor: Colors.green,
-                                content: Text(
-                                  'Username changed to ${_usernameController.text}',
-                                ),
-                              ),
-                            );
+                            
+                            _view.setStatus(ChangeUsernameStatus.Standby);
                           }
-                          Navigator.pop(context);
+                          Navigator.pop(
+                              context, [true, _usernameController.text]);
                         } else {
+                          _view.setStatus(ChangeUsernameStatus.Failed);
                           _key.currentState.showSnackBar(
                             SnackBar(
                               backgroundColor: Colors.red,

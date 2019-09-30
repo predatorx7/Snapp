@@ -1,8 +1,19 @@
 import 'package:flutter/cupertino.dart';
 
+enum ChangeUsernameStatus { Standby, Working, Failed }
+
 class ChangeUsernameViewModel with ChangeNotifier {
   bool _isButtonDisabled = true;
   bool _valid = true;
+  ChangeUsernameStatus _status = ChangeUsernameStatus.Standby;
+
+  ChangeUsernameStatus get status => _status;
+
+  setStatus(ChangeUsernameStatus status) {
+    _status = status;
+    notifyListeners();
+  }
+
   String _errorText;
 
   String get errorText => _errorText;

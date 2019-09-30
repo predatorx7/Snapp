@@ -138,16 +138,17 @@ enum SignUp3Status {
 class SignUp3ViewModel with ChangeNotifier {
   SignUp3Status _status = SignUp3Status.Uninitialized;
   bool _isButtonDisabled = true, _isTapped = false, _showError = false;
-  String _username;
+  String _username, _oldUsername;
   bool hasUsername = false;
   String get username => _username;
-
+  String get oldUsername => _oldUsername;
+  set oldUsername(String x) => _oldUsername = x;
   bool get isButtonDisabled => _isButtonDisabled;
   bool get isTapped => _isTapped;
   bool get showError => _showError;
   SignUp3Status get signUpStatus => _status;
 
-  setUsername(String username) {
+  void setUsername(String username) {
     _username = username;
     print('[View] Setting Username');
     notifyListeners();
@@ -194,6 +195,7 @@ class SignUp3ViewModel with ChangeNotifier {
 
   Future<bool> provideUsername(String email, String fullName) async {
     String username = await ProfileService().autoUsername(email, fullName);
+    oldUsername = _username;
     _username = username;
     hasUsername = true;
     notifyListeners();

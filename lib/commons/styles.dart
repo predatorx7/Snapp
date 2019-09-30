@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../core/utils/Adapt_widget.dart';
 
 ThemeData mainTheme = ThemeData(
   cursorColor: Colors.teal,
@@ -18,8 +17,6 @@ ThemeData mainTheme = ThemeData(
 int actionColor = 0xff3897f0;
 
 Color notBlack = Color(0xff262626);
-
-Adapt flexibleSpaceHeight = Adapt(size: 300);
 
 TextStyle headStyle() => TextStyle(
       fontWeight: FontWeight.bold,

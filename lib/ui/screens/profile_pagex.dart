@@ -10,48 +10,21 @@ import 'package:provider/provider.dart';
 
 import 'story.dart';
 
-class HomeView extends StatefulWidget {
+class ProfileView extends StatefulWidget {
   InfoModel data;
-  HomeView({@required this.data});
+  ProfileView({@required this.data});
   @override
-  _HomeViewState createState() => _HomeViewState();
+  _ProfileViewState createState() => _ProfileViewState();
 }
 
-class _HomeViewState extends State<HomeView> {
-  PageController _pageController;
-  @override
-  initState() {
-    _pageController = PageController(initialPage: 0);
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return PageView(
-      controller: _pageController,
-      children: <Widget>[HomePage(data: widget.data), MessagePage()],
-    );
-  }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
-}
-
-class HomePage extends StatefulWidget {
-  InfoModel data;
-  HomePage({@required this.data});
-
-  @override
-  _HomePageState createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
+class _ProfileViewState extends State<ProfileView> {
   bool loaded = false;
   DatabaseReference _databaseReference = new FirebaseDatabase().reference();
   ProfileService profileAdapter = ProfileService();
+  @override
+  initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

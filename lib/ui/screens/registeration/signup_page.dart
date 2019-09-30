@@ -455,6 +455,7 @@ class _SignStep3State extends State<SignStep3> {
   SignUp3ViewModel _view;
   ProfileService profileAdapter = ProfileService();
   AuthNotifier userAuth;
+  GlobalKey _scaffoldKey = GlobalKey<ScaffoldState>();
   @override
   void initState() {
     super.initState();
@@ -479,6 +480,7 @@ class _SignStep3State extends State<SignStep3> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       body: Padding(
         padding: const EdgeInsets.only(left: 28.0, right: 28.0),
         child: Column(
@@ -515,7 +517,7 @@ class _SignStep3State extends State<SignStep3> {
                 onPressed: (_view.username == null)
                     ? null
                     : () async {
-                      /// TODO test
+                        print('[Sign Up Page 3] Username: ${_view.username}');
                         bool result = await userAuth.signUp(
                             widget.email,
                             widget.fullName,
@@ -523,9 +525,8 @@ class _SignStep3State extends State<SignStep3> {
                             context,
                             _view.username);
                         result
-                            ? print('user created')
+                            ? print('user created: ${userAuth.user}')
                             : print('Something unexpected happened');
-                        // userRepo.nextOnSucess();
                         print('Finished');
                       },
               ),
@@ -537,10 +538,15 @@ class _SignStep3State extends State<SignStep3> {
               text: 'Change username',
               onTap: (_view.username == null)
                   ? null
-                  : () => {
-                        print('[SignUp Page] Change Username'),
-                        Navigator.pushNamed(context, ChangeUsernameRoute),
-                      },
+                  : () async {
+                      print('[SignUp Page] Change Username');
+                      Object navResult = await Navigator.pushNamed(
+                          context, ChangeUsernameRoute);
+                      List<dynamic> result = navResult;
+                      if (result[0]) {
+                        _view.setUsername(result[1]);
+                      }
+                    },
             ),
           ],
         ),

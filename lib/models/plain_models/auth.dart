@@ -10,6 +10,10 @@ class AuthNotifier with ChangeNotifier {
   FirebaseUser _user;
   Status _status = Status.Uninitialized;
 
+  void setUser(FirebaseUser aUser) {
+    _user = aUser;
+  }
+
   AuthNotifier.instance() : _auth = FirebaseAuth.instance {
     _auth.onAuthStateChanged.listen(_onAuthStateChanged);
   }
@@ -81,9 +85,8 @@ class AuthNotifier with ChangeNotifier {
   Future<bool> signUp(email, fullName, password, context, username) async {
     bool result = await RegisterService()
         .signUp(email, fullName, password, context, username);
-    result ? print('user created') : print('Something unexpected happened');
     notifyListeners();
-    return true;
+    return result;
   }
 
   Future signOut() async {
@@ -102,6 +105,7 @@ class AuthNotifier with ChangeNotifier {
       _user = firebaseUser;
       _status = Status.Authenticated;
     }
+    print('[Auth] Current Auth Status: ${_status.toString()}');
     notifyListeners();
   }
 }

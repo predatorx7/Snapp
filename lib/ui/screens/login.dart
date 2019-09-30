@@ -166,27 +166,31 @@ class _LoginPageState extends State<LoginPage> {
               ),
               GestureDetector(
                 onTap: () {
+                  print('[Login Page] Detected Gesture');
                   Navigator.of(context).pushNamed(SignUpRoute);
                 },
-                child: RichText(
-                  textAlign: TextAlign.left,
-                  text: new TextSpan(
-                    style: new TextStyle(
-                      fontSize: 12.0,
-                      color: Colors.grey,
-                    ),
-                    children: <TextSpan>[
-                      new TextSpan(
-                        text: 'Don\'t have an account? ',
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: RichText(
+                    textAlign: TextAlign.left,
+                    text: new TextSpan(
+                      style: new TextStyle(
+                        fontSize: 12.0,
+                        color: Colors.grey,
                       ),
-                      new TextSpan(
-                        text: 'Sign up.',
-                        style: new TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xff262626),
+                      children: <TextSpan>[
+                        new TextSpan(
+                          text: 'Don\'t have an account? ',
                         ),
-                      ),
-                    ],
+                        new TextSpan(
+                          text: 'Sign up.',
+                          style: new TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xff262626),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:instagram/models/view_models/change_username.dart';
 import '../ui/screens/registeration/change_username.dart';
 import 'routing_constants.dart';
-import '../models/plain_models/information.dart';
 import '../models/view_models/login_page.dart';
 import '../models/view_models/message_notification.dart';
 import '../models/view_models/signup_page.dart';
@@ -58,7 +57,6 @@ Route<dynamic> generateRoute(RouteSettings settings) {
             ChangeNotifierProvider.value(
               value: SignUp3ViewModel(),
             ),
-            
             ChangeNotifierProvider(
               builder: (context) => ChangeUsernameViewModel(),
             ),
@@ -96,13 +94,7 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       );
     case ProfilePageRoute:
       return MaterialPageRoute(
-        builder: (context) => MultiProvider(
-          providers: [
-            ChangeNotifierProvider(builder: (_) => InfoModel()),
-            // ChangeNotifierProvider(builder: (_) => AuthNotifier.instance()),
-          ],
-          child: ProfilePage(),
-        ),
+        builder: (context) => ProfilePage(),
       );
     default:
       return MaterialPageRoute(builder: (context) => Splash());

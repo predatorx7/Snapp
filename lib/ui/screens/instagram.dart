@@ -1,5 +1,4 @@
 // View with DATA after Authenticated Login
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +7,6 @@ import 'package:instagram/commons/styles.dart';
 import 'package:instagram/models/plain_models/auth.dart';
 import 'package:instagram/models/plain_models/information.dart';
 import 'package:instagram/models/plain_models/profile.dart';
-import 'package:instagram/ui/components/custom_bottomnavbar_item.dart';
 import 'package:instagram/ui/components/noback.dart';
 import 'package:instagram/ui/screens/profile_page.dart';
 import '../../ui/components/handle_snapshot.dart';
@@ -18,9 +16,7 @@ import 'package:provider/provider.dart';
 import 'homeView.dart';
 
 class Instagram extends StatefulWidget {
-  final FirebaseUser user;
-
-  const Instagram({Key key, this.user}) : super(key: key);
+  const Instagram({Key key}) : super(key: key);
   @override
   _InstagramState createState() => _InstagramState();
 }
@@ -28,7 +24,6 @@ class Instagram extends StatefulWidget {
 class _InstagramStateX extends State<Instagram> {
   PageController _pageController;
   ProfileService profileService;
-  Widget widgetForBody = HomeView();
   // Change with Profile Page and Back to HomeView()
   int _buttonIndex = 0;
 
@@ -64,9 +59,9 @@ class _InstagramStateX extends State<Instagram> {
           future: profileService.getProfileSnapshot(_userRepo.user),
           builder:
               (BuildContext context, AsyncSnapshot<DataSnapshot> snapshot) {
-            data.info = Profile.fromMap(snapshot.data);
-            if (data != null) {
-              return widgetForBody;
+            // data.info = Profile.fromMap(snapshot.data);
+            if (data.info.email != null) {
+              // return widgetForBody;
             } else {
               return Text('There\'s an issue');
             }
@@ -157,133 +152,217 @@ class _InstagramStateX extends State<Instagram> {
   }
 }
 
-class _InstagramState extends State<Instagram>
-    with SingleTickerProviderStateMixin {
+class _InstagramState extends State<Instagram> with TickerProviderStateMixin {
+  FirebaseDatabase _database = new FirebaseDatabase();
   int _viewIndex = 0;
+  AuthNotifier _userRepo;
+  InfoModel data;
   @override
   void initState() {
     super.initState();
   }
 
   @override
+  void didChangeDependencies() {
+    _userRepo = Provider.of<AuthNotifier>(context);
+    data = Provider.of<InfoModel>(context);
+    super.didChangeDependencies();
+  }
+
+  @override
   void dispose() {
+    _userRepo.dispose();
+    data.dispose();
     super.dispose();
+  }
+
+  _setIndex(int index) {
+    setState(() {
+      _viewIndex = index;
+    });
+  }
+
+  _isOutlineOrFilled(int ofIndex) {
+    if (ofIndex == _viewIndex) {
+      return 'Filled';
+    } else {
+      return 'Outline';
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final _userRepo = Provider.of<AuthNotifier>(context);
-    final data = Provider.of<InfoModel>(context);
-    print('[Instagram] ${_userRepo.user}');
+    print('[Instagram] User ${_userRepo.user}');
     return MaterialApp(
       theme: mainTheme,
       home: NoBack(
         child: Scaffold(
-          body: HandleSnapshot(
-            future: ProfileService().getProfileSnapshot(_userRepo.user),
+          body: StreamBuilder(
+            stream: _database
+                .reference()
+                .child("profiles")
+                .orderByChild("email")
+                .equalTo(_userRepo.user.email)
+                .onValue,
             builder:
-                (BuildContext context, AsyncSnapshot<DataSnapshot> snapshot) {
-              data.info = Profile.fromMap(snapshot.data);
-              if (data != null) {
-                return Stack(
-                  children: <Widget>[
-                    new Offstage(
-                      offstage: _viewIndex != 0,
-                      child: new TickerMode(
-                        enabled: _viewIndex == 0,
-                        child: new HomeView(),
+                (BuildContext context, AsyncSnapshot<Event> eventSnapshot) {
+              switch (eventSnapshot.connectionState) {
+                case ConnectionState.waiting:
+                  return Center(
+                    child: Theme(
+                      data: Theme.of(context).copyWith(
+                        accentColor: Colors.white,
+                        primaryColor: Colors.blue,
                       ),
-                    ),
-                    new Offstage(
-                      offstage: _viewIndex != 1,
-                      child: new TickerMode(
-                        enabled: _viewIndex == 1,
-                        child: new MaterialApp(
-                          home: new Center(
-                            child: Text('Search Page'),
-                          ),
+                      child: SizedBox(
+                        height: 27,
+                        width: 27,
+                        child: new CircularProgressIndicator(
+                          strokeWidth: 3,
                         ),
                       ),
                     ),
-                    new Offstage(
-                      offstage: _viewIndex != 3,
-                      child: new TickerMode(
-                        enabled: _viewIndex == 3,
-                        child: new MaterialApp(
-                          home: new Center(
-                            child: Text('Notification Page'),
+                  );
+                  break;
+                default:
+                  if (!eventSnapshot.hasData) {
+                    return Center(
+                      child: Text(':('),
+                    );
+                  } else {
+                    data.setInfo(Profile.fromMap(eventSnapshot.data.snapshot));
+                    print(
+                        '[Instagram] Recieved Profile Data: ${data.info.toJson()}');
+                    if (data.info.email != null) {
+                      return Stack(
+                        children: <Widget>[
+                          Visibility(
+                            visible: _viewIndex == 0,
+                            child: HomeView(data: data),
                           ),
-                        ),
-                      ),
-                    ),
-                    new Offstage(
-                      offstage: _viewIndex != 4,
-                      child: new TickerMode(
-                        enabled: _viewIndex == 4,
-                        child: new ProfilePage(),
-                      ),
-                    ),
-                  ],
-                );
-              } else {
-                return Text('There\'s an issue');
+                          new Offstage(
+                            offstage: _viewIndex != 1,
+                            child: new TickerMode(
+                              enabled: _viewIndex == 1,
+                              child: new MaterialApp(
+                                home: new Center(
+                                  child: Text('Search Page'),
+                                ),
+                              ),
+                            ),
+                          ),
+                          new Offstage(
+                            offstage: _viewIndex != 3,
+                            child: new TickerMode(
+                              enabled: _viewIndex == 3,
+                              child: new MaterialApp(
+                                home: new Center(
+                                  child: Text('Notification Page'),
+                                ),
+                              ),
+                            ),
+                          ),
+                          new Offstage(
+                            offstage: _viewIndex != 4,
+                            child: new TickerMode(
+                              enabled: _viewIndex == 4,
+                              child: ProfilePage(),
+                            ),
+                          ),
+                        ],
+                      );
+                    } else {
+                      data.setInfo(
+                          Profile.fromMap(eventSnapshot.data.snapshot));
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('There\'s an issue'),
+                          Text(Profile.fromMap(eventSnapshot.data.snapshot)
+                              .toJson()
+                              .toString()),
+                          Text(
+                            data.info.toJson().toString(),
+                          )
+                        ],
+                      );
+                    }
+                  }
               }
             },
           ),
-          bottomNavigationBar: BottomNavigationBar(
-            currentIndex: _viewIndex,
-            showSelectedLabels: false,
-            showUnselectedLabels: false,
-            onTap: (indexOfNavBarItem) {
-              switch (indexOfNavBarItem) {
-                case 0:
-                  setState(() {
-                    _viewIndex = 0;
-                  });
-                  break;
-                case 1:
-                  setState(() {
-                    _viewIndex = 1;
-                  });
-                  break;
-                case 2:
-                  Navigator.of(context).pushNamed(UploadPostRoute);
-                  break;
-                case 3:
-                  setState(() {
-                    _viewIndex = 2;
-                  });
-                  break;
-                case 4:
-                  setState(() {
-                    _viewIndex = 3;
-                  });
-                  break;
-                default:
-              }
-            },
-            items: [
-              icBottomNavBarItem(
-                  iconImageAddress: 'assets/res_icons/homeOutline.png',
-                  activeIconImageAddress: 'assets/res_icons/homeFilled.png'),
-              icBottomNavBarItem(
-                  iconImageAddress: 'assets/res_icons/searchOutline.png',
-                  activeIconImageAddress: 'assets/res_icons/searchFilled.png'),
-              BottomNavigationBarItem(
-                title: Container(
-                  height: 0,
+          bottomNavigationBar: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                new BoxShadow(
+                  color: Colors.black,
+                  blurRadius: 8,
+                  spreadRadius: -6,
                 ),
-                icon: Image(
-                  image: AssetImage('assets/res_icons/newPost.png'),
-                ),
+              ],
+            ),
+            child: Container(
+              height: 50,
+              child: Flex(
+                direction: Axis.horizontal,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: <Widget>[
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => _setIndex(0),
+                      child: Image(
+                        image: AssetImage(
+                            'assets/res_icons/home${_isOutlineOrFilled(0)}.png'),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => _setIndex(1),
+                      onLongPress: () {
+                        _userRepo.signOut();
+                      },
+                      child: Image(
+                        image: AssetImage(
+                            'assets/res_icons/search${_isOutlineOrFilled(1)}.png'),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        _setIndex(2);
+                        Navigator.pushNamed(context, UploadPostRoute);
+                      },
+                      child: Image(
+                        image: AssetImage('assets/res_icons/newPost.png'),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => _setIndex(3),
+                      child: Image(
+                        image: AssetImage(
+                            'assets/res_icons/heart${_isOutlineOrFilled(3)}.png'),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        _setIndex(4);
+                      },
+                      child: Image(
+                        image: AssetImage(
+                            'assets/res_icons/user${_isOutlineOrFilled(4)}.png'),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              icBottomNavBarItem(
-                  iconImageAddress: 'assets/res_icons/heartOutline.png',
-                  activeIconImageAddress: 'assets/res_icons/heartFilled.png'),
-              icBottomNavBarItem(
-                  iconImageAddress: 'assets/res_icons/userOutline.png',
-                  activeIconImageAddress: 'assets/res_icons/userFilled.png'),
-            ],
+            ),
           ),
         ),
       ),

@@ -49,13 +49,13 @@ class Root extends StatelessWidget {
             case Status.Unauthenticated:
             case Status.Authenticating:
               return ChangeNotifierProvider(
-                  builder: (context) => LoginPageViewModel(),
-                  child: new LoginPage(),
-                );
+                builder: (context) => LoginPageViewModel(),
+                child: new LoginPage(),
+              );
             case Status.Authenticated:
-              return Instagram(user: userAuth.user);
+              return Instagram();
             default:
-            return new Text('Error');
+              return new Text('Error');
           }
         },
       ),

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:instagram/commons/routing_constants.dart';
 import '../../commons/styles.dart';
 import '../../core/services/profile.dart';
 import '../../models/plain_models/auth.dart';
@@ -22,8 +23,8 @@ class _ProfilePageState extends State<ProfilePage>
   String url;
   bool firstTime = true;
   InfoModel _data;
-  TabController _tabController; // To control switching tabs
-  ScrollController _scrollViewController; // To control scrolling
+  TabController _tabController;
+  ScrollController _scrollViewController;
   TextStyle stateful = TextStyle(fontWeight: FontWeight.bold, fontSize: 16);
   TextStyle stateless = TextStyle();
   ProfileService profileAdapter = ProfileService();
@@ -157,16 +158,29 @@ class _ProfilePageState extends State<ProfilePage>
           Text(
             data.bio,
           ),
+          SizedBox(
+            height: 15,
+          ),
           ConstrainedBox(
             constraints: const BoxConstraints(minWidth: double.infinity),
-            child: OutlineButton(
-              child: Text(
-                'Edit Profile',
-                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+            child: SizedBox(
+              height: 30,
+              child: OutlineButton(
+                child: Text(
+                  'Edit Profile',
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                ),
+                color: Colors.white,
+                highlightedBorderColor: Colors.grey,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(4)),
+                onPressed: () {
+                  Navigator.pushNamed(context, EditProfileRoute);
+                },
               ),
-              onPressed: () {},
             ),
           ),
+          Divider()
         ],
       ),
     );
@@ -184,22 +198,85 @@ class _ProfilePageState extends State<ProfilePage>
           style: TextStyle(fontSize: 16),
         ),
         actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.menu),
-            onPressed: () {
-              print('menu');
-              Navigator.push(
-                context,
-                CupertinoPageRoute(
-                  builder: (context) => Menu(
-                    userInfo: _data.info,
-                  ),
-                ),
-              );
-            },
-          )
+          // IconButton(
+          //   icon: Icon(Icons.menu),
+          //   onPressed: () {
+          //     print('menu');
+          //     Navigator.push(
+          //       context,
+          //       CupertinoPageRoute(
+          //         builder: (context) => Menu(
+          //           userInfo: _data.info,
+          //         ),
+          //       ),
+          //     );
+          //   },
+          // )
         ],
         backgroundColor: Colors.white,
+      ),
+      endDrawer: Drawer(
+        child: Column(
+          children: <Widget>[
+            Expanded(
+              child: ListView(
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(15, 15, 15, 5),
+                    child: Text(
+                      _data.info.username,
+                      style: head2Style(),
+                    ),
+                  ),
+                  Divider(),
+                  // ListTile(
+                  //   onTap: () {},
+                  //   title: Text("Ttem 1"),
+                  //   trailing: Icon(Icons.arrow_forward),
+                  // ),
+                  // ListTile(
+                  //   title: Text("Item 2"),
+                  //   trailing: Icon(Icons.arrow_forward),
+                  // ),
+                ],
+              ),
+            ),
+            Container(
+              child: Align(
+                alignment: FractionalOffset.bottomCenter,
+                child: Container(
+                  child: Column(
+                    children: <Widget>[
+                      Divider(),
+                      ListTile(
+                        onTap: () {
+                          /// Poping this Drawer to avoid '_elements.contains(element)' Assertion Error
+                          Navigator.pop(context);
+                          Navigator.push(
+                            context,
+                            CupertinoPageRoute(
+                              builder: (context) => Menu(
+                                userInfo: _data.info,
+                              ),
+                            ),
+                          );
+                        },
+                        leading: Image(
+                          image: AssetImage(
+                              'assets/res_icons/settingsOutline.png'),
+                        ),
+                        title: Text(
+                          'Settings',
+                          style: actionTitleStyle(),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
       body: NestedScrollView(
         controller: _scrollViewController,
@@ -216,6 +293,7 @@ class _ProfilePageState extends State<ProfilePage>
                 collapseMode: CollapseMode.pin,
                 background: profileWidget(context, _data.info),
               ),
+              actions: <Widget>[Container()],
               bottom: TabBar(
                 tabs: <Widget>[
                   Tab(
@@ -295,6 +373,23 @@ class Menu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: BackButtonIcon(),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        titleSpacing: 0.0,
+        title: Text(
+          'Settings',
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            color: notBlack,
+            fontSize: 18,
+          ),
+        ),
+      ),
       body: ListView(
         children: <Widget>[
           ListTile(

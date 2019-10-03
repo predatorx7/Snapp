@@ -23,6 +23,11 @@ TextStyle headStyle() => TextStyle(
       color: notBlack,
       fontSize: 14,
     );
+TextStyle head2Style() => TextStyle(
+      fontWeight: FontWeight.bold,
+      color: notBlack,
+      fontSize: 16,
+    );
 
 TextStyle actionTitleStyle() => TextStyle(
       fontWeight: FontWeight.normal,

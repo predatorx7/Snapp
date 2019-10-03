@@ -6,7 +6,6 @@ import '../../models/plain_models/profile.dart';
 /// Provides CRUD operations with profile info in database
 class ProfileService {
   FirebaseDatabase _database = new FirebaseDatabase();
-  FirebaseUser _user;
   /// Creates a new user profile in database
   Future createProfile(
       String _fullName, FirebaseUser user, String _username) async {

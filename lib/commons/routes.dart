@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:instagram/models/view_models/change_username.dart';
+import 'package:instagram/ui/screens/edit_profile.dart';
 import '../ui/screens/registeration/change_username.dart';
 import 'routing_constants.dart';
 import '../models/view_models/login_page.dart';
@@ -95,6 +96,10 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case ProfilePageRoute:
       return MaterialPageRoute(
         builder: (context) => ProfilePage(),
+      );
+    case EditProfileRoute:
+      return MaterialPageRoute(
+        builder: (context) => EditProfile(),
       );
     default:
       return MaterialPageRoute(builder: (context) => Splash());

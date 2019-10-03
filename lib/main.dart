@@ -41,8 +41,6 @@ class Root extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: mainTheme,
-      // Specify Initial route
-      // initialRoute: '/',
       onGenerateRoute: generateRoute,
       home: Consumer(
         builder: (context, AuthNotifier userAuth, _) {

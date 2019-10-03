@@ -35,6 +35,7 @@ dependencies:
   connectivity: ^0.4.4
   # exp 
   multi_page_form: ^1.0.4
+  scoped_model: ^1.0.1
   # for Profile information View
   # not under active use
   flutter_sticky_header: 0.3.4

@@ -7,7 +7,7 @@ import 'package:instagram/core/services/registration_service.dart';
 enum Status { Uninitialized, Authenticated, Authenticating, Unauthenticated }
 
 class AuthNotifier with ChangeNotifier {
-  FirebaseAuth _auth;
+  FirebaseAuth _auth = FirebaseAuth.instance;
   FirebaseUser _user;
   Status _status = Status.Uninitialized;
 
@@ -39,7 +39,9 @@ class AuthNotifier with ChangeNotifier {
       // Starting Authentication
       _status = Status.Authenticating;
       notifyListeners();
-      await _auth.signInWithEmailAndPassword(email: email, password: password);
+      FirebaseAuth _otherAuth = FirebaseAuth.instance;
+      await _otherAuth.signInWithEmailAndPassword(
+          email: email, password: password);
       // Will not return if error caught.
       return true;
     } catch (error) {
@@ -139,6 +141,10 @@ class AuthNotifier with ChangeNotifier {
       _status = Status.Authenticated;
     }
     print('[Auth] Current Auth Status: ${_status.toString()}');
-    notifyListeners();
+    try {
+      notifyListeners();
+    } catch (e) {
+      print('[Auth] NotifyListeners() :(');
+    }
   }
 }

@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import '../../../commons/routing_constants.dart';
 import '../../../core/services/registration_service.dart';
 import '../../../core/services/profile.dart';
+import '../../../main.dart';
 import '../../../models/view_models/signup_page.dart';
 import '../../components/buttons.dart';
 import 'package:provider/provider.dart';
 import '../../../models/plain_models/auth.dart';
 import '../../../commons/styles.dart';
 import '../../../core/utils/validators.dart';
-import 'change_username.dart';
 
 class SignUpPage extends StatelessWidget {
   @override
@@ -26,7 +26,6 @@ class _SignStep1 extends StatefulWidget {
 class __SignStep1State extends State<_SignStep1> {
   TextEditingController _usernameController;
   GlobalKey _key = GlobalKey<ScaffoldState>();
-  // bool _isButtonDisabled = true, _isTapped = false, _showError = false;
 
   FocusNode _focusEmail;
 
@@ -196,6 +195,7 @@ class __SignStep1State extends State<_SignStep1> {
                     onPressed: view.isButtonDisabled
                         ? null
                         : () async {
+                            view.setStatus(SignUpStatus.Running);
                             bool emailExists;
                             Validator3000 valValue = Validator3000();
                             print('I work');
@@ -213,6 +213,7 @@ class __SignStep1State extends State<_SignStep1> {
                                     arguments: _usernameController.text);
                               }
                             }
+                            view.setStatus(SignUpStatus.Failed);
                           },
                   );
                 },
@@ -258,9 +259,7 @@ class SignStep2 extends StatefulWidget {
 }
 
 class _SignStep2State extends State<SignStep2> {
-  // TODO Here
   TextEditingController _usernameController, _passwordController;
-  // bool _isButtonDisabled = true, _isTapped = false, _showError = false;
   GlobalKey<ScaffoldState> _key = GlobalKey<ScaffoldState>();
   FocusNode _focusPassword;
   @override
@@ -371,6 +370,7 @@ class _SignStep2State extends State<SignStep2> {
                 onPressed: _signUp.isButtonDisabled
                     ? null
                     : () async {
+                        _signUp.setStatus(SignUp2Status.Running);
                         Validator3000 valValue = Validator3000();
                         print('I work');
                         var validity = true;
@@ -412,6 +412,7 @@ class _SignStep2State extends State<SignStep2> {
                             ),
                           );
                         }
+                        _signUp.setStatus(SignUp2Status.Failed);
                       },
               ),
             ),
@@ -478,7 +479,6 @@ class _SignStep3State extends State<SignStep3> {
 
   @override
   void dispose() {
-    _view.dispose();
     super.dispose();
   }
 
@@ -518,6 +518,7 @@ class _SignStep3State extends State<SignStep3> {
               height: 46,
               width: double.infinity,
               child: ICFlatButton(
+                conditionForProcessIndicator: (_view.username == null),
                 text: 'Next',
                 onPressed: (_view.username == null)
                     ? null
@@ -530,7 +531,7 @@ class _SignStep3State extends State<SignStep3> {
                             context,
                             _view.username);
                         result
-                            ? print('user created: ${userAuth.user}')
+                            ? Navigator.popUntil(context, ModalRoute.withName('/'))
                             : print('Something unexpected happened');
                         print('Finished');
                       },

@@ -137,7 +137,7 @@ enum SignUp3Status {
 
 class SignUp3ViewModel with ChangeNotifier {
   SignUp3Status _status = SignUp3Status.Uninitialized;
-  bool _isButtonDisabled = true, _isTapped = false, _showError = false;
+  bool _isButtonDisabled = false, _isTapped = false, _showError = false;
   String _username, _oldUsername;
   bool hasUsername = false;
   String get username => _username;

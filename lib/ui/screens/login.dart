@@ -26,8 +26,6 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void dispose() {
-    user.dispose();
-    view.dispose();
     _usernameController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -159,7 +157,6 @@ class _LoginPageState extends State<LoginPage> {
               ),
               GestureDetector(
                 onTap: () {
-                  print('[Login Page] Detected Gesture');
                   Navigator.of(context).pushNamed(SignUpRoute);
                 },
                 child: Padding(

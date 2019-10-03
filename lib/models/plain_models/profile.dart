@@ -56,6 +56,7 @@ class Profile {
       this.username});
 
   Profile.fromMap(DataSnapshot snapshotData) {
+    print('[Profile] From map to profile object: ${snapshotData.value}');
     key = snapshotData.value.keys.first;
     var mainData = snapshotData.value[key];
     uid = mainData['uid'] ?? '';

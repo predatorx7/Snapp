@@ -8,9 +8,11 @@ import 'package:instagram/commons/styles.dart';
 import 'package:instagram/models/plain_models/auth.dart';
 import 'package:instagram/models/plain_models/information.dart';
 import 'package:instagram/models/plain_models/profile.dart';
+import 'package:instagram/models/view_models/navigation_bar.dart';
 import 'package:instagram/ui/components/noback.dart';
 import 'package:instagram/ui/screens/profile_page.dart';
 import 'package:provider/provider.dart';
+import 'package:scoped_model/scoped_model.dart';
 
 import 'homeView.dart';
 
@@ -38,7 +40,6 @@ class _InstagramState extends State<Instagram> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    data.dispose();
     super.dispose();
   }
 
@@ -59,9 +60,9 @@ class _InstagramState extends State<Instagram> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     print('[Instagram] User ${widget.user.email}');
-    return MaterialApp(
-      theme: mainTheme,
-      home: NoBack(
+    return NoBack(
+      child: ScopedModel<BottomNavigationBarModel>(
+        model: BottomNavigationBarModel(),
         child: Scaffold(
           body: StreamBuilder(
             stream: _database
@@ -77,8 +78,8 @@ class _InstagramState extends State<Instagram> with TickerProviderStateMixin {
                   return Center(
                     child: Theme(
                       data: Theme.of(context).copyWith(
-                        accentColor: Colors.white,
-                        primaryColor: Colors.blue,
+                        accentColor: Color(actionColor),
+                        primaryColor: Colors.white,
                       ),
                       child: SizedBox(
                         height: 27,
@@ -96,6 +97,8 @@ class _InstagramState extends State<Instagram> with TickerProviderStateMixin {
                       child: Text(':('),
                     );
                   } else {
+                    print(
+                        '[Instagram] Event Snapshot Error: ${eventSnapshot.error}');
                     data.setInfo(Profile.fromMap(eventSnapshot.data.snapshot));
                     print(
                         '[Instagram] Recieved Profile Data: ${data.info.toJson()}');
@@ -187,6 +190,8 @@ class _InstagramState extends State<Instagram> with TickerProviderStateMixin {
                     child: GestureDetector(
                       onTap: () => _setIndex(1),
                       onLongPress: () {
+                        setState(() {});
+                        Provider.of<AuthNotifier>(context).signOut();
                       },
                       child: Image(
                         image: AssetImage(

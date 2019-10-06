@@ -234,15 +234,10 @@ class _UploadMediaState extends State<UploadMedia> {
                         _isLoading = true;
                       });
                       captionFocus.unfocus();
-                      await uploadFile(widget.imageFile, userRepo.user,
+                      await uploadFile(widget.imageFile, userRepo.user.uid,
                           captionController.text);
                       // Upload and await here
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => Instagram(),
-                        ),
-                      );
+                      Navigator.popUntil(context, ModalRoute.withName('/'));
                     },
               text: 'Share',
               textSize: 16,
@@ -293,14 +288,17 @@ class _UploadMediaState extends State<UploadMedia> {
   }
 }
 
-Future uploadFile(File _image, FirebaseUser user, String caption) async {
+Future uploadFile(File _image, String uid, String caption) async {
+  int time = DateTime.now().millisecondsSinceEpoch;
   StorageReference storageReference = FirebaseStorage.instance
       .ref()
-      .child('posts/${user.uid}/${DateTime.now().millisecondsSinceEpoch}');
+      .child('posts/$uid/${DateTime.now().millisecondsSinceEpoch}');
   StorageUploadTask uploadTask = storageReference.putFile(_image);
   await uploadTask.onComplete;
   print('File Uploaded');
-  storageReference.getDownloadURL().then((fileURL) {
-    PostService().createPost(fileURL, user, caption);
-  });
+  storageReference.getDownloadURL().then(
+    (fileURL) {
+      PostService().createPost(fileURL, uid, caption, time);
+    },
+  );
 }

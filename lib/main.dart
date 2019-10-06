@@ -57,6 +57,7 @@ class Root extends StatelessWidget {
           }
         },
       ),
+      /// Does a similar job without being dependent on provider
       // home: StreamBuilder(
       //   stream: FirebaseAuth.instance.onAuthStateChanged,
       //   builder: (BuildContext context, AsyncSnapshot<FirebaseUser> snapshot) {

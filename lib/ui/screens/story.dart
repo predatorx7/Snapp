@@ -81,7 +81,7 @@ class _UploadStoryStageState extends State<UploadStoryStage> {
               Center(
                 child: TappableText(
                   onTap: () async {
-                    await uploadStory(widget.image, userRepo.user);
+                    await uploadStory(widget.image, userRepo.user.uid);
                     Navigator.pop(context);
                   },
                   text: 'Share',
@@ -109,14 +109,14 @@ class _UploadStoryStageState extends State<UploadStoryStage> {
   }
 }
 
-Future uploadStory(File _image, FirebaseUser user) async {
+Future uploadStory(File _image, String uid) async {
   StorageReference storageReference = FirebaseStorage.instance
       .ref()
-      .child('stories/${user.uid}/${DateTime.now().millisecondsSinceEpoch}');
+      .child('stories/$uid/${DateTime.now().millisecondsSinceEpoch}');
   StorageUploadTask uploadTask = storageReference.putFile(_image);
   await uploadTask.onComplete;
   print('Story Uploaded');
   storageReference.getDownloadURL().then((fileURL) {
-    StoryService().createStory(fileURL, '', user);
+    StoryService().createStory(fileURL, '', uid);
   });
 }

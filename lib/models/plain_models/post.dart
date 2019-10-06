@@ -4,7 +4,7 @@ import 'package:meta/meta.dart';
 class Post {
   /// Timestamp of post creation (UNIX Epoch Milliseconds) optional
   int creationTime;
- 
+
   // Post description or Caption
   String description;
 
@@ -25,12 +25,16 @@ class Post {
     this.postKey,
   });
 
-  Post.fromMap(DataSnapshot snapshot, String publisher)
-      : postKey = snapshot.key,
-        creationTime = snapshot.value['creationTime'] ?? '',
-        description = snapshot.value['description'] ?? '',
-        imageURL = snapshot.value['imageURL'] ?? '',
-        publisher = publisher ?? '';
+  Post.fromMap(DataSnapshot snapshot) {
+    Map dataMap = snapshot.value;
+    postKey = dataMap.keys.toList()[0];
+    dataMap = dataMap[postKey];
+    print('[Posts] $dataMap');
+    creationTime = dataMap['creationTime'] ?? null;
+    description = dataMap['description'] ?? '';
+    imageURL = dataMap['imageURL'] ?? '';
+    publisher = dataMap['publisher'] ?? '';
+  }
 
   /// Provides data in JSON format. Provides current time if not optionally disabled.
   Map<String, dynamic> toJson({bool provideWithCurrentTime = true}) {

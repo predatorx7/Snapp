@@ -66,7 +66,9 @@ class Profile {
     follows = mainData['follows'] ?? [];
     fullName = mainData['fullName'] ?? '';
     gender = mainData['gender'] ?? '';
-    posts = mainData['posts'] ?? [];
+    Map rawPostsMap = mainData['posts'] ?? {};
+    posts = rawPostsMap.values.toList() ?? [];
+    print('[Profile] These are posts: ${posts.toString()}');
     profileImage = mainData['profileImage'] ?? '';
     stories = mainData['stories'] ?? [];
     username = mainData['username'] ?? '';

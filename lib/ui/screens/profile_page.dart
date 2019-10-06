@@ -1,6 +1,8 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram/commons/routing_constants.dart';
+import 'package:instagram/core/adapters/posts.dart';
 import '../../commons/styles.dart';
 import '../../core/services/profile.dart';
 import '../../models/plain_models/auth.dart';
@@ -8,6 +10,7 @@ import '../../models/plain_models/information.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/plain_models/profile.dart';
+import 'test.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key key}) : super(key: key);
@@ -28,6 +31,7 @@ class _ProfilePageState extends State<ProfilePage>
   TextStyle stateful = TextStyle(fontWeight: FontWeight.bold, fontSize: 16);
   TextStyle stateless = TextStyle();
   ProfileService profileAdapter = ProfileService();
+  FirebaseDatabase _database = FirebaseDatabase();
   @override
   void initState() {
     super.initState();
@@ -54,130 +58,138 @@ class _ProfilePageState extends State<ProfilePage>
     }
     print(data.bio);
     return SingleChildScrollView(
-      padding: EdgeInsets.all(16),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              // Profile Photo
-              Padding(
-                padding: const EdgeInsets.all(4),
-                child: GestureDetector(
-                  onTap: () {
-                    print('To change profile photo');
-                  },
-                  child: Stack(
-                    children: <Widget>[
-                      CircleAvatar(
-                        radius: 45,
-                        backgroundColor: Colors.grey[200],
-                        child: data.profileImage.isNotEmpty
-                            ? Image.network(
-                                data.profileImage,
-                              )
-                            : Image(
-                                fit: BoxFit.contain,
-                                image: AssetImage('assets/icon/ic_profile.png'),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    // Profile Photo
+                    Padding(
+                      padding: const EdgeInsets.all(4),
+                      child: GestureDetector(
+                        onTap: () {
+                          print('To change profile photo');
+                        },
+                        child: Stack(
+                          children: <Widget>[
+                            CircleAvatar(
+                              radius: 45,
+                              backgroundColor: Colors.grey[200],
+                              child: data.profileImage.isNotEmpty
+                                  ? Image.network(
+                                      data.profileImage,
+                                    )
+                                  : Image(
+                                      fit: BoxFit.contain,
+                                      image: AssetImage(
+                                          'assets/icon/ic_profile.png'),
+                                    ),
+                            ),
+                            Positioned(
+                              right: 0,
+                              bottom: 0,
+                              child: Container(
+                                padding: const EdgeInsets.all(1.0),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                    color: Color(actionColor),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    Icons.add,
+                                    size: 20,
+                                    color: Colors.white,
+                                  ),
+                                ),
                               ),
-                      ),
-                      Positioned(
-                        right: 0,
-                        bottom: 0,
-                        child: Container(
-                          padding: const EdgeInsets.all(1.0),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Container(
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              color: Color(actionColor),
-                              shape: BoxShape.circle,
                             ),
-                            child: Icon(
-                              Icons.add,
-                              size: 20,
-                              color: Colors.white,
-                            ),
-                          ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                    // Posts
+                    Column(
+                      children: <Widget>[
+                        Text(
+                          '${data.posts.length ?? 0}',
+                          style: stateful,
+                        ),
+                        Text(
+                          'Posts',
+                        ),
+                      ],
+                    ),
+                    // Followers
+                    Column(
+                      children: <Widget>[
+                        Text(
+                          '${data.followers.length ?? 0}',
+                          style: stateful,
+                        ),
+                        Text(
+                          'Followers',
+                        ),
+                      ],
+                    ),
+                    // Following
+                    Column(
+                      children: <Widget>[
+                        Text(
+                          '${data.followers.length ?? 0}',
+                          style: stateful,
+                        ),
+                        Text(
+                          'Following',
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-              ),
-              // Posts
-              Column(
-                children: <Widget>[
-                  Text(
-                    '${data.posts.length ?? 0}',
-                    style: stateful,
-                  ),
-                  Text(
-                    'Posts',
-                  ),
-                ],
-              ),
-              // Followers
-              Column(
-                children: <Widget>[
-                  Text(
-                    '${data.followers.length ?? 0}',
-                    style: stateful,
-                  ),
-                  Text(
-                    'Followers',
-                  ),
-                ],
-              ),
-              // Following
-              Column(
-                children: <Widget>[
-                  Text(
-                    '${data.followers.length ?? 0}',
-                    style: stateful,
-                  ),
-                  Text(
-                    'Following',
-                  ),
-                ],
-              ),
-            ],
-          ),
-          SizedBox(
-            height: 8,
-          ),
-          Text(
-            data.fullName,
-            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
-          ),
-          Text(
-            data.bio,
-          ),
-          SizedBox(
-            height: 15,
-          ),
-          ConstrainedBox(
-            constraints: const BoxConstraints(minWidth: double.infinity),
-            child: SizedBox(
-              height: 30,
-              child: OutlineButton(
-                child: Text(
-                  'Edit Profile',
+                SizedBox(
+                  height: 8,
+                ),
+                Text(
+                  data.fullName,
                   style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
                 ),
-                color: Colors.white,
-                highlightedBorderColor: Colors.grey,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(4)),
-                onPressed: () {
-                  Navigator.pushNamed(context, EditProfileRoute);
-                },
-              ),
+                Text(
+                  data.bio,
+                ),
+                SizedBox(
+                  height: 15,
+                ),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(minWidth: double.infinity),
+                  child: SizedBox(
+                    height: 30,
+                    child: OutlineButton(
+                      child: Text(
+                        'Edit Profile',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w600, fontSize: 14),
+                      ),
+                      color: Colors.white,
+                      highlightedBorderColor: Colors.grey,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(4)),
+                      onPressed: () {
+                        Navigator.pushNamed(context, EditProfileRoute);
+                      },
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           Divider()
@@ -197,22 +209,7 @@ class _ProfilePageState extends State<ProfilePage>
           _data.info.username,
           style: TextStyle(fontSize: 16),
         ),
-        actions: <Widget>[
-          // IconButton(
-          //   icon: Icon(Icons.menu),
-          //   onPressed: () {
-          //     print('menu');
-          //     Navigator.push(
-          //       context,
-          //       CupertinoPageRoute(
-          //         builder: (context) => Menu(
-          //           userInfo: _data.info,
-          //         ),
-          //       ),
-          //     );
-          //   },
-          // )
-        ],
+        actions: <Widget>[],
         backgroundColor: Colors.white,
       ),
       endDrawer: Drawer(
@@ -334,11 +331,11 @@ class _ProfilePageState extends State<ProfilePage>
                           child: new GridTile(
                             footer: Text('Caption'),
                             child: Container(
-                              child: new Image.network(
-                                _data.info.posts[index],
-                                fit: BoxFit.fitWidth,
-                              ),
-                            ), //just for testing, will fill with image later
+                                // child: new Image.network(
+                                //   _data.info.posts[index],
+                                //   fit: BoxFit.fitWidth,
+                                // ),
+                                ),
                           ),
                         );
                       },
@@ -346,15 +343,12 @@ class _ProfilePageState extends State<ProfilePage>
                     ListView.builder(
                       itemCount: _data.info.posts.length,
                       itemBuilder: (BuildContext context, int index) {
-                        String url = (_data.info.posts.asMap().toString());
-                        return new Material(
-                          child: new GridTile(
-                            footer: Text('Caption'),
-                            child: new Image.network(
-                              _data.info.posts[index],
-                              fit: BoxFit.fitWidth,
-                            ), //just for testing, will fill with image later
-                          ),
+                        return PostAdapters(
+                          uid: _data.info.uid,
+                          creationTime: _data.info.posts[index],
+                          isInGrid: false,
+                          database: _database,
+                          height: MediaQuery.of(context).size.width,
                         );
                       },
                     ),
@@ -406,7 +400,21 @@ class Menu extends StatelessWidget {
                 fontWeight: FontWeight.normal,
               ),
             ),
-          )
+          ),
+          Divider(),
+          GestureDetector(
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => TestPage(),
+                ),
+              );
+            },
+            child: Padding(
+              padding: EdgeInsets.all(10),
+              child: Text('Instagram clone'),
+            ),
+          ),
         ],
       ),
     );

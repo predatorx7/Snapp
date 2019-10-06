@@ -8,7 +8,7 @@ class InfoModel with ChangeNotifier {
 
   double get heightOfFlexSpace => _heightOfFlexSpace;
 
-  Adapt _flexibleSpaceHeight = Adapt(size: 250);
+  Adapt _flexibleSpaceHeight = Adapt(size: 260);
   InfoModel();
   Profile get info => _info;
 

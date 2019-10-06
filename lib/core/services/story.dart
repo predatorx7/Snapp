@@ -9,16 +9,16 @@ class StoryService {
   FirebaseDatabase _database = new FirebaseDatabase();
 
   /// Creates a new user story in database
-  createStory(_imageURL, String _storyIs, FirebaseUser user) async {
+  createStory(_imageURL, String _storyIs, String uid) async {
     Story _story = new Story(
       imageURL: _imageURL,
-      publisher: user.uid,
+      publisher: uid,
     );
     print('Pushing story to database: ${_story.toJson()}');
 
     try {
       _database.reference().child("storys").push().set(_story.toJson());
-      DataSnapshot snapshot = await ProfileService().getProfileSnapshot(user);
+      DataSnapshot snapshot = await ProfileService().getProfileSnapshot(uid);
       Profile data = Profile.fromMap(snapshot);
       data.stories.add(_imageURL);
       ProfileService().updateProfile(data);

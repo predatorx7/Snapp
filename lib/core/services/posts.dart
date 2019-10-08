@@ -11,12 +11,13 @@ class PostService {
 
   /// Creates a new user post in database
   void createPost(
-      _imageURL, String uid, String caption, int time) async {
+      _imageURL, String uid, String caption, int time, String username) async {
     Post _post = new Post(
       imageURL: _imageURL,
       publisher: uid,
       description: caption,
       creationTime: time,
+      publisherUsername: username,
     );
     print('Pushing post to database: ${_post.toJson()}');
 

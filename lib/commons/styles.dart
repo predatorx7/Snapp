@@ -1,5 +1,18 @@
 import 'package:flutter/material.dart';
 
+Widget icProcessIndicator(context) => Theme(
+      data: Theme.of(context).copyWith(
+        accentColor: Colors.grey[300],
+        primaryColor: Colors.grey,
+      ),
+      child: SizedBox(
+        height: 28,
+        width: 28,
+        child: new CircularProgressIndicator(
+          strokeWidth: 1,
+        ),
+      ),
+    );
 ThemeData mainTheme = ThemeData(
   cursorColor: Colors.teal,
   textSelectionColor: Color(0x550077ff),
@@ -33,6 +46,11 @@ TextStyle actionTitleStyle() => TextStyle(
       fontWeight: FontWeight.normal,
       color: notBlack,
       fontSize: 16,
+    );
+TextStyle actionTitle2Style() => TextStyle(
+      fontWeight: FontWeight.normal,
+      color: notBlack,
+      fontSize: 14,
     );
 TextStyle actionTapStyle() => TextStyle(
       fontWeight: FontWeight.bold,

@@ -1,14 +1,15 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:instagram/commons/routing_constants.dart';
-import 'package:instagram/core/adapters/posts.dart';
+import 'package:instagram/commons/assets.dart';
+import 'package:instagram/ui/screens/post_list.dart';
+import 'package:provider/provider.dart';
+import '../../commons/routing_constants.dart';
+import '../../core/adapters/posts.dart';
 import '../../commons/styles.dart';
 import '../../core/services/profile.dart';
 import '../../models/plain_models/auth.dart';
 import '../../models/plain_models/information.dart';
-import 'package:provider/provider.dart';
-
 import '../../models/plain_models/profile.dart';
 import 'test.dart';
 
@@ -85,11 +86,7 @@ class _ProfilePageState extends State<ProfilePage>
                                   ? Image.network(
                                       data.profileImage,
                                     )
-                                  : Image(
-                                      fit: BoxFit.contain,
-                                      image: AssetImage(
-                                          'assets/icon/ic_profile.png'),
-                                    ),
+                                  : CommonImages.profilePic1,
                             ),
                             Positioned(
                               right: 0,
@@ -200,7 +197,6 @@ class _ProfilePageState extends State<ProfilePage>
 
   @override
   Widget build(BuildContext context) {
-    print('[Profile] Height of Flex Space: ${_data.heightOfFlexSpace}');
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -209,7 +205,6 @@ class _ProfilePageState extends State<ProfilePage>
           _data.info.username,
           style: TextStyle(fontSize: 16),
         ),
-        actions: <Widget>[],
         backgroundColor: Colors.white,
       ),
       endDrawer: Drawer(
@@ -258,10 +253,7 @@ class _ProfilePageState extends State<ProfilePage>
                             ),
                           );
                         },
-                        leading: Image(
-                          image: AssetImage(
-                              'assets/res_icons/settingsOutline.png'),
-                        ),
+                        leading: CommonImages.settingsIcon,
                         title: Text(
                           'Settings',
                           style: actionTitleStyle(),
@@ -284,7 +276,7 @@ class _ProfilePageState extends State<ProfilePage>
               backgroundColor: Colors.white,
               floating: true,
               pinned: true,
-              snap: true,
+              // snap: true,
               expandedHeight: _data.heightOfFlexSpace,
               flexibleSpace: FlexibleSpaceBar(
                 collapseMode: CollapseMode.pin,
@@ -292,6 +284,7 @@ class _ProfilePageState extends State<ProfilePage>
               ),
               actions: <Widget>[Container()],
               bottom: TabBar(
+                indicatorColor: notBlack,
                 tabs: <Widget>[
                   Tab(
                     icon: Icon(
@@ -325,32 +318,20 @@ class _ProfilePageState extends State<ProfilePage>
                           new SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 3),
                       itemBuilder: (BuildContext context, int index) {
-                        // url = (data.posts[index]);
-                        url = (_data.info.posts.asMap().toString());
-                        return new Material(
-                          child: new GridTile(
-                            footer: Text('Caption'),
-                            child: Container(
-                                // child: new Image.network(
-                                //   _data.info.posts[index],
-                                //   fit: BoxFit.fitWidth,
-                                // ),
-                                ),
-                          ),
-                        );
-                      },
-                    ),
-                    ListView.builder(
-                      itemCount: _data.info.posts.length,
-                      itemBuilder: (BuildContext context, int index) {
                         return PostAdapters(
                           uid: _data.info.uid,
                           creationTime: _data.info.posts[index],
-                          isInGrid: false,
+                          isInGrid: true,
                           database: _database,
                           height: MediaQuery.of(context).size.width,
+                          index: index,
                         );
                       },
+                    ),
+                    PostsList(
+                      data: _data,
+                      database: _database,
+                      height: MediaQuery.of(context).size.width,
                     ),
                   ],
                 )

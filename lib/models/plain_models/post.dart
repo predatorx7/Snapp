@@ -14,6 +14,8 @@ class Post {
   /// UserId of publisher `required`
   String publisher;
 
+  String publisherUsername;
+
   /// This is key for database values of Posts
   String postKey;
 
@@ -22,6 +24,7 @@ class Post {
     this.description,
     @required this.imageURL,
     @required this.publisher,
+    @required this.publisherUsername,
     this.postKey,
   });
 
@@ -34,6 +37,7 @@ class Post {
     description = dataMap['description'] ?? '';
     imageURL = dataMap['imageURL'] ?? '';
     publisher = dataMap['publisher'] ?? '';
+    publisherUsername = dataMap['publisherUsername'] ?? '';
   }
 
   /// Provides data in JSON format. Provides current time if not optionally disabled.
@@ -49,6 +53,7 @@ class Post {
       "description": description,
       "imageURL": imageURL,
       "publisher": publisher,
+      "publisherUsername":publisherUsername,
     };
   }
 }

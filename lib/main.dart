@@ -57,7 +57,7 @@ class Root extends StatelessWidget {
           }
         },
       ),
-      /// Does a similar job without being dependent on provider
+      // ! Does a similar job without being dependent on provider
       // home: StreamBuilder(
       //   stream: FirebaseAuth.instance.onAuthStateChanged,
       //   builder: (BuildContext context, AsyncSnapshot<FirebaseUser> snapshot) {
@@ -106,7 +106,7 @@ class Splash extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.only(top: 8.0, bottom: 5),
-              child: CircularProgressIndicator(),
+              child: icProcessIndicator(context),
             ),
             Text('wait')
           ],

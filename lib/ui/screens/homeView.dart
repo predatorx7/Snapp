@@ -1,6 +1,7 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:instagram/commons/assets.dart';
 import 'package:instagram/core/services/profile.dart';
 import 'package:instagram/models/plain_models/information.dart';
 import 'package:instagram/ui/components/handle_view_show.dart';
@@ -71,16 +72,12 @@ class _HomePageState extends State<HomePage> {
                     ),
                   );
                 },
-                child: Image(
-                  image: AssetImage('assets/res_icons/cameraOutline.png'),
-                ),
+                child: CommonImages.cameraOutline,
               ),
               SizedBox(
                 width: 10,
               ),
-              Image(
-                image: AssetImage('assets/res_image/logo.png'),
-              ),
+              CommonImages.logo,
             ],
           ),
         ),
@@ -99,9 +96,7 @@ class _HomePageState extends State<HomePage> {
               children: <Widget>[
                 Container(
                   height: 50,
-                  child: Image(
-                    image: AssetImage('assets/res_icons/directOutline.png'),
-                  ),
+                  child: CommonImages.directOutline2,
                 ),
                 ChangeNotifierProvider(
                   builder: (context) => MessageNotificationModel(),

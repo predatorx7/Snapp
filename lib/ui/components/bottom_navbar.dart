@@ -1,15 +1,10 @@
 import 'package:flutter/material.dart';
 
-BottomNavigationBarItem icBottomNavBarItem(
-    {String imageAddress, String activeImageAddress}) {
+BottomNavigationBarItem icBottomNavBarItem({Image image, Image activeImage}) {
   return BottomNavigationBarItem(
     title: Container(height: 0.0),
-    icon: Image(
-      image: AssetImage(imageAddress),
-    ),
-    activeIcon: Image(
-      image: AssetImage(activeImageAddress),
-    ),
+    icon: image,
+    activeIcon: activeImage,
   );
 }
 

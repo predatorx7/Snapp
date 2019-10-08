@@ -10,7 +10,7 @@ import '../ui/screens/instagram.dart';
 import '../ui/screens/login.dart';
 import '../ui/screens/profile_page.dart';
 import '../ui/screens/registeration/signup_page.dart';
-import '../ui/screens/upload.dart';
+import '../ui/screens/post_upload.dart';
 import 'package:provider/provider.dart';
 
 import '../main.dart';
@@ -86,12 +86,7 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       );
     case UploadPostRoute:
       return MaterialPageRoute(
-        builder: (context) => MultiProvider(
-          providers: [
-            ChangeNotifierProvider(builder: (_) => SignUpViewModel()),
-          ],
-          child: UploadPage(),
-        ),
+        builder: (context) =>  PostUploadPage()
       );
     case ProfilePageRoute:
       return MaterialPageRoute(

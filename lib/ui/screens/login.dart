@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:instagram/commons/assets.dart';
 import 'package:instagram/commons/routing_constants.dart';
 import 'package:instagram/models/view_models/login_page.dart';
 import '../../commons/styles.dart';
@@ -61,9 +62,7 @@ class _LoginPageState extends State<LoginPage> {
                 children: <Widget>[
                   Container(
                     height: 65,
-                    child: Image(
-                      image: AssetImage('assets/res_image/logo.png'),
-                    ),
+                    child: CommonImages.logo,
                   ),
                   SizedBox(
                     height: 20,
@@ -122,8 +121,7 @@ class _LoginPageState extends State<LoginPage> {
                                   if (await user.signIn(
                                       _usernameController.text,
                                       _passwordController.text,
-                                      _key)) {
-                                  }
+                                      _key)) {}
                                 },
                         );
                       },

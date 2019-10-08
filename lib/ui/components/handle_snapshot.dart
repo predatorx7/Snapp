@@ -1,5 +1,6 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:instagram/commons/styles.dart';
 
 /// Handles Snapshot with custom configurations as a StreamBuilder
 class HandleSnapshot extends StatefulWidget {
@@ -21,7 +22,7 @@ class _HandleSnapshotState extends State<HandleSnapshot> {
         switch (snapshot.connectionState) {
           case ConnectionState.waiting:
             return new Center(
-              child: CircularProgressIndicator(),
+              child: icProcessIndicator(context),
             );
           case ConnectionState.active:
             return new Text('Result: ${snapshot.data}');

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:instagram/commons/assets.dart';
 import '../components/buttons.dart';
 
 class CommentsPage extends StatefulWidget {
@@ -41,12 +42,7 @@ class _CommentsPageState extends State<CommentsPage> {
               },
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Image(
-                  image: AssetImage('assets/res_icons/directOutline.png'),
-                  fit: BoxFit.contain,
-                  width: 25.0,
-                  height: 25.0,
-                ),
+                child: CommonImages.directOutline,
               ),
             ),
           ),

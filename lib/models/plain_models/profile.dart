@@ -56,6 +56,7 @@ class Profile {
       this.username});
 
   Profile.fromMap(DataSnapshot snapshotData) {
+    List postLists;
     print('[Profile] From map to profile object: ${snapshotData.value}');
     key = snapshotData.value.keys.first;
     var mainData = snapshotData.value[key];
@@ -66,8 +67,16 @@ class Profile {
     follows = mainData['follows'] ?? [];
     fullName = mainData['fullName'] ?? '';
     gender = mainData['gender'] ?? '';
-    Map rawPostsMap = mainData['posts'] ?? {};
-    posts = rawPostsMap.values.toList() ?? [];
+    // When creating posts by pushing, only the last post pushed has a unique key, the previous ones are altered with incremented numbers on push. Thus
+    // on removing the last post, list is parsed instead of a Map. The below try/catch deals with it properly.
+    try {
+      Map rawPostsMap = mainData['posts'] ?? {};
+      postLists = rawPostsMap.values.toList() ?? [];
+    } catch (e) {
+      List rawPostsList = mainData['posts'] ?? [];
+      postLists = rawPostsList ?? [];
+    }
+    posts = postLists;
     print('[Profile] These are posts: ${posts.toString()}');
     profileImage = mainData['profileImage'] ?? '';
     stories = mainData['stories'] ?? [];

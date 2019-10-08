@@ -1,22 +1,20 @@
 import 'dart:io';
 
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../core/services/posts.dart';
-import '../../models/plain_models/auth.dart';
-import '../components/buttons.dart';
 import 'package:provider/provider.dart';
-import 'instagram.dart';
+import '../../models/plain_models/information.dart';
+import '../../core/services/posts.dart';
+import '../components/buttons.dart';
 
-class UploadPage extends StatefulWidget {
-  const UploadPage({Key key}) : super(key: key);
+class PostUploadPage extends StatefulWidget {
+  const PostUploadPage({Key key}) : super(key: key);
   @override
-  _UploadPageState createState() => _UploadPageState();
+  _PostUploadPageState createState() => _PostUploadPageState();
 }
 
-class _UploadPageState extends State<UploadPage> {
+class _PostUploadPageState extends State<PostUploadPage> {
   File _image;
   int _buttonIndex = 0;
 
@@ -217,7 +215,7 @@ class _UploadMediaState extends State<UploadMedia> {
 
   @override
   Widget build(BuildContext context) {
-    final userRepo = Provider.of<AuthNotifier>(context);
+    final _info = Provider.of<InfoModel>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -234,8 +232,8 @@ class _UploadMediaState extends State<UploadMedia> {
                         _isLoading = true;
                       });
                       captionFocus.unfocus();
-                      await uploadFile(widget.imageFile, userRepo.user.uid,
-                          captionController.text);
+                      await uploadFile(widget.imageFile, _info.info.uid,
+                          captionController.text, _info.info.username);
                       // Upload and await here
                       Navigator.popUntil(context, ModalRoute.withName('/'));
                     },
@@ -288,7 +286,8 @@ class _UploadMediaState extends State<UploadMedia> {
   }
 }
 
-Future uploadFile(File _image, String uid, String caption) async {
+Future uploadFile(
+    File _image, String uid, String caption, String username) async {
   int time = DateTime.now().millisecondsSinceEpoch;
   StorageReference storageReference = FirebaseStorage.instance
       .ref()
@@ -298,7 +297,7 @@ Future uploadFile(File _image, String uid, String caption) async {
   print('File Uploaded');
   storageReference.getDownloadURL().then(
     (fileURL) {
-      PostService().createPost(fileURL, uid, caption, time);
+      PostService().createPost(fileURL, uid, caption, time, username);
     },
   );
 }

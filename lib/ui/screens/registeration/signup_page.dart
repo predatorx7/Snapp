@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../../commons/routing_constants.dart';
 import '../../../core/services/registration_service.dart';
 import '../../../core/services/profile.dart';
-import '../../../main.dart';
 import '../../../models/view_models/signup_page.dart';
 import '../../components/buttons.dart';
 import 'package:provider/provider.dart';
@@ -86,6 +85,7 @@ class __SignStep1State extends State<_SignStep1> {
           FocusScope.of(context).requestFocus(_focusEmail);
           print('IsTapped now True');
         } else {
+          _focusEmail = FocusNode();
           view.setTap(false);
           print('IsTapped now False');
         }
@@ -139,7 +139,7 @@ class __SignStep1State extends State<_SignStep1> {
             TextField(
               focusNode: _focusEmail,
               onTap: () {
-                if (view.isTapped) view.setTap(true);
+                if (!view.isTapped) view.setTap(true);
               },
               style: TextStyle(
                 color: notBlack,
@@ -531,7 +531,8 @@ class _SignStep3State extends State<SignStep3> {
                             context,
                             _view.username);
                         result
-                            ? Navigator.popUntil(context, ModalRoute.withName('/'))
+                            ? Navigator.popUntil(
+                                context, ModalRoute.withName('/'))
                             : print('Something unexpected happened');
                         print('Finished');
                       },
@@ -549,8 +550,10 @@ class _SignStep3State extends State<SignStep3> {
                       Object navResult = await Navigator.pushNamed(
                           context, ChangeUsernameRoute);
                       List<dynamic> result = navResult;
-                      if (result[0]) {
-                        _view.setUsername(result[1]);
+                      if (result != null) {
+                        if (result[0] ?? false) {
+                          _view.setUsername(result[1]);
+                        }
                       }
                     },
             ),

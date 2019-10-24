@@ -181,7 +181,10 @@ class _ProfilePageState extends State<ProfilePage>
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(4)),
                       onPressed: () {
-                        Navigator.pushNamed(context, EditProfileRoute);
+                        Navigator.pushNamed(
+                          context,
+                          EditProfileRoute,
+                        );
                       },
                     ),
                   ),

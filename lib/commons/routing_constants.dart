@@ -7,3 +7,4 @@ const String UploadPostRoute = 'uploadPosts';
 const String ProfilePageRoute = 'profilePage';
 const String ChangeUsernameRoute = 'changeUsername';
 const String EditProfileRoute = 'editProfile';
+const String ChangeProfilePicRoute = 'changeProfilePic';

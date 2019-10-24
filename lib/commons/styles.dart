@@ -52,10 +52,31 @@ TextStyle actionTitle2Style() => TextStyle(
       color: notBlack,
       fontSize: 14,
     );
+TextStyle actionTitle3Style() => TextStyle(
+      fontWeight: FontWeight.w600,
+      color: notBlack,
+      fontSize: 18,
+    );
+InputDecoration editPageInputBorder(String label) => InputDecoration(
+      labelText: label,
+      focusedBorder: UnderlineInputBorder(
+        borderSide: BorderSide(
+          color: Colors.grey,
+        ),
+      ),
+      labelStyle: TextStyle(
+        color: Colors.grey,
+      ),
+    );
 TextStyle actionTapStyle() => TextStyle(
       fontWeight: FontWeight.bold,
       color: Color(actionColor),
       fontSize: 14,
+    );
+TextStyle actionTap2Style() => TextStyle(
+      fontWeight: FontWeight.normal,
+      color: Color(actionColor),
+      fontSize: 18,
     );
 TextStyle bodyStyle() => TextStyle(
       fontWeight: FontWeight.bold,
@@ -68,7 +89,16 @@ TextStyle body2Style() => TextStyle(
       color: Colors.grey,
       fontSize: 14,
     );
-
+TextStyle body4Style() => TextStyle(
+      fontWeight: FontWeight.normal,
+      color: Colors.grey,
+      fontSize: 12,
+    );
+TextStyle body3Style() => TextStyle(
+      fontWeight: FontWeight.normal,
+      color: notBlack,
+      fontSize: 14,
+    );
 InputBorder fieldInputBorder({Color borderColor}) => OutlineInputBorder(
       borderRadius: BorderRadius.circular(5),
       borderSide: BorderSide(

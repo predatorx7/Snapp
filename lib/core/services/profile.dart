@@ -86,15 +86,21 @@ class ProfileService {
   }
 
   /// Update changes to profile
-  Future<void> updateProfile(Profile profile) async {
+  Future<bool> updateProfile(Profile profile) async {
     print('updating $profile');
-    if (profile != null) {
-      await _database
-          .reference()
-          .child("profiles")
-          .child(profile.key)
-          .set(profile.toJson());
+    try {
+      if (profile != null) {
+        await _database
+            .reference()
+            .child("profiles")
+            .child(profile.key)
+            .set(profile.toJson());
+      }
+    } catch (e) {
+      print('[Profile Service] update profile: Error: $e');
+      return false;
     }
+    return true;
   }
 
   /// Delete user profile

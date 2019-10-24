@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:instagram/models/view_models/change_username.dart';
+import 'package:instagram/models/view_models/edit_profile.dart';
+import 'package:instagram/models/view_models/profile_pic.dart';
+import 'package:instagram/ui/screens/change_profpic.dart';
 import 'package:instagram/ui/screens/edit_profile.dart';
 import '../ui/screens/registeration/change_username.dart';
 import 'routing_constants.dart';
@@ -85,16 +88,21 @@ Route<dynamic> generateRoute(RouteSettings settings) {
         ),
       );
     case UploadPostRoute:
-      return MaterialPageRoute(
-        builder: (context) =>  PostUploadPage()
-      );
+      return MaterialPageRoute(builder: (context) => PostUploadPage());
     case ProfilePageRoute:
       return MaterialPageRoute(
         builder: (context) => ProfilePage(),
       );
     case EditProfileRoute:
       return MaterialPageRoute(
-        builder: (context) => EditProfile(),
+        builder: (context) => ChangeNotifierProvider<EditProfileModel>(
+          builder: (context) => EditProfileModel(),
+          child: EditProfile(),
+        ),
+      );
+    case ChangeProfilePicRoute:
+      return MaterialPageRoute(
+        builder: (context) => ProfilePicChangePage(),
       );
     default:
       return MaterialPageRoute(builder: (context) => Splash());

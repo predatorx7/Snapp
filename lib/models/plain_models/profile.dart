@@ -83,8 +83,23 @@ class Profile {
     username = mainData['username'] ?? '';
   }
 
+  Profile.createFromMap(Map mainData) {
+    key = mainData['key'] ?? '';
+    uid = mainData['uid'] ?? '';
+    bio = mainData['bio'] ?? '';
+    email = mainData['email'] ?? '';
+    followers = mainData['followers'] ?? [];
+    follows = mainData['follows'] ?? [];
+    fullName = mainData['fullName'] ?? '';
+    gender = mainData['gender'] ?? '';
+    posts = mainData['posts'] ?? [];
+    profileImage = mainData['profileImage'] ?? '';
+    stories = mainData['stories'] ?? [];
+  }
+
   Map<String, dynamic> toJson() {
     return {
+      "key": key,
       "bio": bio,
       "email": email,
       "followers": followers,

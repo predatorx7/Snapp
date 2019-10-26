@@ -2,6 +2,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram/commons/assets.dart';
+import 'package:instagram/ui/components/profile_avatar.dart';
 import 'package:instagram/ui/screens/post_list.dart';
 import 'package:provider/provider.dart';
 import '../../commons/routing_constants.dart';
@@ -79,14 +80,20 @@ class _ProfilePageState extends State<ProfilePage>
                         },
                         child: Stack(
                           children: <Widget>[
-                            CircleAvatar(
-                              radius: 45,
-                              backgroundColor: Colors.grey[200],
-                              child: data.profileImage.isNotEmpty
-                                  ? Image.network(
-                                      data.profileImage,
-                                    )
-                                  : CommonImages.profilePic1,
+                            // CircleAvatar(
+                            //   radius: 45,
+                            //   backgroundColor: Colors.grey[200],
+                            //   backgroundImage: data.profileImage.isNotEmpty
+                            //       ? NetworkImage(
+                            //           data.profileImage,
+                            //         )
+                            //       : CommonImages.profilePic1.image,
+                            // ),
+                            ICProfileAvatar(
+                              // database: FirebaseDatabase.instance,
+                              // profileOf: data.uid,
+                              profileURL: data.profileImage,
+                              size: 45,
                             ),
                             Positioned(
                               right: 0,

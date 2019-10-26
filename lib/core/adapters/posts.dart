@@ -1,6 +1,7 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram/models/plain_models/post.dart';
+import 'package:instagram/ui/components/process_indicator.dart';
 
 class PostAdapters extends StatelessWidget {
   final String uid;
@@ -59,12 +60,12 @@ class PostAdapters extends StatelessWidget {
       builder: (BuildContext context, AsyncSnapshot<DataSnapshot> snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.waiting:
-            return new CircularProgressIndicator();
+            return new ICProcessIndicator();
           default:
             if (snapshot.hasData) {
               username = snapshot.data.value;
             } else {
-              print(snapshot.data.toString());
+              print("[Post Adapter] Snapshot doesn't have data");
             }
         }
       },
@@ -88,9 +89,6 @@ class PostAdapters extends StatelessWidget {
                 return Container();
               } else {
                 Post metadata = Post.fromMap(snapshot.data);
-                print(
-                    '[Posts Adapter] Metadata: ${metadata.toJson().toString()}');
-                print('[Posts Adapter] Raw Data: ${snapshot.data.toString()}');
                 return new Material(
                   child: new GridTile(
                     header: this.isInGrid

@@ -109,16 +109,20 @@ class GenerateUsername {
   /// Check username availability for single name
   Future<bool> isUsernameAvailable(String _usernameToCheck) async {
     // Available username
-    bool key;
+    bool key = true;
     key = await _databaseUsernameQuery.equalTo(_usernameToCheck).once().then(
       (DataSnapshot snapshot) {
+        print('Snapshot: ${snapshot.value}');
         if (snapshot.value != null && snapshot.value == _usernameToCheck) {
-          return true;
-        } else {
+          print(
+              "Value: ${snapshot.value} ${snapshot.value == _usernameToCheck}");
           return false;
+        } else {
+          return true;
         }
       },
     );
+    print("Is Username $_usernameToCheck available?: $key");
     return key;
   }
 }

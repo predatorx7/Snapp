@@ -11,10 +11,18 @@ class InfoModel with ChangeNotifier {
   Adapt _flexibleSpaceHeight = Adapt(size: 260);
   InfoModel();
   Profile get info => _info;
-
   void setInfo(Profile information) {
     _info = information;
     _heightOfFlexSpace = _flexibleSpaceHeight.withText(text: _info.bio);
     notifyListeners();
+  }
+
+  void shout() {
+    notifyListeners();
+  }
+
+  void setInfoSilently(Profile information) {
+    _info = information;
+    _heightOfFlexSpace = _flexibleSpaceHeight.withText(text: _info.bio);
   }
 }

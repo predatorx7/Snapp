@@ -58,11 +58,11 @@ class _PostViewState extends State<PostView> {
                             return CircleAvatar(
                               radius: 18,
                               backgroundColor: Colors.grey[200],
-                              child: profURL.isNotEmpty
+                              backgroundImage: profURL.isNotEmpty
                                   ? Image.network(
                                       profURL,
-                                    )
-                                  : CommonImages.profilePic2,
+                                    ).image
+                                  : CommonImages.profilePic2.image,
                             );
                           },
                         ),

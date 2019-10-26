@@ -57,8 +57,14 @@ TextStyle actionTitle3Style() => TextStyle(
       color: notBlack,
       fontSize: 18,
     );
+TextStyle actionTitle4Style() => TextStyle(
+      fontWeight: FontWeight.normal,
+      color: notBlack,
+      fontSize: 18,
+    );
 InputDecoration editPageInputBorder(String label) => InputDecoration(
       labelText: label,
+      alignLabelWithHint: true,
       focusedBorder: UnderlineInputBorder(
         borderSide: BorderSide(
           color: Colors.grey,
@@ -98,6 +104,11 @@ TextStyle body3Style() => TextStyle(
       fontWeight: FontWeight.normal,
       color: notBlack,
       fontSize: 14,
+    );
+TextStyle body5Style() => TextStyle(
+      fontWeight: FontWeight.w600,
+      color: notBlack,
+      fontSize: 16,
     );
 InputBorder fieldInputBorder({Color borderColor}) => OutlineInputBorder(
       borderRadius: BorderRadius.circular(5),

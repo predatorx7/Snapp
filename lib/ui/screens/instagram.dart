@@ -73,7 +73,7 @@ class _InstagramState extends State<Instagram> with TickerProviderStateMixin {
                   } else {
                     print(
                         '[Instagram] Event Snapshot Error: ${eventSnapshot.error}');
-                    data.setInfo(Profile.fromMap(eventSnapshot.data.snapshot));
+                    data.setInfoSilently(Profile.fromMap(eventSnapshot.data.snapshot));
                     print(
                         '[Instagram] Recieved Profile Data: ${data.info.toJson()}');
                     if (data.info.email != null) {

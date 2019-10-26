@@ -94,7 +94,7 @@ class ProfileService {
             .reference()
             .child("profiles")
             .child(profile.key)
-            .set(profile.toJson());
+            .update(profile.toJson());
       }
     } catch (e) {
       print('[Profile Service] update profile: Error: $e');

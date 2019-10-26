@@ -60,11 +60,20 @@ class _PostsListState extends State<PostsList> {
                             CircleAvatar(
                               radius: 18,
                               backgroundColor: Colors.grey[200],
-                              child: widget.data.info.profileImage.isNotEmpty
-                                  ? Image.network(
-                                      widget.data.info.profileImage,
-                                    )
-                                  : CommonImages.profilePic2,
+                              backgroundImage:
+                                  widget.data.info.profileImage.isNotEmpty
+                                      ? Image.network(
+                                          widget.data.info.profileImage,
+                                        ).image
+                                      : null,
+                              child: Visibility(
+                                visible: widget.data.info.profileImage.isEmpty,
+                                child: SizedBox(
+                                  height: 18,
+                                  width: 18,
+                                  child: CommonImages.profilePic2,
+                                ),
+                              ),
                             ),
                             Padding(
                               padding: const EdgeInsets.only(left: 8.0),

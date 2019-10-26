@@ -1,6 +1,7 @@
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:instagram/commons/assets.dart';
 import 'package:instagram/commons/routing_constants.dart';
 import 'package:instagram/commons/styles.dart';
 import 'package:instagram/core/services/profile.dart';
@@ -8,8 +9,9 @@ import 'package:instagram/core/utils/namegen.dart';
 import 'package:instagram/models/plain_models/information.dart';
 import 'package:instagram/models/plain_models/profile.dart';
 import 'package:instagram/models/view_models/edit_profile.dart';
-import 'package:instagram/ui/components/dialog.dart';
+import 'package:instagram/ui/components/process_indicator.dart';
 import 'package:instagram/ui/components/profile_avatar.dart';
+import 'package:instagram/ui/screens/pick_gender.dart';
 import 'package:provider/provider.dart';
 
 class EditProfile extends StatefulWidget {
@@ -41,18 +43,35 @@ class _EditProfileState extends State<EditProfile> {
 
   @override
   void didChangeDependencies() {
-    info = Provider.of<InfoModel>(context);
-    view = Provider.of<EditProfileModel>(context);
-    view.setInformation(info.info);
     if (!loaded) {
-      nameController.text = view.information.fullName;
-      usernameController.text = view.information.username;
-      bioController.text = view.information.bio;
-      emailController.text = view.information.email;
-      genderController.text = view.information.gender;
-      loaded = false;
+      info = Provider.of<InfoModel>(context);
+      view = Provider.of<EditProfileModel>(context);
+      nameController.text = info.info.fullName;
+      usernameController.text = info.info.username;
+      if (info.info.bio.isNotEmpty) bioController.text = info.info.bio;
+      emailController.text = info.info.email;
+      genderController.text = info.info.gender;
+      loaded = true;
     }
     super.didChangeDependencies();
+  }
+
+  Future<bool> delProfile(BuildContext context) async {
+    try {
+      // Set Image
+      StorageReference storageReference = FirebaseStorage.instance
+          .ref()
+          .child('profiles/${info.info.uid}/profile_picture');
+      await storageReference.delete();
+      print('File Deleted');
+      info.info.profileImage = "";
+      info.shout();
+      await ProfileService().updateProfile(info.info);
+      return true;
+    } catch (e) {
+      print("Could\'nt delete profile pciture");
+      return false;
+    }
   }
 
   @override
@@ -64,48 +83,161 @@ class _EditProfileState extends State<EditProfile> {
           iconSize: 35,
           icon: Icon(Icons.close),
           onPressed: () async {
-            if (view.information.toJson() != info.info.toJson()) {
-              bool value = await basicDialog(
-                  context: context,
-                  title: "Unsaved changes",
-                  details:
-                      "You have unsaved changes. Are\nyou sure you want to cancel?");
+            Profile information = Profile.createFromMap(info.info.toJson());
+            information.fullName = nameController.text;
+            information.username = usernameController.text;
+            information.bio = bioController.text;
+            information.email = emailController.text;
+            information.gender = genderController.text;
+            if (information.toJson().toString() !=
+                info.info.toJson().toString()) {
+              bool value = false;
+              await showDialog(
+                barrierDismissible: false,
+                context: context,
+                builder: (BuildContext context) {
+                  return Dialog(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 10),
+                                child: Text(
+                                  "Unsaved changes",
+                                  style: actionTitle4Style(),
+                                  textAlign: TextAlign.left,
+                                ),
+                              ),
+                              Text(
+                                "You have unsaved changes. Are\nyou sure you want to cancel?",
+                                style: body2Style(),
+                                textAlign: TextAlign.left,
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          height: 1,
+                          width: MediaQuery.of(context).size.width,
+                          color: Colors.grey[200],
+                        ),
+                        ListTile(
+                          onTap: () {
+                            value = true;
+                            Navigator.pop(context);
+                          },
+                          title: Center(
+                              child: Text("Yes", style: actionTapStyle())),
+                        ),
+                        Container(
+                          height: 1,
+                          width: MediaQuery.of(context).size.width,
+                          color: Colors.grey[200],
+                        ),
+                        ListTile(
+                          onTap: () {
+                            Navigator.maybePop(context);
+                          },
+                          title: Center(child: Text("No", style: body3Style())),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              );
               if (value) {
+                print("Exiting with conditions");
                 Navigator.maybePop(context);
               }
+            } else {
+              print("Exiting without conditions");
+              Navigator.maybePop(context);
             }
           },
         ),
         title: Text(
           "Edit Profile",
-          style: actionTitle2Style(),
+          style: actionTitle3Style(),
         ),
         actions: <Widget>[
-          IconButton(
-            color: Color(actionColor),
-            icon: Icon(Icons.done),
-            onPressed: () async {
-              Profile information = info.info;
-              information.fullName = nameController.text;
-              information.username = usernameController.text;
-              if (bioController.text.isNotEmpty)
+          Builder(builder: (BuildContext recContext) {
+            return IconButton(
+              color: Color(actionColor),
+              icon: Icon(Icons.done),
+              onPressed: () async {
+                Profile information = Profile.createFromMap(info.info.toJson());
+                information.fullName = nameController.text;
+                information.username = usernameController.text;
                 information.bio = bioController.text;
-              information.email = emailController.text;
-              information.gender = genderController.text;
-              view.setInformation(information);
-              var xx = await ProfileService().updateProfile(view.information);
-              if (xx) {
-                info.setInfo(view.information);
-                Navigator.maybePop(context);
-              } else {
-                Scaffold.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text("Something weird happened"),
-                  ),
-                );
-              }
-            },
-          ),
+                information.email = emailController.text;
+                information.gender = genderController.text;
+                if (information.toJson().toString() !=
+                    info.info.toJson().toString()) {
+                  var xx;
+                  await showDialog(
+                    barrierDismissible: false,
+                    context: context,
+                    builder: (BuildContext context) {
+                      ProfileService()
+                          .updateProfile(information)
+                          .then((answer) {
+                        xx = answer;
+                        Navigator.maybePop(context);
+                      });
+                      // mockFuture(context).then((answer) {
+                      //   value = answer;
+                      //   Navigator.maybePop(context);
+                      // });
+                      return Dialog(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(4)),
+                        child: SizedBox(
+                          width: 60,
+                          height: 60,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: <Widget>[
+                              Text(
+                                'Loading',
+                                style: body5Style(),
+                              ),
+                              ICProcessIndicator(
+                                size: 32,
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                  if (xx) {
+                    info.setInfo(information);
+                    Navigator.maybePop(context);
+                  } else {
+                    Scaffold.of(recContext).showSnackBar(
+                      SnackBar(
+                        content: Text("Something weird happened"),
+                      ),
+                    );
+                  }
+                } else
+                  Scaffold.of(recContext).showSnackBar(
+                    SnackBar(
+                      content: Text("No changes made"),
+                      duration: Duration(seconds: 1),
+                    ),
+                  );
+              },
+            );
+          }),
         ],
       ),
       body: ListView(
@@ -113,13 +245,16 @@ class _EditProfileState extends State<EditProfile> {
           SizedBox(
             height: 15,
           ),
-          SizedBox(
-            height: 100,
-            width: 100,
-            child: ICProfileAvatar(
-              database: db,
-              profileOf: info.info.uid,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              ICProfileAvatar(
+                // database: FirebaseDatabase.instance,
+                // profileOf: data.uid,
+                profileURL: info.info.profileImage,
+                size: 50,
+              ),
+            ],
           ),
           SizedBox(
             height: 15,
@@ -155,8 +290,9 @@ class _EditProfileState extends State<EditProfile> {
                           title: Text("New Profile Photo"),
                         ),
                         ListTile(
-                          onTap: () {
-                            print("");
+                          onTap: () async {
+                            await delProfile(context);
+                            await Navigator.maybePop(context);
                           },
                           title: Text("Remove profile photo"),
                         ),
@@ -194,10 +330,18 @@ class _EditProfileState extends State<EditProfile> {
             child: TextField(
               controller: usernameController,
               decoration: InputDecoration(
-                suffixIcon:
-                    view.isBusy ? CircularProgressIndicator() : SizedBox(),
-                errorText:
-                    view.usernameAvailable ? "Username not available" : null,
+                suffixIcon: view.isBusy
+                    ? SizedBox(
+                        height: 15,
+                        width: 15,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : SizedBox(),
+                errorText: view.usernameChanged
+                    ? view.usernameAvailable ? null : "Username not available"
+                    : null,
                 labelText: "Username",
                 focusedBorder: UnderlineInputBorder(
                   borderSide: BorderSide(
@@ -209,11 +353,16 @@ class _EditProfileState extends State<EditProfile> {
                 ),
               ),
               onChanged: (value) async {
-                view.toggleBusy(true);
-                bool isAvailable =
-                    await GenerateUsername().isUsernameAvailable(value);
-                view.setUsernameAvailable(isAvailable);
-                view.toggleBusy(false);
+                print("Is $value != ${info.info.username}");
+                if (value != info.info.username) {
+                  view.toggleBusy(true);
+                  view.setUsernameFieldChange();
+                  await Future.delayed(Duration(milliseconds: 660));
+                  bool isAvailable =
+                      await GenerateUsername().isUsernameAvailable(value);
+                  view.setUsernameAvailable(isAvailable);
+                  view.toggleBusy(false);
+                }
               },
             ),
           ),
@@ -256,14 +405,28 @@ class _EditProfileState extends State<EditProfile> {
             ),
           ),
           GestureDetector(
-            onTap: () {
+            onTap: () async {
               Object reply;
               // Get gender from page
+              reply = await Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => PickGender(
+                    receivedGender: genderController.text,
+                  ),
+                ),
+              );
+              String repliedGender = reply;
+              if (repliedGender.isNotEmpty) {
+                genderController.text = repliedGender;
+              }
             },
             child: AbsorbPointer(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
                   controller: genderController,
                   decoration: editPageInputBorder("Gender"),
                 ),

@@ -111,18 +111,16 @@ class GenerateUsername {
     // Available username
     bool key = true;
     key = await _databaseUsernameQuery.equalTo(_usernameToCheck).once().then(
+
       (DataSnapshot snapshot) {
-        print('Snapshot: ${snapshot.value}');
-        if (snapshot.value != null && snapshot.value == _usernameToCheck) {
-          print(
-              "Value: ${snapshot.value} ${snapshot.value == _usernameToCheck}");
+        print('IsUsernameAvailable: ${snapshot.value}');
+        if (snapshot.value != null) {
           return false;
         } else {
           return true;
         }
       },
     );
-    print("Is Username $_usernameToCheck available?: $key");
     return key;
   }
 }

@@ -93,7 +93,7 @@ class ProfileService {
         await _database
             .reference()
             .child("profiles")
-            .child(profile.key)
+            .child(profile.uid)
             .update(profile.toJson());
       }
     } catch (e) {

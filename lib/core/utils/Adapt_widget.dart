@@ -6,7 +6,7 @@ class Adapt {
     this.size += addSize;
   }
   double withText({String text, double fontSize = 8}) {
-    if (text.isNotEmpty) {
+    if (text?.isNotEmpty ?? false) {
       double numberOfLines = '\n'.allMatches(text).length + 1.0;
       return this.size + (numberOfLines * fontSize);
     } else {

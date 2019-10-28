@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:instagram/models/plain_models/ex_information.dart';
 import 'package:instagram/models/view_models/change_username.dart';
 import 'package:instagram/models/view_models/edit_profile.dart';
 import 'package:instagram/models/view_models/profile_pic.dart';
 import 'package:instagram/ui/screens/profile_pic_edit.dart';
 import 'package:instagram/ui/screens/edit_profile.dart';
+import 'package:instagram/ui/screens/stalked/visited_profile_page.dart';
 import '../ui/screens/registeration/change_username.dart';
 import 'routing_constants.dart';
 import '../models/view_models/login_page.dart';
@@ -13,7 +15,7 @@ import '../ui/screens/instagram.dart';
 import '../ui/screens/login.dart';
 import '../ui/screens/profile_page.dart';
 import '../ui/screens/registeration/signup_page.dart';
-import '../ui/screens/post_upload.dart';
+import '../ui/screens/post/post_upload.dart';
 import 'package:provider/provider.dart';
 
 import '../main.dart';
@@ -29,6 +31,7 @@ Route<dynamic> generateRoute(RouteSettings settings) {
           child: new LoginPage(),
         ),
       );
+
     case HomeRoute:
       return MaterialPageRoute(
         builder: (context) => ChangeNotifierProvider(
@@ -103,6 +106,13 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case ChangeProfilePicRoute:
       return MaterialPageRoute(
         builder: (context) => ProfilePicEditPage(),
+      );
+    case SomeoneProfileRoute:
+      return MaterialPageRoute(
+        builder: (context) => ChangeNotifierProvider<ExInfoModel>(
+          builder: (context) => ExInfoModel(),
+          child: VisitedProfilePage(someone: settings.arguments),
+        ),
       );
     default:
       return MaterialPageRoute(builder: (context) => Splash());

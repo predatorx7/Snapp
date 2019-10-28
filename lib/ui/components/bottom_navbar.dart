@@ -142,6 +142,7 @@ class _BottomNavigationTile extends StatelessWidget {
             children: <Widget>[
               InkResponse(
                 onTap: onTap,
+                highlightColor: Colors.transparent,
                 child: Padding(
                   padding: EdgeInsets.only(top: 15, bottom: 15),
                   child: Column(

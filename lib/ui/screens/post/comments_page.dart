@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:instagram/commons/assets.dart';
-import '../components/buttons.dart';
+import '../../components/buttons.dart';
 
 class CommentsPage extends StatefulWidget {
   final String userId, postId;

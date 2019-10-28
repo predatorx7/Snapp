@@ -55,46 +55,85 @@ class Profile {
       this.uid,
       this.username});
 
+  List _getFromArray(data){
+    // When creating a child by pushing, only the last post pushed has a unique key, the previous ones are altered with incremented numbers on push. Thus
+    // on removing the last child, list is parsed instead of a Map. The below workaround try/catch deals with it.
+    List listIs;
+    try {
+      Map rawPostsMap =data ?? {};
+      listIs = rawPostsMap.values.toList() ?? [];
+    } catch (e) {
+      List rawPostsList = data ?? [];
+      listIs = rawPostsList ?? [];
+    }
+    return listIs;
+  }
+
   Profile.fromMap(DataSnapshot snapshotData) {
-    List postLists;
-    print('[Profile] From map to profile object: ${snapshotData.value}');
     key = snapshotData.value.keys.first;
     var mainData = snapshotData.value[key];
     uid = mainData['uid'] ?? '';
     bio = mainData['bio'] ?? '';
     email = mainData['email'] ?? '';
-    followers = mainData['followers'] ?? [];
-    follows = mainData['follows'] ?? [];
+    followers = _getFromArray(mainData['followers']);
+    follows = _getFromArray(mainData['follows']);
     fullName = mainData['fullName'] ?? '';
     gender = mainData['gender'] ?? '';
-    // When creating posts by pushing, only the last post pushed has a unique key, the previous ones are altered with incremented numbers on push. Thus
-    // on removing the last post, list is parsed instead of a Map. The below try/catch deals with it properly.
-    try {
-      Map rawPostsMap = mainData['posts'] ?? {};
-      postLists = rawPostsMap.values.toList() ?? [];
-    } catch (e) {
-      List rawPostsList = mainData['posts'] ?? [];
-      postLists = rawPostsList ?? [];
-    }
-    posts = postLists;
-    print('[Profile] These are posts: ${posts.toString()}');
+    posts = _getFromArray(mainData['posts']);
     profileImage = mainData['profileImage'] ?? '';
-    stories = mainData['stories'] ?? [];
+    stories = _getFromArray(mainData['stories']);
     username = mainData['username'] ?? '';
   }
 
   Profile.createFromMap(Map mainData) {
-    key = mainData['key'] ?? '';
+//    key = mainData['uid'] ?? '';
+//    uid = mainData['uid'] ?? '';
+//    bio = mainData['bio'] ?? '';
+//    email = mainData['email'] ?? '';
+//    username = mainData['username'] ?? '';
+//    followers = mainData['followers'] ?? [];
+//    follows = _tryAssign('follows', mainData, []);
+//    fullName = mainData['fullName'] ?? '';
+//    gender = mainData['gender'] ?? '';
+//    posts = mainData['posts'] ?? [];
+//    profileImage = mainData['profileImage'] ?? '';
+//    stories = mainData['stories'] ?? [];
+
     uid = mainData['uid'] ?? '';
     bio = mainData['bio'] ?? '';
     email = mainData['email'] ?? '';
-    followers = mainData['followers'] ?? [];
-    follows = mainData['follows'] ?? [];
+    followers = _getFromArray(mainData['followers']);
+    follows = _getFromArray(mainData['follows']);
     fullName = mainData['fullName'] ?? '';
     gender = mainData['gender'] ?? '';
-    posts = mainData['posts'] ?? [];
+    posts = _getFromArray(mainData['posts']);
     profileImage = mainData['profileImage'] ?? '';
-    stories = mainData['stories'] ?? [];
+    stories = _getFromArray(mainData['stories']);
+    username = mainData['username'] ?? '';
+  }
+
+  _tryAssign(String key, Map data, replace) {
+    dynamic x;
+    try {
+      x = data[key];
+    } catch (e) {
+      x = replace;
+    }
+    return x;
+  }
+
+  Profile.fromValue(Map mainData) {
+    uid = _tryAssign('uid', mainData, '');
+    bio = _tryAssign('bio', mainData, '');
+    email = _tryAssign('email', mainData, '');
+    followers = _getFromArray(mainData['followers'] ?? []);
+    follows = _getFromArray(mainData['follows'] ?? []);
+    fullName = _tryAssign('fullName', mainData, '');
+    gender = _tryAssign('gender', mainData, '');
+    posts = _getFromArray(mainData['posts'] ?? []);
+    profileImage = _tryAssign('profileImage', mainData, '');
+    stories = _getFromArray(mainData['stories'] ?? []);
+    username = _tryAssign('username', mainData, '');
   }
 
   Map<String, dynamic> toJson() {

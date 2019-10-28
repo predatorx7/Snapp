@@ -3,10 +3,12 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:instagram/commons/styles.dart';
+import 'package:instagram/ui/components/process_indicator.dart';
 import 'package:provider/provider.dart';
-import '../../models/plain_models/information.dart';
-import '../../core/services/posts.dart';
-import '../components/buttons.dart';
+import '../../../models/plain_models/information.dart';
+import '../../../core/services/posts.dart';
+import '../../components/buttons.dart';
 
 class PostUploadPage extends StatefulWidget {
   const PostUploadPage({Key key}) : super(key: key);
@@ -232,10 +234,39 @@ class _UploadMediaState extends State<UploadMedia> {
                         _isLoading = true;
                       });
                       captionFocus.unfocus();
-                      await uploadFile(widget.imageFile, _info.info.uid,
-                          captionController.text, _info.info.username);
-                      // Upload and await here
-                      Navigator.popUntil(context, ModalRoute.withName('/'));
+                      await showDialog(
+                        barrierDismissible: false,
+                        context: context,
+                        builder: (BuildContext context) {
+                          // Call
+                          uploadFile(widget.imageFile, _info.info.uid,
+                                  captionController.text, _info.info.username)
+                              .then((answer) {
+                            Navigator.popUntil(context, ModalRoute.withName('/'));
+                          });
+                          return Dialog(
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(4)),
+                            child: SizedBox(
+                              width: 60,
+                              height: 60,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: <Widget>[
+                                  Text(
+                                    'Uploading',
+                                    style: body5Style(),
+                                  ),
+                                  ICProcessIndicator(
+                                    size: 32,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      );
                     },
               text: 'Share',
               textSize: 16,
@@ -246,10 +277,6 @@ class _UploadMediaState extends State<UploadMedia> {
       body: ListView(
         // mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Visibility(
-            visible: _isLoading,
-            child: LinearProgressIndicator(),
-          ),
           Container(
             padding: EdgeInsets.all(15),
             height: 300,

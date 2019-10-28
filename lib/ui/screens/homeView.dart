@@ -12,51 +12,17 @@ import 'package:provider/provider.dart';
 import 'story.dart';
 
 class HomeView extends StatefulWidget {
-  InfoModel data;
-  HomeView({@required this.data});
   @override
   _HomeViewState createState() => _HomeViewState();
 }
 
 class _HomeViewState extends State<HomeView> {
-  PageController _pageController;
-  @override
-  initState() {
-    _pageController = PageController(initialPage: 0);
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return PageView(
-      controller: _pageController,
-      children: <Widget>[HomePage(data: widget.data), MessagePage()],
-    );
-  }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
-}
-
-class HomePage extends StatefulWidget {
-  InfoModel data;
-  HomePage({@required this.data});
-
-  @override
-  _HomePageState createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
   bool loaded = false;
   DatabaseReference _databaseReference = new FirebaseDatabase().reference();
   ProfileService profileAdapter = ProfileService();
 
   @override
   Widget build(BuildContext context) {
-    print('Feed Model Data; ${widget.data.info.toJson().toString()}');
     return Scaffold(
       appBar: AppBar(
         title: Container(
@@ -131,14 +97,12 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body: _FeedView(data: widget.data),
+      body: _FeedView(),
     );
   }
 }
 
 class _FeedView extends StatefulWidget {
-  InfoModel data;
-  _FeedView({this.data});
   @override
   _FeedViewState createState() => _FeedViewState();
 }
@@ -148,19 +112,22 @@ class _FeedViewState extends State<_FeedView> {
   DatabaseReference _databaseReference = new FirebaseDatabase().reference();
   List<dynamic> followerList;
   ProfileService profileAdapter = ProfileService();
+  InfoModel _data;
+  @override
+  void didChangeDependencies() {
+    _data = Provider.of<InfoModel>(context);
+    super.didChangeDependencies();
+  }
 
   @override
   Widget build(BuildContext context) {
-    print('[Home\'s List View] Setting up Posts');
-    List followerList = widget.data.info.followers;
-    print('[FeedView] Info: ${widget.data.info.toJson().toString()}');
+    List followerList = _data.info.followers;
     if (followerList.isNotEmpty) {
       return ListView.builder(
         itemBuilder: (BuildContext context, int index) {
-          return HandleViewSnapshot(
+          return FutureBuilder(
             future: _databaseReference
-                .child(
-                    'posts/${followerList[index].isNotEmpty ? followerList[index] : followerList[index + 1]}')
+                .child('posts/${followerList[index]}')
                 .orderByChild("creationTime")
                 .onValue
                 .last
@@ -171,7 +138,11 @@ class _FeedViewState extends State<_FeedView> {
             ),
             builder: (BuildContext context,
                 AsyncSnapshot<DataSnapshot> asyncSnapshot) {
-              return Text(asyncSnapshot.data.value);
+              if (asyncSnapshot.hasData) {
+                return Text('${asyncSnapshot.data.value}');
+              } else {
+                return Container();
+              }
             },
           );
         },

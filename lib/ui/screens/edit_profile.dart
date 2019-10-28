@@ -327,36 +327,36 @@ class _EditProfileState extends State<EditProfile> {
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: TextField(
+            child: TextFormField(
               controller: usernameController,
               decoration: InputDecoration(
-                suffixIcon: view.isBusy
-                    ? SizedBox(
-                        height: 15,
-                        width: 15,
+                suffix: view.isBusy
+                    ? ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxHeight: 15,
+                          maxWidth: 15,
+                        ),
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
                         ),
                       )
                     : SizedBox(),
-                errorText: view.usernameChanged
-                    ? view.usernameAvailable ? null : "Username not available"
-                    : null,
-                labelText: "Username",
+                labelText: view.usernameChanged?view.usernameAvailable ? "Username" : "Username not available":"Username",
                 focusedBorder: UnderlineInputBorder(
                   borderSide: BorderSide(
-                    color: Colors.grey,
+                    color: view.usernameChanged?view.usernameAvailable ? Colors.grey: Colors.red[600]:Colors.grey,
                   ),
                 ),
                 labelStyle: TextStyle(
-                  color: Colors.grey,
+                  color: view.usernameChanged?view.usernameAvailable ? Colors.grey: Colors.red[600]:Colors.grey,
                 ),
               ),
               onChanged: (value) async {
-                print("Is $value != ${info.info.username}");
                 if (value != info.info.username) {
                   view.toggleBusy(true);
-                  view.setUsernameFieldChange();
+                  if(!view.usernameChanged){
+                    view.setUsernameFieldChange();
+                  }
                   await Future.delayed(Duration(milliseconds: 660));
                   bool isAvailable =
                       await GenerateUsername().isUsernameAvailable(value);

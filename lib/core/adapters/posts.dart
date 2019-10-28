@@ -50,26 +50,15 @@ class PostAdapters extends StatelessWidget {
     String username;
     EdgeInsetsGeometry postPadding;
     postPadding = paddingForPost(index, isInGrid);
-    FutureBuilder(
-      future: FirebaseDatabase()
-          .reference()
-          .child("profiles")
-          .orderByChild("uid")
-          .equalTo(uid)
-          .once(),
-      builder: (BuildContext context, AsyncSnapshot<DataSnapshot> snapshot) {
-        switch (snapshot.connectionState) {
-          case ConnectionState.waiting:
-            return new ICProcessIndicator();
-          default:
-            if (snapshot.hasData) {
-              username = snapshot.data.value;
-            } else {
-              print("[Post Adapter] Snapshot doesn't have data");
-            }
-        }
-      },
-    );
+    FirebaseDatabase()
+        .reference()
+        .child("profiles")
+        .orderByChild("uid")
+        .equalTo(uid)
+        .once()
+        .then((DataSnapshot snapshot) {
+      if (snapshot.value != null) username = snapshot.value;
+    });
     return Padding(
       padding: postPadding,
       child: Container(

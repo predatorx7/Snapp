@@ -8,3 +8,4 @@ const String ProfilePageRoute = 'profilePage';
 const String ChangeUsernameRoute = 'changeUsername';
 const String EditProfileRoute = 'editProfile';
 const String ChangeProfilePicRoute = 'changeProfilePic';
+const String SomeoneProfileRoute = 'someoneProfileRoute';

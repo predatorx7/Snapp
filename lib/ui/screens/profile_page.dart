@@ -278,21 +278,21 @@ class _ProfilePageState extends State<ProfilePage>
         ),
       ),
       body: RefreshIndicator(
-
         displacement: 20,
-        onRefresh: ()async{
+        onRefresh: () async {
           await Future.delayed(Duration(seconds: 1));
           await FirebaseDatabase.instance
               .reference()
               .child("profiles")
               .orderByChild("uid")
-              .equalTo(_data.info.uid).once().then((DataSnapshot dataSnap){
-                if(dataSnap.value != null){
-                  print('RefreshedInfo: ${dataSnap.value.toString()}');
-                  _data.setInfo(Profile.fromMap(dataSnap));
-                }
+              .equalTo(_data.info.uid)
+              .once()
+              .then((DataSnapshot dataSnap) {
+            if (dataSnap.value != null) {
+              print('RefreshedInfo: ${dataSnap.value.toString()}');
+              _data.setInfo(Profile.fromMap(dataSnap));
+            }
           });
-
         },
         child: NestedScrollView(
           controller: _scrollViewController,
@@ -358,8 +358,6 @@ class _ProfilePageState extends State<ProfilePage>
                           },
                         ),
                         PostsList(
-                          data: _data,
-                          database: _database,
                           height: MediaQuery.of(context).size.width,
                         ),
                       ],

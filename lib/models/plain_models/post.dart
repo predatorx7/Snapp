@@ -16,6 +16,8 @@ class Post {
 
   String publisherUsername;
 
+  List likes;
+
   /// This is key for database values of Posts
   String postKey;
 
@@ -27,12 +29,35 @@ class Post {
     @required this.publisherUsername,
     this.postKey,
   });
+  List _getFromArray(data) {
+    // When creating a child by pushing, only the last post pushed has a unique key, the previous ones are altered with incremented numbers on push. Thus
+    // on removing the last child, list is parsed instead of a Map. The below workaround try/catch deals with it.
+    List listIs;
+    try {
+      Map rawPostsMap = data ?? {};
+      listIs = rawPostsMap.values.toList() ?? [];
+    } catch (e) {
+      List rawPostsList = data ?? [];
+      listIs = rawPostsList ?? [];
+    }
+    return listIs;
+  }
 
   Post.fromMap(DataSnapshot snapshot) {
     Map dataMap = snapshot.value;
     postKey = dataMap.keys.toList()[0];
     dataMap = dataMap[postKey];
-    print('[Posts] $dataMap');
+    likes = _getFromArray(dataMap['likes'] ?? []);
+    creationTime = dataMap['creationTime'] ?? null;
+    description = dataMap['description'] ?? '';
+    imageURL = dataMap['imageURL'] ?? '';
+    publisher = dataMap['publisher'] ?? '';
+    publisherUsername = dataMap['publisherUsername'] ?? '';
+  }
+
+  Post.createFromMap(Map dataMap, String key) {
+    postKey = key;
+    likes = _getFromArray(dataMap['likes'] ?? []);
     creationTime = dataMap['creationTime'] ?? null;
     description = dataMap['description'] ?? '';
     imageURL = dataMap['imageURL'] ?? '';
@@ -53,7 +78,7 @@ class Post {
       "description": description,
       "imageURL": imageURL,
       "publisher": publisher,
-      "publisherUsername":publisherUsername,
+      "publisherUsername": publisherUsername,
     };
   }
 }

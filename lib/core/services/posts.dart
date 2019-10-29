@@ -22,11 +22,7 @@ class PostService {
     print('Pushing post to database: ${_post.toJson()}');
 
     try {
-      _database
-          .reference()
-          .child("posts/$uid")
-          .push()
-          .set(_post.toJson());
+      _database.reference().child("posts/$uid").push().set(_post.toJson());
       DataSnapshot snapshot = await ProfileService().getProfileSnapshot(uid);
       Profile data = Profile.fromMap(snapshot);
       ProfileService().updateProfile(data);
@@ -82,6 +78,18 @@ class PostService {
     return _readData;
   }
 
+  static Future<Post> getPost(String postKey, String publisher) async {
+    Post post;
+    DataSnapshot dSnap = await FirebaseDatabase.instance
+        .reference()
+        .child('posts/$publisher/$postKey')
+        .once();
+    if (dSnap.value != null) {
+      print('[Post Service] Retrieved post: ${dSnap.value.toString()}');
+    }
+    return post;
+  }
+
   /// Update changes to post
   Future<void> updatePost(Post post) async {
     if (post != null) {
@@ -90,6 +98,39 @@ class PostService {
           .child("posts")
           .child(post.postKey)
           .set(post.toJson());
+    }
+  }
+
+  static Future<bool> doLike(Profile liker, Post post) async {
+    DatabaseReference dr = FirebaseDatabase.instance.reference();
+    try {
+      await dr
+          .child("posts/${post.publisher}/${post.postKey}/likes")
+          .push()
+          .set(liker.uid);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  static Future<bool> unLike(Profile unliker, Post post) async {
+    DatabaseReference dr = FirebaseDatabase.instance
+        .reference()
+        .child("posts/${post.publisher}/${post.postKey}/likes");
+    try {
+      await dr.once().then((DataSnapshot value) {
+        print("Recieved this post likes ${value.value.toString()}");
+        for (var i in value.value.keys.toList()) {
+          if (value.value[i] == unliker.uid) {
+            dr.child(i).remove();
+            break;
+          }
+        }
+      });
+      return true;
+    } catch (e) {
+      return false;
     }
   }
 

@@ -1,5 +1,7 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram/core/utils/Adapt_widget.dart';
+import 'package:instagram/models/plain_models/post.dart';
 import 'profile.dart';
 
 class InfoModel with ChangeNotifier {

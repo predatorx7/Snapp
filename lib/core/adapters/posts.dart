@@ -1,7 +1,7 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram/models/plain_models/post.dart';
-import 'package:instagram/ui/components/process_indicator.dart';
+import 'package:instagram/ui/screens/visited/visited_post.dart';
 
 class PostAdapters extends StatelessWidget {
   final String uid;
@@ -47,18 +47,8 @@ class PostAdapters extends StatelessWidget {
   /// futures FutureBuilder depends on when necessary.
   @override
   Widget build(BuildContext context) {
-    String username;
     EdgeInsetsGeometry postPadding;
     postPadding = paddingForPost(index, isInGrid);
-    FirebaseDatabase()
-        .reference()
-        .child("profiles")
-        .orderByChild("uid")
-        .equalTo(uid)
-        .once()
-        .then((DataSnapshot snapshot) {
-      if (snapshot.value != null) username = snapshot.value;
-    });
     return Padding(
       padding: postPadding,
       child: Container(
@@ -78,41 +68,78 @@ class PostAdapters extends StatelessWidget {
                 return Container();
               } else {
                 Post metadata = Post.fromMap(snapshot.data);
-                return new Material(
-                  child: new GridTile(
-                    header: this.isInGrid
-                        ? null
-                        : Text('${metadata.publisher}: $username'),
-                    footer:
-                        this.isInGrid ? null : Text(metadata.description ?? ''),
-                    child: new Image.network(
-                      metadata.imageURL,
-                      loadingBuilder: (BuildContext context, Widget child,
-                          ImageChunkEvent loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return Center(
-                          child: Theme(
-                            data: Theme.of(context).copyWith(
-                              accentColor: Colors.grey[300],
-                              primaryColor: Colors.grey,
-                            ),
-                            child: SizedBox(
-                              height: 28,
-                              width: 28,
-                              child: new CircularProgressIndicator(
-                                value: loadingProgress.expectedTotalBytes !=
-                                        null
-                                    ? loadingProgress.cumulativeBytesLoaded /
-                                        loadingProgress.expectedTotalBytes
-                                    : null,
-                                strokeWidth: 2,
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => VisitedPost(
+                          post: metadata,
+                        ),
+                      ),
+                    );
+                  },
+                  onLongPressStart: (gesture) {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        double constr = MediaQuery.of(context).size.width / 1.2;
+                        return Dialog(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4)),
+                          child: GestureDetector(
+                            onLongPressEnd: (gesture) {
+                              Navigator.pop(context);
+                            },
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(
+                                maxHeight: constr,
+                                minHeight: constr,
+                                maxWidth: constr,
+                                minWidth: constr,
+                              ),
+                              child: Image.network(
+                                metadata.imageURL,
+                                height: constr,
+                                width: constr,
+                                fit: BoxFit.fitWidth,
                               ),
                             ),
                           ),
                         );
                       },
-                      height: height,
-                      fit: BoxFit.fitWidth,
+                    );
+                  },
+                  child: new Material(
+                    child: new GridTile(
+                      child: new Image.network(
+                        metadata.imageURL,
+                        loadingBuilder: (BuildContext context, Widget child,
+                            ImageChunkEvent loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Center(
+                            child: Theme(
+                              data: Theme.of(context).copyWith(
+                                accentColor: Colors.grey[300],
+                                primaryColor: Colors.grey,
+                              ),
+                              child: SizedBox(
+                                height: 28,
+                                width: 28,
+                                child: new CircularProgressIndicator(
+                                  value: loadingProgress.expectedTotalBytes !=
+                                          null
+                                      ? loadingProgress.cumulativeBytesLoaded /
+                                          loadingProgress.expectedTotalBytes
+                                      : null,
+                                  strokeWidth: 2,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                        height: height,
+                        fit: BoxFit.fitWidth,
+                      ),
                     ),
                   ),
                 );

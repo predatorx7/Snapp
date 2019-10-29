@@ -57,30 +57,6 @@ class Root extends StatelessWidget {
           }
         },
       ),
-      // ! Does a similar job without being dependent on provider
-      // home: StreamBuilder(
-      //   stream: FirebaseAuth.instance.onAuthStateChanged,
-      //   builder: (BuildContext context, AsyncSnapshot<FirebaseUser> snapshot) {
-      //     switch (snapshot.connectionState) {
-      //       // When uninitialized
-      //       case ConnectionState.waiting:
-      //         return new Splash(data: snapshot);
-      //       case ConnectionState.active:
-      //         if (snapshot.hasData) {
-      //           return new Instagram(user: snapshot.data);
-      //         } else {
-      //           return ChangeNotifierProvider(
-      //             builder: (context) => LoginPageViewModel(),
-      //             child: new LoginPage(),
-      //           );
-      //         }
-      //         break;
-      //       default:
-      //         // Snapshot has Error
-      //         return new Text('Error: ${snapshot.error}');
-      //     }
-      //   },
-      // ),
     );
   }
 }

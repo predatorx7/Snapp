@@ -2,12 +2,10 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram/commons/routing_constants.dart';
 import 'package:instagram/commons/styles.dart';
-import 'package:instagram/models/plain_models/information.dart';
 import 'package:instagram/models/plain_models/profile.dart';
 import 'package:instagram/models/view_models/search_page.dart';
 import 'package:instagram/ui/components/profile_avatar.dart';
 import 'package:instagram/ui/screens/profile_page.dart';
-import 'package:provider/provider.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class SearchPage extends StatefulWidget {

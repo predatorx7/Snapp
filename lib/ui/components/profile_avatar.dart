@@ -41,7 +41,7 @@ class _ICProfileAvatarState extends State<ICProfileAvatar> {
       );
     } else {
       return FutureBuilder(
-        future: widget.database
+        future: FirebaseDatabase.instance
             .reference()
             .child('profiles')
             .orderByChild("uid")

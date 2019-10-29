@@ -1,12 +1,11 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:instagram/commons/assets.dart';
+import 'package:instagram/models/plain_models/app_notification.dart';
 import 'package:instagram/models/plain_models/ex_information.dart';
 import 'package:instagram/ui/components/profile_avatar.dart';
-import 'package:instagram/ui/screens/post/user_post_list.dart';
+import 'visited_post_list.dart';
 import 'package:provider/provider.dart';
-import '../../../commons/routing_constants.dart';
 import '../../../core/adapters/posts.dart';
 import '../../../commons/styles.dart';
 import '../../../core/services/profile.dart';
@@ -59,9 +58,6 @@ class _VisitedProfilePageState extends State<VisitedProfilePage>
         }
       }
     }
-
-    print(
-        "Visited Profile: ${_data.info.email} Observer: ${_observer.info.email}");
     super.didChangeDependencies();
   }
 
@@ -160,81 +156,86 @@ class _VisitedProfilePageState extends State<VisitedProfilePage>
                       children: <Widget>[
                         Expanded(
                           child: OutlineButton(
-                            onPressed: ()async {
+                            onPressed: () async {
                               _controller = await showModalBottomSheet(
-                                  backgroundColor: Colors.transparent,
-                                  useRootNavigator: true,
-                                  context: context,
-                                  builder: (context) {
-                                    return BottomSheet(
-                                      elevation: 8,
-                                      backgroundColor: Colors.transparent,
-                                      onClosing: () {
-                                        print("Bottom sheet closed");
-                                      },
-                                      builder: (context) {
-                                        return Container(
-                                          decoration: new BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius: new BorderRadius.only(
-                                              topLeft:
-                                                  const Radius.circular(10.0),
-                                              topRight:
-                                                  const Radius.circular(10.0),
-                                            ),
+                                backgroundColor: Colors.transparent,
+                                useRootNavigator: true,
+                                context: context,
+                                builder: (context) {
+                                  return BottomSheet(
+                                    elevation: 8,
+                                    backgroundColor: Colors.transparent,
+                                    onClosing: () {
+                                      print("Bottom sheet closed");
+                                    },
+                                    builder: (context) {
+                                      return Container(
+                                        decoration: new BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: new BorderRadius.only(
+                                            topLeft:
+                                                const Radius.circular(10.0),
+                                            topRight:
+                                                const Radius.circular(10.0),
                                           ),
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: <Widget>[
-                                              Column(
-                                                children: <Widget>[
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
-                                                    child: Container(
-                                                      height: 4,
-                                                      width: 35,
-                                                      decoration: BoxDecoration(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(10),
-                                                          color:
-                                                              Colors.grey[400]),
-                                                    ),
+                                        ),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: <Widget>[
+                                            Column(
+                                              children: <Widget>[
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child: Container(
+                                                    height: 4,
+                                                    width: 35,
+                                                    decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10),
+                                                        color:
+                                                            Colors.grey[400]),
                                                   ),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
-                                                    child: Text(
-                                                        _data.info.username),
-                                                  ),
-                                                  Divider(),
-                                                ],
-                                              ),
-                                              ListTile(
-                                                onTap:()async {
-                                                  await _data.doUnFollow(_observer.info);
-                                                  _observer.info.follows.remove(_data.info.uid);
-                                                  _observer.shout();
-                                                  Navigator.maybePop(context);
-                                                }
-,                                                title: Text(
-                                                  'Unfollow',
-                                                  style: TextStyle(
-                                                      color: Colors.red),
                                                 ),
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child:
+                                                      Text(_data.info.username),
+                                                ),
+                                                Divider(),
+                                              ],
+                                            ),
+                                            ListTile(
+                                              onTap: _data.isBusy
+                                                  ? null
+                                                  : () async {
+                                                      await _data.doUnFollow(
+                                                          _observer.info);
+                                                      _observer.info.follows
+                                                          .remove(
+                                                              _data.info.uid);
+                                                      _observer.shout();
+                                                      Navigator.maybePop(
+                                                          context);
+                                                    },
+                                              title: Text(
+                                                'Unfollow',
+                                                style: TextStyle(
+                                                    color: Colors.red),
                                               ),
-                                              SizedBox(
-                                                height: 60,
-                                              ),
-                                            ],
-                                          ),
-                                        );
-                                      },
-                                    );
-                                  });
+                                            ),
+                                            SizedBox(
+                                              height: 60,
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                  );
+                                },
+                              );
                             },
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
@@ -282,10 +283,21 @@ class _VisitedProfilePageState extends State<VisitedProfilePage>
                       constraints:
                           const BoxConstraints(minWidth: double.infinity),
                       child: FlatButton(
-                        onPressed: () {
-                          // Follow
-                          _data.doFollow(_observer.info);
-                        },
+                        onPressed: _data.isBusy
+                            ? null
+                            : () async {
+                                // Follow
+                                await _data.doFollow(_observer.info);
+                                _observer.info.follows.add(_data.info.uid);
+                                _observer.shout();
+                                await AppNotification.notify(
+                                  AppNotification(
+                                    notifyTo: _data.info.uid,
+                                    notificationFrom: _observer.info.uid,
+                                    event: OnEvent.startedFollowing,
+                                  ),
+                                );
+                              },
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(4)),
                         color: Color(actionColor),
@@ -323,10 +335,11 @@ class _VisitedProfilePageState extends State<VisitedProfilePage>
         backgroundColor: Colors.white,
         actions: <Widget>[
           IconButton(
-            onPressed: (){
+            onPressed: () {
               print('Hello');
             },
-            icon: Icon(Icons.more_vert),)
+            icon: Icon(Icons.more_vert),
+          )
         ],
       ),
       body: NestedScrollView(
@@ -390,8 +403,6 @@ class _VisitedProfilePageState extends State<VisitedProfilePage>
                       },
                     ),
                     PostsList(
-                      data: _data,
-                      database: _database,
                       height: MediaQuery.of(context).size.width,
                     ),
                   ],

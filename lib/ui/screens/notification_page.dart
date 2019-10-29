@@ -1,7 +1,10 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram/commons/routing_constants.dart';
+import 'package:instagram/commons/styles.dart';
 import 'package:instagram/models/plain_models/app_notification.dart';
 import 'package:instagram/models/plain_models/information.dart';
+import 'package:instagram/models/plain_models/profile.dart';
 import 'package:instagram/models/view_models/notification_page.dart';
 import 'package:instagram/ui/components/profile_avatar.dart';
 import 'package:provider/provider.dart';
@@ -16,46 +19,61 @@ class NotificationsPage extends StatefulWidget {
 
 class _NotificationsPageState extends State<NotificationsPage> {
   InfoModel data;
-  NotificationPageModel view;
   @override
   void didChangeDependencies() {
     data = Provider.of<InfoModel>(context, listen: false);
-    view = ScopedModel.of<NotificationPageModel>(context);
+    ScopedModel.of<NotificationPageModel>(context).fetch(data.info.uid);
     super.didChangeDependencies();
   }
 
   @override
   Widget build(BuildContext context) {
-    Future.delayed(Duration(seconds: 0), () {
-      view.fetch(data.info.uid);
-    });
     return Scaffold(
-      body: ListView.builder(
-        itemCount: view.getNotifications.length,
-        itemBuilder: (context, index) {
-          if (view.getNotifications.isEmpty) {
-            return Container();
-          }
-          AppNotification hey = view.getNotifications[index];
-          return ListTile(
-            onTap: (){
-              Navigator.of(context)
-                  .pushNamed(SomeoneProfileRoute, arguments: hey.notificationFrom);
-            },
-            leading: ICProfileAvatar(
-              profileOf: hey.notificationFrom,
-            ),
-            title: Text(
-              hey.message(),
-            ),
-            subtitle: Text(
-              timeago.format(
-                DateTime.fromMillisecondsSinceEpoch(hey.time),
-              ),
-            ),
-          );
-        },
+      appBar: AppBar(
+        title: Text(
+          'Activity',
+          style: TextStyle(fontSize: 18),
+        ),
       ),
+      body: ScopedModelDescendant<NotificationPageModel>(
+          builder: (context, _, view) {
+        return ListView.builder(
+          itemCount: view.getNotifications.length,
+          itemBuilder: (context, index) {
+            AppNotification hey = view.getNotifications[index];
+            return FutureBuilder(
+                future: FirebaseDatabase.instance
+                    .reference()
+                    .child('profiles')
+                    .orderByChild("uid")
+                    .equalTo(hey.notificationFrom)
+                    .once(),
+                builder: (context, AsyncSnapshot<DataSnapshot> snap) {
+                  if (!snap.hasData) return Container();
+                  Profile temp = Profile.fromMap(snap.data);
+                  return ListTile(
+                    onTap: () {
+                      if (hey.event == OnEvent.startedFollowing) {
+                        Navigator.of(context)
+                            .pushNamed(SomeoneProfileRoute, arguments: temp);
+                      }
+                    },
+                    leading: ICProfileAvatar(
+                      profileURL: temp.profileImage,
+                    ),
+                    title: Text(
+                      hey.message(hey),
+                    ),
+                    subtitle: Text(
+                      timeago.format(
+                        DateTime.fromMillisecondsSinceEpoch(hey.time),
+                      ),
+                    ),
+                  );
+                });
+          },
+        );
+      }),
     );
   }
 }

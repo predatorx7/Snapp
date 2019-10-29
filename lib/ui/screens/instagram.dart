@@ -2,7 +2,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram/commons/assets.dart';
 import 'package:instagram/commons/routing_constants.dart';
@@ -12,7 +11,6 @@ import 'package:instagram/models/plain_models/profile.dart';
 import 'package:instagram/models/view_models/instagram.dart';
 import 'package:instagram/models/view_models/notification_page.dart';
 import 'package:instagram/ui/components/bottom_navbar.dart';
-import 'package:instagram/ui/components/noback.dart';
 import 'package:instagram/ui/screens/notification_page.dart';
 import 'package:instagram/ui/screens/profile_page.dart';
 import 'package:instagram/ui/screens/search_page.dart';
@@ -55,160 +53,162 @@ class _InstagramState extends State<Instagram> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     print('[Instagram] User ${widget.user.email}');
-    return NoBack(
-      child: ScopedModel<InstagramPaginationModel>(
-        model: InstagramPaginationModel(),
-        child: ScopedModelDescendant<
-            InstagramPaginationModel>(
-            builder: (context, _,
-                InstagramPaginationModel _pageView) {
-              return PageView(
-              controller: _pageController,
-//          dragStartBehavior: null,
-                physics:_pageView.viewIndex != 0?new NeverScrollableScrollPhysics():new PageScrollPhysics(),
-              children: <Widget>[
-                StoryPick(),
-                Scaffold(
-                  body: StreamBuilder(
-                    stream: _database
-                        .reference()
-                        .child("profiles")
-                        .orderByChild("email")
-                        .equalTo(widget.user.email)
-                        .onValue,
-                    builder:
-                        (BuildContext context, AsyncSnapshot<Event> eventSnapshot) {
-                      switch (eventSnapshot.connectionState) {
-                        case ConnectionState.waiting:
-                          return Center(
-                            child: icProcessIndicator(context),
+    return ScopedModel<InstagramPaginationModel>(
+      model: InstagramPaginationModel(),
+      child: ScopedModelDescendant<InstagramPaginationModel>(
+          builder: (context, _, InstagramPaginationModel _pageView) {
+        return PageView(
+          controller: _pageController,
+          physics: _pageView.viewIndex != 0
+              ? new NeverScrollableScrollPhysics()
+              : new PageScrollPhysics(),
+          children: <Widget>[
+            StoryPick(),
+            Scaffold(
+              body: StreamBuilder(
+                stream: _database
+                    .reference()
+                    .child("profiles")
+                    .orderByChild("email")
+                    .equalTo(widget.user.email)
+                    .onValue,
+                builder: (BuildContext context,
+                    AsyncSnapshot<Event> eventSnapshot) {
+                  switch (eventSnapshot.connectionState) {
+                    case ConnectionState.waiting:
+                      return Center(
+                        child: icProcessIndicator(context),
+                      );
+                      break;
+                    default:
+                      if (!eventSnapshot.hasData) {
+                        return Center(
+                          child: Text(':('),
+                        );
+                      } else {
+                        data.setInfoSilently(
+                            Profile.fromMap(eventSnapshot.data.snapshot));
+                        if (data.info.email != null) {
+                          return Stack(
+                            children: <Widget>[
+                              Visibility(
+                                maintainState: true,
+                                visible: _pageView.viewIndex == 0,
+                                child: HomeView(),
+                              ),
+                              // TRY
+                              // new Offstage(
+                              //   offstage: _pageView.viewIndex != 0,
+                              //   child: new TickerMode(
+                              //     enabled: _pageView.viewIndex == 0,
+                              //     child: new HomeView(),
+                              //   ),
+                              // ),
+                              new Offstage(
+                                offstage: _pageView.viewIndex != 1,
+                                child: new TickerMode(
+                                  enabled: _pageView.viewIndex == 1,
+                                  child: new SearchPage(
+                                    observer: data.info.uid,
+                                  ),
+                                ),
+                              ),
+                              new Offstage(
+                                offstage: _pageView.viewIndex != 3,
+                                child: new TickerMode(
+                                  enabled: _pageView.viewIndex == 3,
+                                  child:
+                                      new ScopedModel<NotificationPageModel>(
+                                    model: NotificationPageModel(),
+                                    child: NotificationsPage(),
+                                  ),
+                                ),
+                              ),
+                              new Offstage(
+                                offstage: _pageView.viewIndex != 4,
+                                child: new TickerMode(
+                                  enabled: _pageView.viewIndex == 4,
+                                  child: ProfilePage(),
+                                ),
+                              ),
+                            ],
                           );
-                          break;
-                        default:
-                          if (!eventSnapshot.hasData) {
-                            return Center(
-                              child: Text(':('),
-                            );
-                          } else {
-                            print(
-                                '[Instagram] Event Snapshot Error: ${eventSnapshot.error}');
-                            data.setInfoSilently(
-                                Profile.fromMap(eventSnapshot.data.snapshot));
-                            print(
-                                '[Instagram] Recieved Profile Data: ${data.info.toJson()}');
-                            if (data.info.email != null) {
-                              return Stack(
-                                  children: <Widget>[
-                                    Visibility(
-                                      visible: _pageView.viewIndex == 0,
-                                      child: HomeView(),
-                                    ),
-                                    new Offstage(
-                                      offstage: _pageView.viewIndex != 1,
-                                      child: new TickerMode(
-                                        enabled: _pageView.viewIndex == 1,
-                                        child: new SearchPage(
-                                          observer: data.info.uid,
-                                        ),
-                                      ),
-                                    ),
-                                    new Offstage(
-                                      offstage: _pageView.viewIndex != 3,
-                                      child: new TickerMode(
-                                        enabled: _pageView.viewIndex == 3,
-                                        child: new ScopedModel<
-                                            NotificationPageModel>(
-                                          model: NotificationPageModel(),
-                                          child: NotificationsPage(),
-                                        ),
-                                      ),
-                                    ),
-                                    new Offstage(
-                                      offstage: _pageView.viewIndex != 4,
-                                      child: new TickerMode(
-                                        enabled: _pageView.viewIndex == 4,
-                                        child: ProfilePage(),
-                                      ),
-                                    ),
-                                  ],
-                                );
-                            } else {
-                              data.setInfo(
-                                  Profile.fromMap(eventSnapshot.data.snapshot));
-                              return Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text('There\'s an issue'),
-                                  Text(Profile.fromMap(eventSnapshot.data.snapshot)
+                        } else {
+                          data.setInfo(
+                              Profile.fromMap(eventSnapshot.data.snapshot));
+                          return Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text('There\'s an issue'),
+                              Text(
+                                  Profile.fromMap(eventSnapshot.data.snapshot)
                                       .toJson()
                                       .toString()),
-                                  Text(
-                                    data.info.toJson().toString(),
-                                  )
-                                ],
-                              );
-                            }
-                          }
+                              Text(
+                                data.info.toJson().toString(),
+                              )
+                            ],
+                          );
+                        }
+                      }
+                  }
+                },
+              ),
+              bottomNavigationBar:
+                  ScopedModelDescendant<InstagramPaginationModel>(
+                builder: (context, _, InstagramPaginationModel _pageView) {
+                  return ICBottomNavBar(
+                    currentIndex: _pageView.viewIndex,
+                    onTap: (index) {
+                      switch (index) {
+                        case 0:
+                          _pageView.setIndex(0);
+                          break;
+                        case 1:
+                          _pageView.setIndex(1);
+                          break;
+                        case 2:
+                          Navigator.pushNamed(context, UploadPostRoute);
+                          break;
+                        case 3:
+                          _pageView.setIndex(3);
+                          break;
+                        case 4:
+                          _pageView.setIndex(4);
+                          break;
+                        default:
                       }
                     },
-                  ),
-                  bottomNavigationBar:
-                      ScopedModelDescendant<InstagramPaginationModel>(
-                    builder: (context, _, InstagramPaginationModel _pageView) {
-                      return ICBottomNavBar(
-                        currentIndex: _pageView.viewIndex,
-                        onTap: (index) {
-                          switch (index) {
-                            case 0:
-                              _pageView.setIndex(0);
-                              break;
-                            case 1:
-                              _pageView.setIndex(1);
-                              break;
-                            case 2:
-                              Navigator.pushNamed(context, UploadPostRoute);
-                              break;
-                            case 3:
-                              _pageView.setIndex(3);
-                              break;
-                            case 4:
-                              _pageView.setIndex(4);
-                              break;
-                            default:
-                          }
-                        },
-                        items: <BottomNavigationBarItem>[
-                          icBottomNavBarItem(
-                            image: CommonImages.homeOutline,
-                            activeImage: CommonImages.homeFilled,
-                          ),
-                          icBottomNavBarItem(
-                            image: CommonImages.searchOutline,
-                            activeImage: CommonImages.searchFilled,
-                          ),
-                          icBottomNavBarItem(
-                            image: CommonImages.newPost,
-                            activeImage: CommonImages.newPost,
-                          ),
-                          icBottomNavBarItem(
-                            image: CommonImages.heartOutline,
-                            activeImage: CommonImages.heartFilled,
-                          ),
-                          icBottomNavBarItem(
-                            image: CommonImages.userOutline,
-                            activeImage: CommonImages.userFilled,
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                ),
-                MessagePage(),
-              ],
-            );
-          }
-        ),
-      ),
+                    items: <BottomNavigationBarItem>[
+                      icBottomNavBarItem(
+                        image: CommonImages.homeOutline,
+                        activeImage: CommonImages.homeFilled,
+                      ),
+                      icBottomNavBarItem(
+                        image: CommonImages.searchOutline,
+                        activeImage: CommonImages.searchFilled,
+                      ),
+                      icBottomNavBarItem(
+                        image: CommonImages.newPost,
+                        activeImage: CommonImages.newPost,
+                      ),
+                      icBottomNavBarItem(
+                        image: CommonImages.heartOutline,
+                        activeImage: CommonImages.heartFilled,
+                      ),
+                      icBottomNavBarItem(
+                        image: CommonImages.userOutline,
+                        activeImage: CommonImages.userFilled,
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+            MessagePage(),
+          ],
+        );
+      }),
     );
   }
 }

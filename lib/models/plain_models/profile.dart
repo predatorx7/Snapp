@@ -55,12 +55,12 @@ class Profile {
       this.uid,
       this.username});
 
-  List _getFromArray(data){
+  List _getFromArray(data) {
     // When creating a child by pushing, only the last post pushed has a unique key, the previous ones are altered with incremented numbers on push. Thus
     // on removing the last child, list is parsed instead of a Map. The below workaround try/catch deals with it.
     List listIs;
     try {
-      Map rawPostsMap =data ?? {};
+      Map rawPostsMap = data ?? {};
       listIs = rawPostsMap.values.toList() ?? [];
     } catch (e) {
       List rawPostsList = data ?? [];
@@ -76,6 +76,7 @@ class Profile {
     bio = mainData['bio'] ?? '';
     email = mainData['email'] ?? '';
     followers = _getFromArray(mainData['followers']);
+    print(followers.toString());
     follows = _getFromArray(mainData['follows']);
     fullName = mainData['fullName'] ?? '';
     gender = mainData['gender'] ?? '';

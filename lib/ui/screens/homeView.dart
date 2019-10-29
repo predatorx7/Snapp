@@ -2,9 +2,12 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram/commons/assets.dart';
+import 'package:instagram/commons/styles.dart';
 import 'package:instagram/core/services/profile.dart';
+import 'package:instagram/models/plain_models/feed_model.dart';
 import 'package:instagram/models/plain_models/information.dart';
-import 'package:instagram/ui/components/handle_view_show.dart';
+import 'package:instagram/ui/screens/post/feed_post_list.dart';
+import 'package:scoped_model/scoped_model.dart';
 import '../../models/view_models/message_notification.dart';
 import 'package:instagram/ui/screens/messages.dart';
 import 'package:provider/provider.dart';
@@ -18,7 +21,6 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   bool loaded = false;
-  DatabaseReference _databaseReference = new FirebaseDatabase().reference();
   ProfileService profileAdapter = ProfileService();
 
   @override
@@ -109,43 +111,70 @@ class _FeedView extends StatefulWidget {
 
 class _FeedViewState extends State<_FeedView> {
   bool isListNotEmpty;
-  DatabaseReference _databaseReference = new FirebaseDatabase().reference();
-  List<dynamic> followerList;
   ProfileService profileAdapter = ProfileService();
   InfoModel _data;
+  List<dynamic> followList;
   @override
   void didChangeDependencies() {
     _data = Provider.of<InfoModel>(context);
+    followList = _data.info.follows;
     super.didChangeDependencies();
   }
 
   @override
   Widget build(BuildContext context) {
-    List followerList = _data.info.followers;
-    if (followerList.isNotEmpty) {
-      return ListView.builder(
-        itemBuilder: (BuildContext context, int index) {
-          return FutureBuilder(
-            future: _databaseReference
-                .child('posts/${followerList[index]}')
-                .orderByChild("creationTime")
-                .onValue
-                .last
-                .then(
-              (Event onValue) {
-                return onValue.snapshot;
-              },
+    if (followList.isNotEmpty) {
+      return ScopedModel<FeedModel>(
+        model: FeedModel(),
+        child: ScopedModelDescendant<FeedModel>(
+          builder: (context, child, cfeed) {
+            print('List of followers: ${followList.toString()}');
+            switch (cfeed.status) {
+              case FeedStatus.idle:
+                cfeed.fetch(followList);
+                return Center(
+                  child: Text('Wait'),
+                );
+              case FeedStatus.busy:
+                return Center(
+                  child: Container(
+                    height: 40,
+                    width: 40,
+                    child: icProcessIndicator(context),
+                  ),
+                );
+              case FeedStatus.nothing:
+                return RefreshIndicator(
+                  onRefresh: () async {
+                    await cfeed.fetch(followList);
+                  },
+                  child: Center(
+                    child: Text(
+                      'No posts to show',
+                      style: body3Style(),
+                    ),
+                  ),
+                );
+              case FeedStatus.fruitful:
+                return RefreshIndicator(
+                  onRefresh: () async {
+                    await cfeed.fetch(followList);
+                  },
+                  child: FeedPostList(
+                    size: MediaQuery.of(context).size.width,
+                  ),
+                );
+              default:
+                return child;
+            }
+          },
+          child: Center(
+            child: Text(
+              'There\'s an issue',
+              style: body3Style(),
             ),
-            builder: (BuildContext context,
-                AsyncSnapshot<DataSnapshot> asyncSnapshot) {
-              if (asyncSnapshot.hasData) {
-                return Text('${asyncSnapshot.data.value}');
-              } else {
-                return Container();
-              }
-            },
-          );
-        },
+          ),
+        ),
       );
     } else {
       return Center(

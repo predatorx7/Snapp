@@ -103,6 +103,58 @@ class ProfileService {
     return true;
   }
 
+  Future doFollow(Profile observer, String tofollow) async {
+    try {
+      await _database
+          .reference()
+          .child("profiles/$tofollow/followers")
+          .push()
+          .set(observer.uid);
+      await _database
+          .reference()
+          .child("profiles/${observer.uid}/follows")
+          .push()
+          .set(tofollow);
+    } catch (e) {}
+  }
+
+  doUnFollow(Profile observer, String toUnfollow) async {
+    try {
+      await _database
+          .reference()
+          .child("profiles/$toUnfollow/followers")
+          .once()
+          .then((DataSnapshot value) {
+        print("Recieved this user's profile ${value.value.toString()}");
+        for (var i in value.value.keys.toList()) {
+          if (value.value[i] == observer.uid) {
+            _database
+                .reference()
+                .child("profiles/$toUnfollow/followers/$i")
+                .remove();
+            break;
+          }
+        }
+      });
+      await _database
+          .reference()
+          .child("profiles/${observer.uid}/follows")
+          .once()
+          .then((DataSnapshot value) {
+        print("Recieved observer's profile ${value.value.toString()}");
+        for (var i in value.value.keys.toList()) {
+          if (value.value[i] == toUnfollow) {
+            _database
+                .reference()
+                .child("profiles/${observer.uid}/followers/$i")
+                .remove();
+            break;
+          }
+        }
+      });
+    } catch (e) {}
+  }
+
   /// Delete user profile
   deleteProfile(String profileKey) {
     _database

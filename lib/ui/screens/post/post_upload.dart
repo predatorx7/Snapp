@@ -5,6 +5,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:instagram/commons/styles.dart';
 import 'package:instagram/ui/components/process_indicator.dart';
+import 'package:instagram/ui/components/profile_avatar.dart';
 import 'package:provider/provider.dart';
 import '../../../models/plain_models/information.dart';
 import '../../../core/services/posts.dart';
@@ -242,7 +243,8 @@ class _UploadMediaState extends State<UploadMedia> {
                           uploadFile(widget.imageFile, _info.info.uid,
                                   captionController.text, _info.info.username)
                               .then((answer) {
-                            Navigator.popUntil(context, ModalRoute.withName('/'));
+                            Navigator.popUntil(
+                                context, ModalRoute.withName('/'));
                           });
                           return Dialog(
                             shape: RoundedRectangleBorder(
@@ -297,8 +299,8 @@ class _UploadMediaState extends State<UploadMedia> {
               maxLength: 150,
               decoration: InputDecoration(
                 border: InputBorder.none,
-                icon: CircleAvatar(
-                  child: Icon(Icons.person_outline),
+                icon: ICProfileAvatar(
+                  profileURL: _info.info.profileImage,
                 ),
                 hintText: 'Write a caption...',
                 hintStyle: TextStyle(

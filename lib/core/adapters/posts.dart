@@ -72,6 +72,7 @@ class PostAdapters extends StatelessWidget {
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
+                        maintainState: true,
                         builder: (context) => VisitedPost(
                           post: metadata,
                         ),

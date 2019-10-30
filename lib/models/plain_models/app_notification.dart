@@ -111,10 +111,9 @@ class AppNotification {
     return _notificationList;
   }
 
-  String message(AppNotification notification) {
-    String username = notification.notificationFrom;
+  String message(OnEvent event, String username) {
     String message = "";
-    switch (notification.event) {
+    switch (event) {
       case OnEvent.likedPost:
         message = "liked your post.";
         break;

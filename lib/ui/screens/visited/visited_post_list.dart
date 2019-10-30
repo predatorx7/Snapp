@@ -2,7 +2,6 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram/commons/assets.dart';
 import 'package:instagram/commons/styles.dart';
-import 'package:instagram/core/adapters/posts.dart';
 import 'package:instagram/core/services/posts.dart';
 import 'package:instagram/models/plain_models/app_notification.dart';
 import 'package:instagram/models/plain_models/ex_information.dart';
@@ -69,8 +68,6 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
                 return Container();
               } else {
                 Post metadata = Post.fromMap(snapshot.data);
-                bool postLiked = metadata.likes.contains(_observer.info.uid);
-
                 return ScopedModel<PostsListModel>(
                   model: PostsListModel(),
                   child: new Material(
@@ -170,14 +167,13 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
                         Expanded(
                           child: ScopedModelDescendant<PostsListModel>(
                               builder: (context, _, view) {
-                            if (postLiked) {
-                              view.setColor(Colors.red[400]);
-                            }
+                            view.setliked(
+                                metadata.likes.contains(_observer.info.uid));
                             return GestureDetector(
                               onDoubleTap: () async {
                                 // Toggle heart animation
                                 view.doAnimation();
-                                if (!postLiked) {
+                                if (!view.liked) {
                                   await PostService.doLike(
                                       _observer.info, metadata);
                                   await AppNotification.notify(
@@ -188,9 +184,7 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
                                       postKey: metadata.postKey,
                                     ),
                                   );
-                                  setState(() {
-                                    postLiked = true;
-                                  });
+                                  metadata.likes.add(_observer.info.uid);
                                 }
                               },
                               child: Stack(
@@ -270,15 +264,16 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
                         ),
                         ScopedModelDescendant<PostsListModel>(
                           builder: (context, _, view) {
+                            view.setliked(
+                                metadata.likes.contains(_observer.info.uid));
                             return Column(
                               children: <Widget>[
                                 Row(
                                   children: <Widget>[
                                     GestureDetector(
                                       onTap: () async {
-                                        print('pressed like');
-                                        if (!postLiked) {
-                                          view.dolikeOn();
+                                        if (!view.liked) {
+                                          view.setliked(true);
                                           await PostService.doLike(
                                               _observer.info, metadata);
                                           await AppNotification.notify(
@@ -290,22 +285,18 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
                                               postKey: metadata.postKey,
                                             ),
                                           );
-                                          setState(() {
-                                            postLiked = true;
-                                          });
+                                          metadata.likes.add(_observer.info.uid);
                                         } else {
-                                          view.dolikeOff();
+                                          view.setliked(false);
                                           await PostService.unLike(
                                               _observer.info, metadata);
-                                          setState(() {
-                                            postLiked = false;
-                                          });
+                                          metadata.likes.remove(_observer.info.uid);
                                         }
                                       },
                                       child: Padding(
                                         padding: const EdgeInsets.all(6.0),
                                         child: Visibility(
-                                          visible: postLiked,
+                                          visible: view.liked,
                                           child: AnimatedContainer(
                                             alignment: Alignment.center,
                                             curve: Curves.easeIn,
@@ -313,7 +304,7 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
                                                 new Duration(milliseconds: 900),
                                             child: Icon(
                                               Icons.favorite,
-                                              color: view.heartColor,
+                                              color: Colors.red[400],
                                               size: 30,
                                             ),
                                           ),
@@ -341,13 +332,13 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
                                         print('pressed send');
                                       },
                                       child: Padding(
-                                        padding: const EdgeInsets.all(6.0),
+                                        padding: const EdgeInsets.fromLTRB(6, 4, 6, 6),
                                         child: RotationTransition(
                                           turns: new AlwaysStoppedAnimation(
                                               -45 / 360),
                                           child: new Icon(
                                             OMIcons.send,
-                                            size: 30,
+                                            size: 28,
                                           ),
                                         ),
                                       ),
@@ -426,15 +417,6 @@ class PostsListModel extends Model {
     notifyListeners();
   }
 
-  Color _heartColor = Colors.red;
-
-  Color get heartColor => _heartColor;
-
-  setColor(Color color) {
-    _heartColor = color;
-    notifyListeners();
-  }
-
   double _size = 120;
 
   double get size => _size;
@@ -444,49 +426,19 @@ class PostsListModel extends Model {
     notifyListeners();
   }
 
-  dolikeOn() async {
-    setliked(true);
-    Future.delayed(Duration(milliseconds: 150), () {
-      setColor(Colors.red[100]);
-    });
-    Future.delayed(Duration(milliseconds: 250), () {
-      setColor(Colors.red[200]);
-    });
-    Future.delayed(Duration(milliseconds: 500), () {
-      setColor(Colors.red[400]);
-    });
-  }
-
-  dolikeOff() async {
-    Future.delayed(Duration(milliseconds: 150), () {
-      setColor(Colors.red[400]);
-    });
-    Future.delayed(Duration(milliseconds: 250), () {
-      setColor(Colors.red[200]);
-    });
-    Future.delayed(Duration(milliseconds: 500), () {
-      setColor(Colors.red[100]);
-    });
-    setliked(false);
-  }
-
   doAnimation() async {
     setShowHeart(true);
-    setliked(true);
     Future.delayed(Duration(milliseconds: 900), () {
       setShowHeart(false);
     });
     Future.delayed(Duration(milliseconds: 150), () {
       setSize(130);
-      setColor(Colors.red[100]);
     });
     Future.delayed(Duration(milliseconds: 250), () {
       setSize(140);
-      setColor(Colors.red[200]);
     });
     Future.delayed(Duration(milliseconds: 500), () {
       setSize(120);
-      setColor(Colors.red[400]);
     });
   }
 }

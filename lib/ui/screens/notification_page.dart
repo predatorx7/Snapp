@@ -62,7 +62,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                       profileURL: temp.profileImage,
                     ),
                     title: Text(
-                      hey.message(hey),
+                      hey.message(hey.event, temp.username),
                     ),
                     subtitle: Text(
                       timeago.format(

@@ -121,7 +121,9 @@ class _FeedPostListState extends State<FeedPostList>
                   child: ScopedModelDescendant<SubPostModel>(
                       builder: (context, _, view) {
                     if (postLiked) {
-                      view.setColor(Colors.red[400]);
+                      view.setliked(true);
+                    } else {
+                      view.setliked(false);
                     }
                     return GestureDetector(
                       onDoubleTap: () async {
@@ -135,6 +137,7 @@ class _FeedPostListState extends State<FeedPostList>
                             event: OnEvent.likedPost,
                             postKey: metadata.postKey ?? '',
                           );
+                          metadata.likes.add(_observer.info.uid);
                           setState(() {
                             postLiked = true;
                           });
@@ -220,9 +223,8 @@ class _FeedPostListState extends State<FeedPostList>
                           children: <Widget>[
                             GestureDetector(
                               onTap: () async {
-                                print('pressed like');
                                 if (!postLiked) {
-                                  view.dolikeOn();
+                                  view.setliked(true);
                                   await PostService.doLike(
                                       _observer.info, metadata);
                                   await AppNotification.notify(
@@ -233,13 +235,14 @@ class _FeedPostListState extends State<FeedPostList>
                                       postKey: metadata.postKey ?? '',
                                     ),
                                   );
+                                  metadata.likes.add(_observer.info.uid);
                                   setState(() {
                                     postLiked = true;
                                   });
                                 } else {
-                                  view.dolikeOff();
                                   await PostService.unLike(
                                       _observer.info, metadata);
+                                  metadata.likes.remove(_observer.info.uid);
                                   setState(() {
                                     postLiked = false;
                                   });
@@ -249,15 +252,10 @@ class _FeedPostListState extends State<FeedPostList>
                                 padding: const EdgeInsets.all(6.0),
                                 child: Visibility(
                                   visible: postLiked,
-                                  child: AnimatedContainer(
-                                    alignment: Alignment.center,
-                                    curve: Curves.easeIn,
-                                    duration: new Duration(milliseconds: 900),
-                                    child: Icon(
-                                      Icons.favorite,
-                                      color: view.heartColor,
-                                      size: 30,
-                                    ),
+                                  child: Icon(
+                                    Icons.favorite,
+                                    color: Colors.red[400],
+                                    size: 30,
                                   ),
                                   replacement: Icon(
                                     Icons.favorite_border,
@@ -288,7 +286,7 @@ class _FeedPostListState extends State<FeedPostList>
                                   turns: new AlwaysStoppedAnimation(-45 / 360),
                                   child: new Icon(
                                     OMIcons.send,
-                                    size: 30,
+                                    size: 28,
                                   ),
                                 ),
                               ),
@@ -362,15 +360,6 @@ class SubPostModel extends Model {
     notifyListeners();
   }
 
-  Color _heartColor = Colors.red;
-
-  Color get heartColor => _heartColor;
-
-  setColor(Color color) {
-    _heartColor = color;
-    notifyListeners();
-  }
-
   double _size = 120;
 
   double get size => _size;
@@ -378,32 +367,6 @@ class SubPostModel extends Model {
   setSize(double size) {
     _size = size;
     notifyListeners();
-  }
-
-  dolikeOn() async {
-    setliked(true);
-    Future.delayed(Duration(milliseconds: 150), () {
-      setColor(Colors.red[100]);
-    });
-    Future.delayed(Duration(milliseconds: 250), () {
-      setColor(Colors.red[200]);
-    });
-    Future.delayed(Duration(milliseconds: 500), () {
-      setColor(Colors.red[400]);
-    });
-  }
-
-  dolikeOff() async {
-    Future.delayed(Duration(milliseconds: 150), () {
-      setColor(Colors.red[400]);
-    });
-    Future.delayed(Duration(milliseconds: 250), () {
-      setColor(Colors.red[200]);
-    });
-    Future.delayed(Duration(milliseconds: 500), () {
-      setColor(Colors.red[100]);
-    });
-    setliked(false);
   }
 
   doAnimation() async {
@@ -414,15 +377,12 @@ class SubPostModel extends Model {
     });
     Future.delayed(Duration(milliseconds: 150), () {
       setSize(130);
-      setColor(Colors.red[100]);
     });
     Future.delayed(Duration(milliseconds: 250), () {
       setSize(140);
-      setColor(Colors.red[200]);
     });
     Future.delayed(Duration(milliseconds: 500), () {
       setSize(120);
-      setColor(Colors.red[400]);
     });
   }
 }

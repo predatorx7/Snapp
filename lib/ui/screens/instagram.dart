@@ -28,7 +28,8 @@ class Instagram extends StatefulWidget {
   _InstagramState createState() => _InstagramState();
 }
 
-class _InstagramState extends State<Instagram> with TickerProviderStateMixin {
+class _InstagramState
+    extends State<Instagram> /*with TickerProviderStateMixin*/ {
   FirebaseDatabase _database = new FirebaseDatabase();
   InfoModel data;
   PageController _pageController;
@@ -72,8 +73,8 @@ class _InstagramState extends State<Instagram> with TickerProviderStateMixin {
                     .orderByChild("email")
                     .equalTo(widget.user.email)
                     .onValue,
-                builder: (BuildContext context,
-                    AsyncSnapshot<Event> eventSnapshot) {
+                builder:
+                    (BuildContext context, AsyncSnapshot<Event> eventSnapshot) {
                   switch (eventSnapshot.connectionState) {
                     case ConnectionState.waiting:
                       return Center(
@@ -104,33 +105,53 @@ class _InstagramState extends State<Instagram> with TickerProviderStateMixin {
                               //     child: new HomeView(),
                               //   ),
                               // ),
-                              new Offstage(
-                                offstage: _pageView.viewIndex != 1,
-                                child: new TickerMode(
-                                  enabled: _pageView.viewIndex == 1,
-                                  child: new SearchPage(
-                                    observer: data.info.uid,
-                                  ),
+                              Visibility(
+                                maintainState: true,
+                                visible: _pageView.viewIndex == 1,
+                                child: SearchPage(
+                                  observer: data.info.uid,
                                 ),
                               ),
-                              new Offstage(
-                                offstage: _pageView.viewIndex != 3,
-                                child: new TickerMode(
-                                  enabled: _pageView.viewIndex == 3,
-                                  child:
-                                      new ScopedModel<NotificationPageModel>(
-                                    model: NotificationPageModel(),
-                                    child: NotificationsPage(),
-                                  ),
+                              // new Offstage(
+                              //   offstage: _pageView.viewIndex != 1,
+                              //   child: new TickerMode(
+                              //     enabled: _pageView.viewIndex == 1,
+                              //     child: new SearchPage(
+                              //       observer: data.info.uid,
+                              //     ),
+                              //   ),
+                              // ),
+                              Visibility(
+                                maintainState: true,
+                                visible: _pageView.viewIndex == 3,
+                                child: ScopedModel<NotificationPageModel>(
+                                  model: NotificationPageModel(),
+                                  child: NotificationsPage(),
                                 ),
                               ),
-                              new Offstage(
-                                offstage: _pageView.viewIndex != 4,
-                                child: new TickerMode(
-                                  enabled: _pageView.viewIndex == 4,
-                                  child: ProfilePage(),
-                                ),
+                              // new Offstage(
+                              //   offstage: _pageView.viewIndex != 3,
+                              //   child: new TickerMode(
+                              //     enabled: _pageView.viewIndex == 3,
+                              //     child:
+                              //         new ScopedModel<NotificationPageModel>(
+                              //       model: NotificationPageModel(),
+                              //       child: NotificationsPage(),
+                              //     ),
+                              //   ),
+                              // ),
+                              Visibility(
+                                maintainState: true,
+                                visible: _pageView.viewIndex == 4,
+                                child: ProfilePage(),
                               ),
+                              // new Offstage(
+                              //   offstage: _pageView.viewIndex != 4,
+                              //   child: new TickerMode(
+                              //     enabled: _pageView.viewIndex == 4,
+                              //     child: ProfilePage(),
+                              //   ),
+                              // ),
                             ],
                           );
                         } else {
@@ -140,10 +161,9 @@ class _InstagramState extends State<Instagram> with TickerProviderStateMixin {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text('There\'s an issue'),
-                              Text(
-                                  Profile.fromMap(eventSnapshot.data.snapshot)
-                                      .toJson()
-                                      .toString()),
+                              Text(Profile.fromMap(eventSnapshot.data.snapshot)
+                                  .toJson()
+                                  .toString()),
                               Text(
                                 data.info.toJson().toString(),
                               )

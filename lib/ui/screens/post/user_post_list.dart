@@ -67,9 +67,6 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
                     child: ScopedModelDescendant<PostsListModel>(
                       builder: (context, _, view) {
                         view.setliked(metadata.likes.contains(_data.info.uid));
-                        if (view.liked) {
-                          view.setColor(Colors.red[400]);
-                        }
                         return Column(
                           children: <Widget>[
                             Padding(
@@ -203,6 +200,7 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
                                   if (!view.liked) {
                                     await PostService.doLike(
                                         _data.info, metadata);
+                                    metadata.likes.add(_data.info.uid);
                                     view.setliked(true);
                                   }
                                 },
@@ -288,14 +286,14 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
                                     GestureDetector(
                                       onTap: () async {
                                         if (!view.liked) {
-                                          view.dolikeOn();
+                                          view.setliked(true);
                                           await PostService.doLike(
                                               _data.info, metadata);
-                                          view.setliked(true);
+                                          metadata.likes.add(_data.info.uid);
                                         } else {
-                                          view.dolikeOff();
                                           await PostService.unLike(
                                               _data.info, metadata);
+                                          metadata.likes.remove(_data.info.uid);
                                           view.setliked(false);
                                         }
                                       },
@@ -303,16 +301,10 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
                                         padding: const EdgeInsets.all(6.0),
                                         child: Visibility(
                                           visible: view.liked,
-                                          child: AnimatedContainer(
-                                            alignment: Alignment.center,
-                                            curve: Curves.easeIn,
-                                            duration:
-                                                new Duration(milliseconds: 900),
-                                            child: Icon(
-                                              Icons.favorite,
-                                              color: view.heartColor,
-                                              size: 30,
-                                            ),
+                                          child: Icon(
+                                            Icons.favorite,
+                                            color: Colors.red[400],
+                                            size: 30,
                                           ),
                                           replacement: Icon(
                                             Icons.favorite_border,
@@ -344,7 +336,7 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
                                               -45 / 360),
                                           child: new Icon(
                                             OMIcons.send,
-                                            size: 30,
+                                            size: 28,
                                           ),
                                         ),
                                       ),
@@ -423,15 +415,6 @@ class PostsListModel extends Model {
     notifyListeners();
   }
 
-  Color _heartColor = Colors.red;
-
-  Color get heartColor => _heartColor;
-
-  setColor(Color color) {
-    _heartColor = color;
-    notifyListeners();
-  }
-
   double _size = 120;
 
   double get size => _size;
@@ -441,49 +424,19 @@ class PostsListModel extends Model {
     notifyListeners();
   }
 
-  dolikeOn() async {
-    setliked(true);
-    Future.delayed(Duration(milliseconds: 150), () {
-      setColor(Colors.red[100]);
-    });
-    Future.delayed(Duration(milliseconds: 250), () {
-      setColor(Colors.red[200]);
-    });
-    Future.delayed(Duration(milliseconds: 500), () {
-      setColor(Colors.red[400]);
-    });
-  }
-
-  dolikeOff() async {
-    Future.delayed(Duration(milliseconds: 150), () {
-      setColor(Colors.red[400]);
-    });
-    Future.delayed(Duration(milliseconds: 250), () {
-      setColor(Colors.red[200]);
-    });
-    Future.delayed(Duration(milliseconds: 500), () {
-      setColor(Colors.red[100]);
-    });
-    setliked(false);
-  }
-
   doAnimation() async {
     setShowHeart(true);
-    setliked(true);
     Future.delayed(Duration(milliseconds: 900), () {
       setShowHeart(false);
     });
     Future.delayed(Duration(milliseconds: 150), () {
       setSize(130);
-      setColor(Colors.red[100]);
     });
     Future.delayed(Duration(milliseconds: 250), () {
       setSize(140);
-      setColor(Colors.red[200]);
     });
     Future.delayed(Duration(milliseconds: 500), () {
       setSize(120);
-      setColor(Colors.red[400]);
     });
   }
 }

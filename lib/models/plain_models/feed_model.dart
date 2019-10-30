@@ -27,9 +27,11 @@ class FeedModel extends Model {
     Map<String, Post> postMap = {};
     for (String follower in followers) {
       DataSnapshot ds = await dr.child(follower).once();
-      for (String postKey in ds.value.keys) {
-        var post = Post.createFromMap(ds.value[postKey], postKey);
-        postMap[postKey] = post;
+      if (ds.value != null) {
+        for (String postKey in ds.value.keys) {
+          var post = Post.createFromMap(ds.value[postKey], postKey);
+          postMap[postKey] = post;
+        }
       }
     }
     List<String> sortedKeys = postMap.keys.toList()..sort();

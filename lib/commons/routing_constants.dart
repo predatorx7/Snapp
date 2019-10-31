@@ -9,3 +9,4 @@ const String ChangeUsernameRoute = 'changeUsername';
 const String EditProfileRoute = 'editProfile';
 const String ChangeProfilePicRoute = 'changeProfilePic';
 const String SomeoneProfileRoute = 'someoneProfileRoute';
+const String CommentsPageRoute = 'commentPageRoute';

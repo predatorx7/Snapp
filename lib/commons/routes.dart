@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:instagram/models/plain_models/ex_information.dart';
 import 'package:instagram/models/view_models/change_username.dart';
 import 'package:instagram/models/view_models/edit_profile.dart';
+import 'package:instagram/ui/screens/post/comments_page.dart';
 import 'package:instagram/ui/screens/profile_pic_edit.dart';
 import 'package:instagram/ui/screens/edit_profile.dart';
 import 'package:instagram/ui/screens/visited/visited_profile_page.dart';
@@ -111,6 +112,12 @@ Route<dynamic> generateRoute(RouteSettings settings) {
         builder: (context) => ChangeNotifierProvider<ExInfoModel>(
           builder: (context) => ExInfoModel(),
           child: VisitedProfilePage(someone: settings.arguments),
+        ),
+      );
+    case CommentsPageRoute:
+      return MaterialPageRoute(
+        builder: (context) => CommentsPage(
+          postData: settings.arguments,
         ),
       );
     default:

@@ -1,7 +1,6 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:instagram/commons/assets.dart';
 import 'package:instagram/commons/routing_constants.dart';
 import 'package:instagram/commons/styles.dart';
 import 'package:instagram/core/services/profile.dart';

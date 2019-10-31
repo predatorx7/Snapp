@@ -1,6 +1,7 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram/commons/assets.dart';
+import 'package:instagram/commons/routing_constants.dart';
 import 'package:instagram/commons/styles.dart';
 import 'package:instagram/core/services/posts.dart';
 import 'package:instagram/models/plain_models/information.dart';
@@ -315,7 +316,9 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
                                     ),
                                     GestureDetector(
                                       onTap: () {
-                                        print('pressed comment');
+                                        Navigator.of(context).pushNamed(
+                                            CommentsPageRoute,
+                                            arguments: metadata);
                                       },
                                       child: Padding(
                                         padding: const EdgeInsets.all(6.0),

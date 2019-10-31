@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:instagram/commons/routing_constants.dart';
 import 'package:instagram/commons/styles.dart';
 import 'package:instagram/core/services/posts.dart';
 import 'package:instagram/core/services/profile.dart';
@@ -266,7 +267,9 @@ class _FeedPostListState extends State<FeedPostList>
                             ),
                             GestureDetector(
                               onTap: () {
-                                print('pressed comment');
+                                Navigator.of(context).pushNamed(
+                                    CommentsPageRoute,
+                                    arguments: metadata);
                               },
                               child: Padding(
                                 padding: const EdgeInsets.all(6.0),

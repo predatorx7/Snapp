@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:instagram/commons/assets.dart';
+import 'package:instagram/core/services/comments.dart';
+import 'package:instagram/models/plain_models/information.dart';
+import 'package:instagram/models/plain_models/post.dart';
+import 'package:instagram/ui/components/profile_avatar.dart';
+import 'package:provider/provider.dart';
 import '../../components/buttons.dart';
 
 class CommentsPage extends StatefulWidget {
-  final String userId, postId;
-  CommentsPage({this.postId, this.userId});
+  final Post postData;
+  CommentsPage({this.postData});
   @override
   _CommentsPageState createState() => _CommentsPageState();
 }
@@ -12,10 +17,17 @@ class CommentsPage extends StatefulWidget {
 class _CommentsPageState extends State<CommentsPage> {
   TextEditingController _addCommentController;
   bool _isButtonDisabled = true;
+  InfoModel observer;
   @override
   void initState() {
     super.initState();
     _addCommentController = new TextEditingController();
+  }
+
+  @override
+  void didChangeDependencies() {
+    observer = Provider.of<InfoModel>(context);
+    super.didChangeDependencies();
   }
 
   @override
@@ -58,8 +70,8 @@ class _CommentsPageState extends State<CommentsPage> {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    CircleAvatar(
-                      child: Icon(Icons.person),
+                    ICProfileAvatar(
+                      profileOf: widget.postData.publisher,
                     ),
                     SizedBox(
                       width: 10,
@@ -77,13 +89,12 @@ class _CommentsPageState extends State<CommentsPage> {
                               ),
                               children: <TextSpan>[
                                 new TextSpan(
-                                  text: 'User_name ',
+                                  text: widget.postData.publisherUsername,
                                   style: new TextStyle(
                                       fontWeight: FontWeight.bold),
                                 ),
                                 new TextSpan(
-                                  text:
-                                      'Abc def ghi jkh lmn opq rst uvw xyz abc def ghi jkl mno',
+                                  text: widget.postData.description,
                                 ),
                               ],
                             ),
@@ -95,7 +106,6 @@ class _CommentsPageState extends State<CommentsPage> {
                 ),
               ),
               Divider(),
-              // TODO: Implement Builder to get 2D Comments
               ListView(
                 shrinkWrap: true,
               )
@@ -112,8 +122,8 @@ class _CommentsPageState extends State<CommentsPage> {
                   children: <Widget>[
                     Padding(
                       padding: const EdgeInsets.all(10.0),
-                      child: Icon(
-                        Icons.person,
+                      child: ICProfileAvatar(
+                        profileURL: observer.info.profileImage,
                       ),
                     ),
                     Flexible(
@@ -145,6 +155,11 @@ class _CommentsPageState extends State<CommentsPage> {
                             ? null
                             : () {
                                 print('Posting');
+                                CommentService.createComment(
+                                  widget.postData.postKey,
+                                  _addCommentController.text,
+                                  observer.info.uid,
+                                );
                               },
                       ),
                     ),

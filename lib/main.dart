@@ -14,6 +14,7 @@ import 'models/view_models/login_page.dart';
 void main() {
   /// To keep app in Portrait Mode
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  // Setting up Notification Handler
   runApp(
     MultiProvider(
       providers: [

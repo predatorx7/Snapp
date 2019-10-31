@@ -1,4 +1,3 @@
-import 'package:firebase_database/firebase_database.dart';
 import 'package:meta/meta.dart';
 
 class Comment {
@@ -25,12 +24,12 @@ class Comment {
     @required this.publisher,
   });
 
-  Comment.fromMap(DataSnapshot snapshot, String publisher)
-      : commentKey = snapshot.key,
-        comment = snapshot.value['comment'] ?? '',
-        creationTime = snapshot.value['creationTime'] ?? '',
-        postKey = snapshot.value['postKey'],
-        publisher = publisher ?? '';
+  Comment.fromMap(Map data, commentKey)
+      : commentKey = commentKey,
+        comment = data['comment'] ?? '',
+        creationTime = data['creationTime'] ?? '',
+        postKey = data['postKey'],
+        publisher = data['publisher'] ?? '';
 
   /// Provides data in JSON format. Provides current time if not optionally disabled.
   Map<String, dynamic> toJson({bool provideWithCurrentTime = true}) {

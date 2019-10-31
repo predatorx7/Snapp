@@ -1,6 +1,7 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram/commons/assets.dart';
+import 'package:instagram/commons/routing_constants.dart';
 import 'package:instagram/commons/styles.dart';
 import 'package:instagram/core/services/posts.dart';
 import 'package:instagram/models/plain_models/app_notification.dart';
@@ -285,12 +286,14 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
                                               postKey: metadata.postKey,
                                             ),
                                           );
-                                          metadata.likes.add(_observer.info.uid);
+                                          metadata.likes
+                                              .add(_observer.info.uid);
                                         } else {
                                           view.setliked(false);
                                           await PostService.unLike(
                                               _observer.info, metadata);
-                                          metadata.likes.remove(_observer.info.uid);
+                                          metadata.likes
+                                              .remove(_observer.info.uid);
                                         }
                                       },
                                       child: Padding(
@@ -317,7 +320,9 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
                                     ),
                                     GestureDetector(
                                       onTap: () {
-                                        print('pressed comment');
+                                        Navigator.of(context).pushNamed(
+                                            CommentsPageRoute,
+                                            arguments: metadata);
                                       },
                                       child: Padding(
                                         padding: const EdgeInsets.all(6.0),
@@ -332,7 +337,8 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
                                         print('pressed send');
                                       },
                                       child: Padding(
-                                        padding: const EdgeInsets.fromLTRB(6, 4, 6, 6),
+                                        padding: const EdgeInsets.fromLTRB(
+                                            6, 4, 6, 6),
                                         child: RotationTransition(
                                           turns: new AlwaysStoppedAnimation(
                                               -45 / 360),

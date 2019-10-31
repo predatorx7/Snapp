@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:instagram/commons/routing_constants.dart';
 import 'package:instagram/commons/styles.dart';
 import 'package:instagram/core/services/posts.dart';
 import 'package:instagram/core/services/profile.dart';
@@ -55,7 +56,6 @@ class _VisitedPostState extends State<VisitedPost> {
         child: icProcessIndicator(context),
       );
     }
-    bool postLiked = metadata.likes.contains(_observer.info.uid);
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -142,14 +142,13 @@ class _VisitedPostState extends State<VisitedPost> {
                 ),
                 ScopedModelDescendant<SubPostModel>(
                   builder: (context, _, view) {
-                    if (postLiked) {
-                      view.setColor(Colors.red[400]);
-                    }
+                    view.setliked(metadata.likes.contains(_observer.info.uid));
                     return GestureDetector(
                       onDoubleTap: () async {
                         // Toggle heart animation
                         view.doAnimation();
-                        if (!postLiked) {
+                        if (!view.liked) {
+                          metadata.likes.add(_observer.info.uid);
                           await PostService.doLike(_observer.info, metadata);
                           AppNotification(
                             notifyTo: metadata.publisher,
@@ -157,9 +156,6 @@ class _VisitedPostState extends State<VisitedPost> {
                             event: OnEvent.likedPost,
                             postKey: metadata.postKey ?? '',
                           );
-                          setState(() {
-                            postLiked = true;
-                          });
                         }
                       },
                       child: Stack(
@@ -238,9 +234,8 @@ class _VisitedPostState extends State<VisitedPost> {
                           children: <Widget>[
                             GestureDetector(
                               onTap: () async {
-                                print('pressed like');
-                                if (!postLiked) {
-                                  view.dolikeOn();
+                                if (!view.liked) {
+                                  view.setliked(true);
                                   await PostService.doLike(
                                       _observer.info, metadata);
                                   await AppNotification.notify(
@@ -251,29 +246,25 @@ class _VisitedPostState extends State<VisitedPost> {
                                       postKey: metadata.postKey ?? '',
                                     ),
                                   );
-                                  setState(() {
-                                    postLiked = true;
-                                  });
+                                  metadata.likes.add(_observer.info.uid);
                                 } else {
-                                  view.dolikeOff();
+                                  view.setliked(false);
                                   await PostService.unLike(
                                       _observer.info, metadata);
-                                  setState(() {
-                                    postLiked = false;
-                                  });
+                                  metadata.likes.remove(_observer.info.uid);
                                 }
                               },
                               child: Padding(
                                 padding: const EdgeInsets.all(6.0),
                                 child: Visibility(
-                                  visible: postLiked,
+                                  visible: view.liked,
                                   child: AnimatedContainer(
                                     alignment: Alignment.center,
                                     curve: Curves.easeIn,
                                     duration: new Duration(milliseconds: 900),
                                     child: Icon(
                                       Icons.favorite,
-                                      color: view.heartColor,
+                                      color: Colors.red[400],
                                       size: 30,
                                     ),
                                   ),
@@ -286,7 +277,7 @@ class _VisitedPostState extends State<VisitedPost> {
                             ),
                             GestureDetector(
                               onTap: () {
-                                print('pressed comment');
+                                Navigator.of(context).pushNamed(CommentsPageRoute, arguments: metadata);
                               },
                               child: Padding(
                                 padding: const EdgeInsets.all(6.0),
@@ -380,15 +371,6 @@ class SubPostModel extends Model {
     notifyListeners();
   }
 
-  Color _heartColor = Colors.red;
-
-  Color get heartColor => _heartColor;
-
-  setColor(Color color) {
-    _heartColor = color;
-    notifyListeners();
-  }
-
   double _size = 120;
 
   double get size => _size;
@@ -398,49 +380,19 @@ class SubPostModel extends Model {
     notifyListeners();
   }
 
-  dolikeOn() async {
-    setliked(true);
-    Future.delayed(Duration(milliseconds: 150), () {
-      setColor(Colors.red[100]);
-    });
-    Future.delayed(Duration(milliseconds: 250), () {
-      setColor(Colors.red[200]);
-    });
-    Future.delayed(Duration(milliseconds: 500), () {
-      setColor(Colors.red[400]);
-    });
-  }
-
-  dolikeOff() async {
-    Future.delayed(Duration(milliseconds: 150), () {
-      setColor(Colors.red[400]);
-    });
-    Future.delayed(Duration(milliseconds: 250), () {
-      setColor(Colors.red[200]);
-    });
-    Future.delayed(Duration(milliseconds: 500), () {
-      setColor(Colors.red[100]);
-    });
-    setliked(false);
-  }
-
   doAnimation() async {
     setShowHeart(true);
-    setliked(true);
     Future.delayed(Duration(milliseconds: 900), () {
       setShowHeart(false);
     });
     Future.delayed(Duration(milliseconds: 150), () {
       setSize(130);
-      setColor(Colors.red[100]);
     });
     Future.delayed(Duration(milliseconds: 250), () {
       setSize(140);
-      setColor(Colors.red[200]);
     });
     Future.delayed(Duration(milliseconds: 500), () {
       setSize(120);
-      setColor(Colors.red[400]);
     });
   }
 }

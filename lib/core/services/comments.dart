@@ -1,70 +1,56 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import '../../models/plain_models/comments.dart';
 
 /// Provides CRUD operations with comment info in database
 class CommentService {
-  FirebaseDatabase _database = new FirebaseDatabase();
-
   /// Creates a new user comment in database
-  createComment(_postKey, String _commentIs, FirebaseUser user) {
+  static createComment(String _postKey, String _commentIs, String commentPublisher) {
     Comment _comment = new Comment(
       postKey: _postKey,
       comment: _commentIs,
-      publisher: user.uid,
+      publisher: commentPublisher,
     );
-    print('Pushing comment to database: ${_comment.toJson()}');
-
     try {
-      _database.reference().child("comments").push().set(_comment.toJson());
+      FirebaseDatabase.instance
+          .reference()
+          .child("comments/$_postKey")
+          .push()
+          .set(_comment.toJson());
     } catch (e) {
       print('An unexpected error occured.\nError: $e');
     }
   }
 
   /// To retrieve user's whole comment from database
-  Future<Comment> getComment(FirebaseUser user) async {
-    var _readData = await _database
+  static Future<List<Comment>> fetchComment(String postKey) async {
+    List<Comment> commentList = [];
+    var _readData = await FirebaseDatabase.instance
         .reference()
         .child("comments")
-        .orderByChild("publisher")
-        .orderByChild('creationTime')
-        .equalTo(user.uid)
+        .orderByChild("postKey")
+        .equalTo(postKey)
         .once()
         .then((DataSnapshot snapshot) {
       if (snapshot.value != null) {
-        return Comment.fromMap(snapshot.value, user.uid);
+        for (String commentKey in snapshot.value.keys.toList()) {
+          Map comment = snapshot.value[commentKey];
+          Comment.fromMap(comment, commentKey);
+        }
       } else {
-        print('Couldn\'t get comment');
         return null;
       }
     });
-    return _readData;
-  }
-
-  /// Update changes to comment
-  Future<void> updateComment(Comment comment) async {
-    if (comment != null) {
-      await _database
-          .reference()
-          .child("comments")
-          .child(comment.commentKey)
-          .set(comment.toJson());
-    }
+    return commentList;
   }
 
   /// Delete user comment
-  deleteComment(String commentKey) {
-    _database
+  deleteComment(Comment comment, String postKey) {
+    FirebaseDatabase.instance
         .reference()
-        .child("comments")
-        .child(commentKey)
+        .child("comments/$postKey/${comment.commentKey}")
         .remove()
         .then((_) {
-      print("Delete comment $commentKey successful");
-      // setState(() {
-      //   // SetState if no listeners
-      // });
+      print('Comment deleted');
     });
   }
 }

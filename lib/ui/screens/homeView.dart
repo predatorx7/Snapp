@@ -1,4 +1,4 @@
-import 'package:firebase_database/firebase_database.dart';
+import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram/commons/assets.dart';
@@ -6,13 +6,15 @@ import 'package:instagram/commons/styles.dart';
 import 'package:instagram/core/services/profile.dart';
 import 'package:instagram/models/plain_models/feed_model.dart';
 import 'package:instagram/models/plain_models/information.dart';
+import 'package:instagram/models/plain_models/story_model.dart';
+import 'package:instagram/ui/components/profile_avatar.dart';
 import 'package:instagram/ui/screens/post/feed_post_list.dart';
+import 'package:instagram/ui/screens/story/camera.dart';
 import 'package:scoped_model/scoped_model.dart';
 import '../../models/view_models/message_notification.dart';
-import 'package:instagram/ui/screens/messages.dart';
 import 'package:provider/provider.dart';
 
-import 'story.dart';
+import 'messaging/messaging.dart';
 
 class HomeView extends StatefulWidget {
   @override
@@ -32,11 +34,15 @@ class _HomeViewState extends State<HomeView> {
           child: Row(
             children: <Widget>[
               GestureDetector(
-                onTap: () {
+                onTap: () async {
+                  List<CameraDescription> camera = await availableCameras();
                   Navigator.push(
                     context,
                     CupertinoPageRoute(
-                      builder: (context) => StoryPick(),
+                      builder: (context) => TakePictureScreen(
+                        // Pass the appropriate camera to the TakePictureScreen widget.
+                        camera: camera.first,
+                      ),
                     ),
                   );
                 },
@@ -55,7 +61,7 @@ class _HomeViewState extends State<HomeView> {
               Navigator.push(
                 context,
                 CupertinoPageRoute(
-                  builder: (context) => MessagePage(),
+                  builder: (context) => MessagingPage(),
                 ),
               );
             },
@@ -99,8 +105,100 @@ class _HomeViewState extends State<HomeView> {
           ),
         ],
       ),
-      body: _FeedView(),
+      body:  _FeedView(),
+//      Column(
+//        children: <Widget>[
+//          _StoryView(),
+//          _FeedView(),
+//        ],
+//      ),
     );
+  }
+}
+
+class _StoryView extends StatefulWidget {
+  @override
+  _StoryViewState createState() => _StoryViewState();
+}
+
+class _StoryViewState extends State<_FeedView> {
+  bool isListNotEmpty;
+  ProfileService profileAdapter = ProfileService();
+  InfoModel _data;
+  List<dynamic> followList;
+  @override
+  void didChangeDependencies() {
+    _data = Provider.of<InfoModel>(context);
+    followList = _data.info.follows;
+    super.didChangeDependencies();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (followList.isNotEmpty || followList != null) {
+      return ScopedModel<StoryModel>(
+        model: StoryModel(),
+        child: ScopedModelDescendant<StoryModel>(
+          builder: (context, child, story) {
+            print('List of followers: ${followList.toString()}');
+            switch (story.status) {
+              case StoryStatus.idle:
+                story.fetch(followList);
+                return Center(
+                  child: Text('Wait'),
+                );
+              case StoryStatus.busy:
+                return Center(
+                  child: Container(
+                    height: 40,
+                    width: 40,
+                    child: icProcessIndicator(context),
+                  ),
+                );
+              case StoryStatus.nothing:
+                return RefreshIndicator(
+                  onRefresh: () async {
+                    await story.fetch(followList);
+                  },
+                  child: Center(
+                    child: Text(
+                      'No posts to show',
+                      style: body3Style(),
+                    ),
+                  ),
+                );
+              case StoryStatus.fruitful:
+                return RefreshIndicator(
+                  onRefresh: () async {
+                    await story.fetch(followList);
+                  },
+                  child: Row(
+                    children: <Widget>[
+                      ICProfileAvatar(profileURL: _data.info.profileImage,),
+//                      ListView(
+//                        scrollDirection: Axis.horizontal,
+//                        children: <Widget>[
+//
+//                        ],
+//                      ),
+                    ],
+                  ),
+                );
+              default:
+                return child;
+            }
+          },
+          child: Center(
+            child: Text(
+              'There\'s an issue',
+              style: body3Style(),
+            ),
+          ),
+        ),
+      );
+    } else {
+      return SizedBox();
+    }
   }
 }
 

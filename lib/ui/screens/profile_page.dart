@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram/commons/assets.dart';
 import 'package:instagram/ui/components/profile_avatar.dart';
+import 'package:instagram/ui/screens/listusers.dart';
 import 'package:instagram/ui/screens/post/user_post_list.dart';
 import 'package:provider/provider.dart';
 import '../../commons/routing_constants.dart';
@@ -134,28 +135,52 @@ class _ProfilePageState extends State<ProfilePage>
                       ],
                     ),
                     // Followers
-                    Column(
-                      children: <Widget>[
-                        Text(
-                          '${data.followers.length ?? 0}',
-                          style: stateful,
-                        ),
-                        Text(
-                          'Followers',
-                        ),
-                      ],
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => ListUsers(
+                              users: data.followers,
+                              title: 'Followers',
+                            ),
+                          ),
+                        );
+                      },
+                      child: Column(
+                        children: <Widget>[
+                          Text(
+                            '${data.followers.length ?? 0}',
+                            style: stateful,
+                          ),
+                          Text(
+                            'Followers',
+                          ),
+                        ],
+                      ),
                     ),
                     // Following
-                    Column(
-                      children: <Widget>[
-                        Text(
-                          '${data.follows.length ?? 0}',
-                          style: stateful,
-                        ),
-                        Text(
-                          'Following',
-                        ),
-                      ],
+                    GestureDetector(
+                      onTap: (){
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => ListUsers(
+                              users: data.follows,
+                              title: 'Following',
+                            ),
+                          ),
+                        );
+                      },
+                      child: Column(
+                        children: <Widget>[
+                          Text(
+                            '${data.follows.length ?? 0}',
+                            style: stateful,
+                          ),
+                          Text(
+                            'Following',
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),

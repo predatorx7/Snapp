@@ -62,6 +62,11 @@ TextStyle actionTitle4Style() => TextStyle(
       color: notBlack,
       fontSize: 18,
     );
+TextStyle actionTitle5Style() => TextStyle(
+      fontWeight: FontWeight.bold,
+      color: notBlack,
+      fontSize: 14,
+    );
 InputDecoration editPageInputBorder(String label) => InputDecoration(
       labelText: label,
       alignLabelWithHint: true,

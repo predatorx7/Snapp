@@ -17,12 +17,17 @@ class Story {
   /// This is key for database values of Story
   String storyKey;
 
+  String publisherUsername;
+
+  List<String> views;
+
   Story({
     this.creationTime,
     this.expiryTime,
     @required this.imageURL,
     @required this.publisher,
     this.storyKey,
+    this.publisherUsername,
   });
 
   Story.fromMap(DataSnapshot snapshot, String publisher)
@@ -30,6 +35,7 @@ class Story {
         creationTime = snapshot.value['creationTime'] ?? '',
         expiryTime = snapshot.value['expiryTime'] ?? '',
         imageURL = snapshot.value['imageURL'] ?? '',
+  publisherUsername = snapshot.value['publisherUsername'] ?? '',
         publisher = publisher ?? '';
 
   /// Provides data in JSON format. Provides current time if not optionally disabled.
@@ -46,6 +52,30 @@ class Story {
       "expiryTime": expiryTime,
       "imageURL": imageURL,
       "publisher": publisher,
+      "publisherUsername": publisherUsername,
     };
+  }
+  List _getFromArray(data) {
+    // When creating a child by pushing, only the last post pushed has a unique key, the previous ones are altered with incremented numbers on push. Thus
+    // on removing the last child, list is parsed instead of a Map. The below workaround try/catch deals with it.
+    List listIs;
+    try {
+      Map rawPostsMap = data ?? {};
+      listIs = rawPostsMap.values.toList() ?? [];
+    } catch (e) {
+      List rawPostsList = data ?? [];
+      listIs = rawPostsList ?? [];
+    }
+    return listIs;
+  }
+
+  Story.createFromMap(Map dataMap, String key) {
+    storyKey = key;
+//    views = _getFromArray(dataMap['likes'] ?? []);
+    creationTime = dataMap['creationTime'] ?? null;
+    imageURL = dataMap['imageURL'] ?? '';
+    publisher = dataMap['publisher'] ?? '';
+    publisherUsername = dataMap['publisherUsername'] ?? '';
+    creationTime = dataMap['expiryTime'] ?? null;
   }
 }

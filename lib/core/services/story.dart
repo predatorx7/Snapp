@@ -9,29 +9,44 @@ class StoryService {
   FirebaseDatabase _database = new FirebaseDatabase();
 
   /// Creates a new user story in database
-  createStory(_imageURL, String _storyIs, String uid) async {
+  void createStory(
+      _imageURL, String uid, int time, String username) async {
     Story _story = new Story(
       imageURL: _imageURL,
       publisher: uid,
+      creationTime: time,
+      publisherUsername: username,
     );
-    print('Pushing story to database: ${_story.toJson()}');
+    print('Pushing post to database: ${_story.toJson()}');
 
     try {
-      _database.reference().child("storys").push().set(_story.toJson());
+      _database.reference().child("stories/$uid").push().set(_story.toJson());
       DataSnapshot snapshot = await ProfileService().getProfileSnapshot(uid);
       Profile data = Profile.fromMap(snapshot);
-      data.stories.add(_imageURL);
       ProfileService().updateProfile(data);
+      if (data != null) {
+        await _database
+            .reference()
+            .child("profiles")
+            .child(data.key)
+            .child('stories')
+            .push()
+        // Reference to post as time to help in provide fuzzy time, fetching post and sorting based on time.
+            .set(_story.creationTime);
+      }
+      print('[Story Service] Story creation: successful');
     } catch (e) {
-      print('An unexpected error occured.\nError: $e');
+      print(
+          '[Story Service] Story creation: An unexpected error occured.\nError: $e');
     }
   }
+
 
   /// To retrieve user's whole story from database
   Future<Story> getStory(FirebaseUser user) async {
     var _readData = await _database
         .reference()
-        .child("storys")
+        .child("stories")
         .orderByChild("publisher")
         .equalTo(user.uid)
         .once()

@@ -93,6 +93,10 @@ class AppNotification {
             event = OnEvent.likedPost;
             link = x[from]['postKey'];
             break;
+          case "commented on your":
+            event = OnEvent.commentedOnYour;
+            link = x[from]['postKey'];
+            break;
           default:
         }
         _notificationList.add(
@@ -119,6 +123,9 @@ class AppNotification {
         break;
       case OnEvent.startedFollowing:
         message = "started following you.";
+        break;
+      case OnEvent.commentedOnYour:
+        message = "commented on your post";
         break;
       default:
     }

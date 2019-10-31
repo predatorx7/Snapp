@@ -1,4 +1,5 @@
 // View with DATA after Authenticated Login
+import 'package:camera/camera.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
@@ -14,12 +15,12 @@ import 'package:instagram/ui/components/bottom_navbar.dart';
 import 'package:instagram/ui/screens/notification_page.dart';
 import 'package:instagram/ui/screens/profile_page.dart';
 import 'package:instagram/ui/screens/search_page.dart';
-import 'package:instagram/ui/screens/story.dart';
+import 'package:instagram/ui/screens/story/camera.dart';
 import 'package:provider/provider.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 import 'homeView.dart';
-import 'messages.dart';
+import 'messaging/messaging.dart';
 
 class Instagram extends StatefulWidget {
   final FirebaseUser user;
@@ -64,7 +65,22 @@ class _InstagramState
               ? new NeverScrollableScrollPhysics()
               : new PageScrollPhysics(),
           children: <Widget>[
-            StoryPick(),
+            FutureBuilder(
+              future: availableCameras(),
+              builder: (BuildContext context,
+                  AsyncSnapshot<List<CameraDescription>> asyncSnap) {
+                if (asyncSnap.hasData) {
+                  return TakePictureScreen(
+                    // Pass the appropriate camera to the TakePictureScreen widget.
+                    camera: asyncSnap.data.first,
+                  );
+                } else {
+                  return Container(
+                    color: Colors.black54,
+                  );
+                }
+              },
+            ),
             Scaffold(
               body: StreamBuilder(
                 stream: _database
@@ -225,7 +241,7 @@ class _InstagramState
                 },
               ),
             ),
-            MessagePage(),
+            MessagingPage(),
           ],
         );
       }),

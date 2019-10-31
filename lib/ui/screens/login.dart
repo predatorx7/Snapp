@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:instagram/commons/assets.dart';
 import 'package:instagram/commons/routing_constants.dart';
 import 'package:instagram/models/view_models/login_page.dart';
+import 'package:instagram/ui/screens/login_help.dart';
 import '../../commons/styles.dart';
 import '../../models/plain_models/auth.dart';
 import '../components/buttons.dart';
@@ -130,25 +131,34 @@ class _LoginPageState extends State<LoginPage> {
                   SizedBox(
                     height: 10,
                   ),
-                  RichText(
-                    textAlign: TextAlign.left,
-                    text: new TextSpan(
-                      style: new TextStyle(
-                        fontSize: 12.0,
-                        color: Colors.grey,
-                      ),
-                      children: <TextSpan>[
-                        new TextSpan(
-                          text: 'Forgotten your login details? ',
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => LoginHelpPage(),
                         ),
-                        new TextSpan(
-                          text: 'Get help signing in',
-                          style: new TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xff262626),
+                      );
+                    },
+                    child: RichText(
+                      textAlign: TextAlign.left,
+                      text: new TextSpan(
+                        style: new TextStyle(
+                          fontSize: 12.0,
+                          color: Colors.grey,
+                        ),
+                        children: <TextSpan>[
+                          new TextSpan(
+                            text: 'Forgotten your login details? ',
                           ),
-                        ),
-                      ],
+                          new TextSpan(
+                            text: 'Get help signing in',
+                            style: new TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xff262626),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],

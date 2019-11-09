@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:instagram/commons/assets.dart';
 import 'package:instagram/commons/routing_constants.dart';
+import 'package:instagram/core/services/connectivity_service.dart';
 import 'package:instagram/models/view_models/login_page.dart';
 import 'package:instagram/ui/screens/login_help.dart';
 import '../../commons/styles.dart';
@@ -19,13 +20,22 @@ class _LoginPageState extends State<LoginPage> {
   GlobalKey<ScaffoldState> _key = GlobalKey<ScaffoldState>();
   AuthNotifier user;
   LoginPageViewModel view;
+  ConnectivityStatus connectionStatus;
   @override
   void initState() {
     super.initState();
     _usernameController = new TextEditingController();
     _passwordController = new TextEditingController();
+
   }
 
+  @override
+  void didChangeDependencies() {
+    connectionStatus = Provider.of<ConnectivityStatus>(context);
+    user = Provider.of<AuthNotifier>(context);
+    view = Provider.of<LoginPageViewModel>(context, listen: false);
+    super.didChangeDependencies();
+  }
   @override
   void dispose() {
     _usernameController.dispose();
@@ -35,8 +45,6 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    user = Provider.of<AuthNotifier>(context);
-    view = Provider.of<LoginPageViewModel>(context, listen: false);
     return Scaffold(
       key: _key,
       resizeToAvoidBottomInset: false,
@@ -119,6 +127,13 @@ class _LoginPageState extends State<LoginPage> {
                           onPressed: _view.isButtonDisabled
                               ? null
                               : () async {
+//                            Future.delayed(Duration(seconds: 15), (){
+//                              // Wait for 15 seconds
+//                              if(connectionStatus == ConnectivityStatus.Offline){
+//                                // If offline then exit.
+//                               return;
+//                              }
+//                            });
                                   if (await user.signIn(
                                       _usernameController.text,
                                       _passwordController.text,

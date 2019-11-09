@@ -7,9 +7,9 @@ import '../../core/services/connectivity_service.dart';
 class NetworkSensitiveWidget extends StatefulWidget {
   /// A widget which will get connection status on demand. It's much recommended to pass an App-wide Material app as an argument for this field to access connection status anywhere.
   /// Use `var connectionStatus = Provider.of<ConnectivityStatus>(context)` anywhere down this widget to get connection status.
-  final Widget widget;
+  final Widget child;
 
-  const NetworkSensitiveWidget({Key key, this.widget}) : super(key: key);
+  const NetworkSensitiveWidget({Key key, this.child}) : super(key: key);
 
   @override
   _NetworkSensitiveWidgetState createState() => _NetworkSensitiveWidgetState();
@@ -21,7 +21,7 @@ class _NetworkSensitiveWidgetState extends State<NetworkSensitiveWidget> {
     return StreamProvider<ConnectivityStatus>(
       builder: (context) =>
           ConnectivityService().connectionStatusController.stream,
-      child: widget.widget,
+      child: widget.child,
     );
   }
 }

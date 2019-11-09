@@ -118,65 +118,66 @@ class _CommentsPageState extends State<CommentsPage> {
                   ),
             body: Stack(
               children: <Widget>[
-                ListView(
-                  children: <Widget>[
-                    Padding(
-                      ///Show if Caption Exist
-                      padding: const EdgeInsets.all(10.0),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          ICProfileAvatar(
-                            profileOf: widget.postData.publisher,
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Flexible(
-                            child: Column(
-                              children: <Widget>[
-                                RichText(
-                                  // maxLines: 16,
-                                  textAlign: TextAlign.left,
-                                  text: new TextSpan(
-                                    style: new TextStyle(
-                                      fontSize: 14.0,
-                                      color: Colors.black,
-                                    ),
-                                    children: <TextSpan>[
-                                      new TextSpan(
-                                        text:
-                                            '${widget.postData.publisherUsername} ',
-                                        style: new TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      new TextSpan(
-                                        text: widget.postData.description,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
+                RefreshIndicator(
+                  onRefresh: () async {
+                    var list = await CommentService.fetchComment(
+                        widget.postData.postKey);
+                    if (list != null) {
+                      setState(() {
+                        commentList = list;
+                      });
+                    }
+                  },
+                  child: ListView(
+                    children: <Widget>[
+                      Padding(
+                        ///Show if Caption Exist
+                        padding: const EdgeInsets.all(10.0),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            ICProfileAvatar(
+                              profileOf: widget.postData.publisher,
                             ),
-                          ),
-                        ],
+                            SizedBox(
+                              width: 10,
+                            ),
+                            Flexible(
+                              child: Column(
+                                children: <Widget>[
+                                  RichText(
+                                    // maxLines: 16,
+                                    textAlign: TextAlign.left,
+                                    text: new TextSpan(
+                                      style: new TextStyle(
+                                        fontSize: 14.0,
+                                        color: Colors.black,
+                                      ),
+                                      children: <TextSpan>[
+                                        new TextSpan(
+                                          text:
+                                              '${widget.postData.publisherUsername} ',
+                                          style: new TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        new TextSpan(
+                                          text: widget.postData.description,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    Divider(),
-                    RefreshIndicator(
-                      onRefresh: () async {
-                        var list = await CommentService.fetchComment(
-                            widget.postData.postKey);
-                        if (list != null) {
-                          setState(() {
-                            commentList = list;
-                          });
-                        }
-                      },
-                      child: ListView.builder(
+                      Divider(),
+                      ListView.builder(
                         itemCount: commentList.length,
                         shrinkWrap: true,
+                        reverse: true,
                         itemBuilder: (BuildContext context, int index) {
                           Comment comment = commentList[index];
                           return Container(
@@ -236,9 +237,9 @@ class _CommentsPageState extends State<CommentsPage> {
                             ),
                           );
                         },
-                      ),
-                    )
-                  ],
+                      )
+                    ],
+                  ),
                 ),
                 Positioned(
                   bottom: 0.0,

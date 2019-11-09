@@ -39,6 +39,7 @@ class StoryModel extends Model {
       }
     }
     List<String> sortedKeys = storyMap.keys.toList()..sort();
+    this.stories = [];
     while (sortedKeys.isNotEmpty) {
       String lateKey = sortedKeys.removeLast();
       this.stories.add(storyMap[lateKey]);

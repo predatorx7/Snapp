@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:instagram/commons/routes.dart';
 import 'package:instagram/commons/styles.dart';
 import 'package:instagram/models/view_models/signup_page.dart';
+import 'package:instagram/ui/components/network_sensitive.dart';
 import 'package:instagram/ui/screens/instagram.dart';
 import 'package:instagram/ui/screens/login.dart';
 import 'package:provider/provider.dart';
@@ -40,23 +41,25 @@ void main() {
 class Root extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: mainTheme,
-      onGenerateRoute: generateRoute,
-      home: Consumer(
-        builder: (context, AuthNotifier userAuth, _) {
-          switch (userAuth.status) {
-            case Status.Uninitialized:
-              return Splash();
-            case Status.Unauthenticated:
-            case Status.Authenticating:
-              return LoginPage();
-            case Status.Authenticated:
-              return Instagram(user: userAuth.user);
-            default:
-              return new Text('Error');
-          }
-        },
+    return NetworkSensitiveWidget(
+      child: MaterialApp(
+        theme: mainTheme,
+        onGenerateRoute: generateRoute,
+        home: Consumer(
+          builder: (context, AuthNotifier userAuth, _) {
+            switch (userAuth.status) {
+              case Status.Uninitialized:
+                return Splash();
+              case Status.Unauthenticated:
+              case Status.Authenticating:
+                return LoginPage();
+              case Status.Authenticated:
+                return Instagram(user: userAuth.user);
+              default:
+                return new Text('Error');
+            }
+          },
+        ),
       ),
     );
   }

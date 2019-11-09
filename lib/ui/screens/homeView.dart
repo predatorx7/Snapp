@@ -22,8 +22,21 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  bool loaded = false;
+  bool _loaded = false;
   ProfileService profileAdapter = ProfileService();
+  ScrollController _scrollViewController;
+  InfoModel _data;
+  @override
+  void initState() {
+    _scrollViewController = ScrollController();
+    super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    _data = Provider.of<InfoModel>(context);
+    super.didChangeDependencies();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -105,13 +118,43 @@ class _HomeViewState extends State<HomeView> {
           ),
         ],
       ),
-      body:  _FeedView(),
-//      Column(
-//        children: <Widget>[
-//          _StoryView(),
-//          _FeedView(),
-//        ],
-//      ),
+      body: ScopedModel<StoryModel>(
+        model: StoryModel(),
+        child: ScopedModel<FeedModel>(
+          model: FeedModel(),
+          child: ScopedModelDescendant<StoryModel>(
+              builder: (context, child, story) {
+            return ScopedModelDescendant<FeedModel>(
+              builder: (context, child, cfeed) {
+                if (_loaded) {
+                  cfeed.fetch(_data.info.follows);
+                  story.fetch(_data.info.follows);
+                }
+                return RefreshIndicator(
+                  onRefresh: () async {
+                    cfeed.fetch(_data.info.follows);
+                    story.fetch(_data.info.follows);
+                  },
+                  child: Builder(builder: (context) {
+                    return NestedScrollView(
+                      controller: _scrollViewController,
+                      headerSliverBuilder:
+                          (BuildContext context, bool boxIsScrolled) {
+                        return <Widget>[
+                          SliverAppBar(
+                            title: _StoryView(),
+                          ),
+                        ];
+                      },
+                      body: _FeedView(),
+                    );
+                  }),
+                );
+              },
+            );
+          }),
+        ),
+      ),
     );
   }
 }
@@ -121,83 +164,72 @@ class _StoryView extends StatefulWidget {
   _StoryViewState createState() => _StoryViewState();
 }
 
-class _StoryViewState extends State<_FeedView> {
+class _StoryViewState extends State<_StoryView> {
   bool isListNotEmpty;
   ProfileService profileAdapter = ProfileService();
   InfoModel _data;
   List<dynamic> followList;
+  StoryModel story;
   @override
   void didChangeDependencies() {
     _data = Provider.of<InfoModel>(context);
     followList = _data.info.follows;
+    story = ScopedModel.of<StoryModel>(context);
     super.didChangeDependencies();
   }
 
   @override
   Widget build(BuildContext context) {
     if (followList.isNotEmpty || followList != null) {
-      return ScopedModel<StoryModel>(
-        model: StoryModel(),
-        child: ScopedModelDescendant<StoryModel>(
-          builder: (context, child, story) {
-            print('List of followers: ${followList.toString()}');
-            switch (story.status) {
-              case StoryStatus.idle:
-                story.fetch(followList);
-                return Center(
-                  child: Text('Wait'),
-                );
-              case StoryStatus.busy:
-                return Center(
-                  child: Container(
-                    height: 40,
-                    width: 40,
-                    child: icProcessIndicator(context),
-                  ),
-                );
-              case StoryStatus.nothing:
-                return RefreshIndicator(
-                  onRefresh: () async {
-                    await story.fetch(followList);
-                  },
-                  child: Center(
-                    child: Text(
-                      'No posts to show',
-                      style: body3Style(),
-                    ),
-                  ),
-                );
-              case StoryStatus.fruitful:
-                return RefreshIndicator(
-                  onRefresh: () async {
-                    await story.fetch(followList);
-                  },
-                  child: Row(
-                    children: <Widget>[
-                      ICProfileAvatar(profileURL: _data.info.profileImage,),
-//                      ListView(
-//                        scrollDirection: Axis.horizontal,
-//                        children: <Widget>[
-//
-//                        ],
-//                      ),
-                    ],
-                  ),
-                );
-              default:
-                return child;
-            }
-          },
-          child: Center(
-            child: Text(
-              'There\'s an issue',
-              style: body3Style(),
-            ),
+      return Container(
+        height: 50,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: <Widget>[
+              ICProfileAvatar(
+                profileURL: _data.info.profileImage,
+              ),
+              ListView.builder(
+                scrollDirection: Axis.horizontal,
+                shrinkWrap: true,
+                itemCount: story.stories.length,
+                itemBuilder: (context, index){
+                  return Text(story.stories[index].publisher);
+                },
+              ),
+            ],
           ),
         ),
       );
+//      return SliverList(
+//        delegate: SliverChildBuilderDelegate((context, index) {
+//          return Container(
+//            height: 50,
+//            child: Row(
+//              children: <Widget>[
+//                ICProfileAvatar(
+//                  profileURL: _data.info.profileImage,
+//                ),
+////                      ListView(
+////                        scrollDirection: Axis.horizontal,
+////                        children: <Widget>[
+////
+////                        ],
+////                      ),
+//              ],
+//            ),
+//          );
+//        },
+////        childCount: ScopedModel.of<StoryModel>(context).stories.length,
+//          childCount: story.stories.length,
+//        ),
+//      );
     } else {
-      return SizedBox();
+      return SizedBox(
+        height: 0,
+        width: 0,
+      );
     }
   }
 }
@@ -222,55 +254,42 @@ class _FeedViewState extends State<_FeedView> {
   @override
   Widget build(BuildContext context) {
     if (followList.isNotEmpty) {
-      return ScopedModel<FeedModel>(
-        model: FeedModel(),
-        child: ScopedModelDescendant<FeedModel>(
-          builder: (context, child, cfeed) {
-            print('List of followers: ${followList.toString()}');
-            switch (cfeed.status) {
-              case FeedStatus.idle:
-                cfeed.fetch(followList);
-                return Center(
-                  child: Text('Wait'),
-                );
-              case FeedStatus.busy:
-                return Center(
-                  child: Container(
-                    height: 40,
-                    width: 40,
-                    child: icProcessIndicator(context),
-                  ),
-                );
-              case FeedStatus.nothing:
-                return RefreshIndicator(
-                  onRefresh: () async {
-                    await cfeed.fetch(followList);
-                  },
-                  child: Center(
-                    child: Text(
-                      'No posts to show',
-                      style: body3Style(),
-                    ),
-                  ),
-                );
-              case FeedStatus.fruitful:
-                return RefreshIndicator(
-                  onRefresh: () async {
-                    await cfeed.fetch(followList);
-                  },
-                  child: FeedPostList(
-                    size: MediaQuery.of(context).size.width,
-                  ),
-                );
-              default:
-                return child;
-            }
-          },
-          child: Center(
-            child: Text(
-              'There\'s an issue',
-              style: body3Style(),
-            ),
+      return ScopedModelDescendant<FeedModel>(
+        builder: (context, child, cfeed) {
+          print('List of followers: ${followList.toString()}');
+          switch (cfeed.status) {
+            case FeedStatus.idle:
+              cfeed.fetch(followList);
+              return Center(
+                child: Text('Wait'),
+              );
+            case FeedStatus.busy:
+              return Center(
+                child: Container(
+                  height: 40,
+                  width: 40,
+                  child: icProcessIndicator(context),
+                ),
+              );
+            case FeedStatus.nothing:
+              return Center(
+                child: Text(
+                  'No posts to show',
+                  style: body3Style(),
+                ),
+              );
+            case FeedStatus.fruitful:
+              return FeedPostList(
+                size: MediaQuery.of(context).size.width,
+              );
+            default:
+              return child;
+          }
+        },
+        child: Center(
+          child: Text(
+            'There\'s an issue',
+            style: body3Style(),
           ),
         ),
       );

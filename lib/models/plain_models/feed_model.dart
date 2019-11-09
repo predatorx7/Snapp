@@ -35,6 +35,7 @@ class FeedModel extends Model {
       }
     }
     List<String> sortedKeys = postMap.keys.toList()..sort();
+    this.posts = [];
     while (sortedKeys.isNotEmpty) {
       String lateKey = sortedKeys.removeLast();
       this.posts.add(postMap[lateKey]);

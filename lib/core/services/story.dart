@@ -9,8 +9,7 @@ class StoryService {
   FirebaseDatabase _database = new FirebaseDatabase();
 
   /// Creates a new user story in database
-  void createStory(
-      _imageURL, String uid, int time, String username) async {
+  void createStory(_imageURL, String uid, int time, String username) async {
     Story _story = new Story(
       imageURL: _imageURL,
       publisher: uid,
@@ -20,19 +19,20 @@ class StoryService {
     print('Pushing post to database: ${_story.toJson()}');
 
     try {
-      _database.reference().child("stories/$uid").push().set(_story.toJson());
+      _database
+          .reference()
+          .child("stories/$uid")
+          .set({_story.expiryTime.toString(): _story.toJson()});
       DataSnapshot snapshot = await ProfileService().getProfileSnapshot(uid);
       Profile data = Profile.fromMap(snapshot);
       ProfileService().updateProfile(data);
       if (data != null) {
         await _database
             .reference()
-            .child("profiles")
+            .child("archive")
             .child(data.key)
             .child('stories')
-            .push()
-        // Reference to post as time to help in provide fuzzy time, fetching post and sorting based on time.
-            .set(_story.creationTime);
+            .set({'expiryTime': _story.expiryTime});
       }
       print('[Story Service] Story creation: successful');
     } catch (e) {
@@ -40,7 +40,6 @@ class StoryService {
           '[Story Service] Story creation: An unexpected error occured.\nError: $e');
     }
   }
-
 
   /// To retrieve user's whole story from database
   Future<Story> getStory(FirebaseUser user) async {

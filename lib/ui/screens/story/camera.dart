@@ -5,6 +5,7 @@ import 'package:camera/camera.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram/core/services/story.dart';
+import 'package:instagram/core/services/transactions.dart';
 import 'package:instagram/models/plain_models/information.dart';
 import 'package:path/path.dart' show join;
 import 'package:path_provider/path_provider.dart';
@@ -145,7 +146,6 @@ class TakePictureScreenState extends State<TakePictureScreen> {
 // A widget that displays the picture taken by the user.
 class DisplayPictureScreen extends StatelessWidget {
   final String imagePath;
-
   const DisplayPictureScreen({Key key, this.imagePath}) : super(key: key);
 
   @override
@@ -182,40 +182,47 @@ class DisplayPictureScreen extends StatelessWidget {
                 right: 20,
                 bottom: 15,
               ),
-              child: FlatButton(
-                color: Colors.white,
-                onPressed: () {
-                  print('Post Story');
-                  uploadFile(File(imagePath), user.info.uid, user.info.username)
-                      .then((answer) {
-                    Navigator.popUntil(context, ModalRoute.withName('/'));
-                  });
-                },
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.only(top: 5, bottom: 5),
-                      child: Text(
-                        'Set story',
-                        style: TextStyle(
-                          color: Colors.black,
+              child: Consumer<Transactions>(builder: (context, tLock, child) {
+                return FlatButton(
+                  color: Colors.white,
+                  onPressed: () {
+                    print('Post Story');
+                    if (!tLock.isLocked) {
+                      int key = tLock.acquireLock();
+                      uploadFile(File(imagePath), user.info.uid,
+                              user.info.username)
+                          .then((answer) {
+                        tLock.releaseLock(key);
+                        Navigator.popUntil(context, ModalRoute.withName('/'));
+                      });
+                    }
+                  },
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.only(top: 5, bottom: 5),
+                        child: Text(
+                          'Set story',
+                          style: TextStyle(
+                            color: Colors.black,
+                          ),
                         ),
                       ),
-                    ),
-                    SizedBox(
-                      width: 2,
-                    ),
-                    Icon(Icons.chevron_right, color: Colors.black)
-                  ],
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: new BorderRadius.circular(18.0),
-                  side: BorderSide(
-                    color: Colors.white,
+                      SizedBox(
+                        width: 2,
+                      ),
+                      Icon(Icons.chevron_right, color: Colors.black)
+                    ],
                   ),
-                ),
-              ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: new BorderRadius.circular(18.0),
+                    side: BorderSide(
+                      color: Colors.white,
+                    ),
+                  ),
+                );
+              }),
             ),
           ),
         ],

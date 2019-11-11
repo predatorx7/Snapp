@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram/models/plain_models/app_notification.dart';
 import 'package:instagram/models/plain_models/ex_information.dart';
+import 'package:instagram/models/plain_models/post.dart';
 import 'package:instagram/ui/components/profile_avatar.dart';
 import '../listusers.dart';
 import 'visited_post_list.dart';
@@ -38,7 +39,9 @@ class _VisitedProfilePageState extends State<VisitedProfilePage>
   ProfileService profileAdapter = ProfileService();
   FirebaseDatabase _database = FirebaseDatabase();
   PersistentBottomSheetController _controller; // <------ Instance variable
+  List<Post> postList;
   final _scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   void initState() {
     super.initState();
@@ -57,8 +60,12 @@ class _VisitedProfilePageState extends State<VisitedProfilePage>
         if (_data.info.followers.contains(_observer.info.uid)) {
           _data.setFollow(true);
         }
+        postList = [];
       }
     }
+    _data.posts.then((val) {
+      postList = val;
+    });
     super.didChangeDependencies();
   }
 
@@ -102,7 +109,7 @@ class _VisitedProfilePageState extends State<VisitedProfilePage>
                     Column(
                       children: <Widget>[
                         Text(
-                          '${_data.info.posts?.length ?? 0}',
+                          '${postList?.length ?? 0}',
                           style: stateful,
                         ),
                         Text(
@@ -112,7 +119,7 @@ class _VisitedProfilePageState extends State<VisitedProfilePage>
                     ),
                     // Followers
                     GestureDetector(
-                      onTap: (){
+                      onTap: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => ListUsers(
@@ -136,7 +143,7 @@ class _VisitedProfilePageState extends State<VisitedProfilePage>
                     ),
                     // Following
                     GestureDetector(
-                      onTap: (){
+                      onTap: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => ListUsers(
@@ -405,21 +412,21 @@ class _VisitedProfilePageState extends State<VisitedProfilePage>
         },
         body: Visibility(
           visible: (_data.info != null),
-          child: (_data.info.posts?.isNotEmpty ?? false)
+          child: (postList?.isNotEmpty ?? false)
               ? TabBarView(
                   controller: _tabController,
                   children: <Widget>[
                     new GridView.builder(
                       physics: AlwaysScrollableScrollPhysics(
                           parent: BouncingScrollPhysics()),
-                      itemCount: _data.info.posts.length ?? 0,
+                      itemCount: postList.length ?? 0,
                       gridDelegate:
                           new SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 3),
                       itemBuilder: (BuildContext context, int index) {
                         return PostAdapters(
                           uid: _data.info.uid,
-                          creationTime: _data.info.posts[index],
+                          creationTime: postList[index].creationTime,
                           isInGrid: true,
                           database: _database,
                           height: MediaQuery.of(context).size.width,

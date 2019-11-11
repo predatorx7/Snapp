@@ -20,22 +20,12 @@ class PostService {
       publisherUsername: username,
     );
     print('Pushing post to database: ${_post.toJson()}');
-
     try {
-      _database.reference().child("posts/$uid").push().set(_post.toJson());
-      DataSnapshot snapshot = await ProfileService().getProfileSnapshot(uid);
-      Profile data = Profile.fromMap(snapshot);
-      ProfileService().updateProfile(data);
-      if (data != null) {
-        await _database
-            .reference()
-            .child("profiles")
-            .child(data.key)
-            .child('posts')
-            .push()
-            // Reference to post as time to help in provide fuzzy time, fetching post and sorting based on time.
-            .set(_post.creationTime);
-      }
+      await _database
+          .reference()
+          .child("posts/$uid")
+          .push()
+          .set(_post.toJson());
       print('[Post Service] Post creation: successful');
     } catch (e) {
       print(
@@ -43,40 +33,6 @@ class PostService {
     }
   }
 
-  // Returns int which is time of creation and ID of post for this user
-  Future getPostList(String uid) async {
-    DataSnapshot snapshot = await ProfileService().getProfileSnapshot(uid);
-    Profile data = Profile.fromMap(snapshot);
-    ProfileService().updateProfile(data);
-    var _readData = await _database
-        .reference()
-        .child("profiles")
-        .child(data.key)
-        .child('posts')
-        .once();
-    return _readData.value;
-  }
-
-  /// To retrieve user's whole post from database
-  Future<Post> getPostByTime(FirebaseUser user) async {
-    var _readData = await _database
-        .reference()
-        .child("posts")
-        .orderByChild("publisher")
-        .equalTo(user.uid)
-        .once()
-        .then(
-      (DataSnapshot snapshot) {
-        if (snapshot.value != null) {
-          return Post.fromMap(snapshot.value);
-        } else {
-          print('Couldn\'t get post');
-          return null;
-        }
-      },
-    );
-    return _readData;
-  }
 
   static Future<Post> getPost(String postKey, String publisher) async {
     Post post;
@@ -88,17 +44,6 @@ class PostService {
       print('[Post Service] Retrieved post: ${dSnap.value.toString()}');
     }
     return post;
-  }
-
-  /// Update changes to post
-  Future<void> updatePost(Post post) async {
-    if (post != null) {
-      await _database
-          .reference()
-          .child("posts")
-          .child(post.postKey)
-          .set(post.toJson());
-    }
   }
 
   static Future<bool> doLike(Profile liker, Post post) async {

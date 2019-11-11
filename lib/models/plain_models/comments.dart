@@ -15,16 +15,16 @@ class Comment {
 
   /// UserId of publisher `required`
   String publisher;
-
+  // Username of publisher `required`
   String pulisherUsername;
 
   Comment({
-    @required this.comment,
+    this.comment,
     this.commentKey,
     this.creationTime,
-    @required this.postKey,
-    @required this.publisher,
-    @required this.pulisherUsername,
+    this.postKey,
+    this.publisher,
+    this.pulisherUsername,
   });
 
   Comment.fromMap(Map data, commentKey)
@@ -36,7 +36,8 @@ class Comment {
         pulisherUsername = data['pulisherUsername'] ?? '';
 
   /// Provides data in JSON format. Provides current time if not optionally disabled.
-  Map<String, dynamic> toJson({bool provideWithCurrentTime = true, String commentKey}) {
+  Map<String, dynamic> toJson(
+      {bool provideWithCurrentTime = true, String commentKey}) {
     /// Gets Current time
     if (provideWithCurrentTime == true) {
       DateTime currentTime = new DateTime.now();

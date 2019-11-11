@@ -40,9 +40,12 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
           _data.setFollow(true);
         }
       }
+      postList = [];
     }
+    _data.posts.then((val){
+      postList = val;
+    });
     uid = _data.info.uid;
-    postList = _data.info.posts;
     super.didChangeDependencies();
   }
 
@@ -50,7 +53,7 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return GridView.builder(
       physics: AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-      itemCount: _data.info.posts.length ?? 0,
+      itemCount: postList.length ?? 0,
       gridDelegate:
           new SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 1),
       itemBuilder: (BuildContext context, int index) {

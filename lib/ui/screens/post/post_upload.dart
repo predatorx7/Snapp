@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:instagram/commons/styles.dart';
+import 'package:instagram/core/services/transactions.dart';
 import 'package:instagram/ui/components/process_indicator.dart';
 import 'package:instagram/ui/components/profile_avatar.dart';
 import 'package:provider/provider.dart';
@@ -227,52 +228,72 @@ class _UploadMediaState extends State<UploadMedia> {
         ),
         actions: <Widget>[
           Center(
-            child: TappableText(
-              onTap: _isLoading
-                  ? null
-                  : () async {
-                      setState(() {
-                        _isLoading = true;
-                      });
-                      captionFocus.unfocus();
-                      await showDialog(
-                        barrierDismissible: false,
-                        context: context,
-                        builder: (BuildContext context) {
-                          // Call
-                          uploadFile(widget.imageFile, _info.info.uid,
-                                  captionController.text, _info.info.username)
-                              .then((answer) {
-                            Navigator.popUntil(
-                                context, ModalRoute.withName('/'));
-                          });
-                          return Dialog(
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(4)),
-                            child: SizedBox(
-                              width: 60,
-                              height: 60,
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: <Widget>[
-                                  Text(
-                                    'Uploading',
-                                    style: body5Style(),
-                                  ),
-                                  ICProcessIndicator(
-                                    size: 32,
-                                  ),
-                                ],
+            child: Consumer<Transactions>(builder: (context, tLock, child) {
+              return TappableText(
+                onTap: _isLoading
+                    ? null
+                    : () async {
+                        captionFocus.unfocus();
+                        await showDialog(
+                          barrierDismissible: false,
+                          context: context,
+                          builder: (BuildContext context) {
+                            // Call
+                            if (!_isLoading) {
+                              // Uploading file
+                              // Prevent re-uploading when state changes
+                              // TODO: Change Stupid code
+                              if (!tLock.isLocked) {
+                                int key = tLock.acquireLock();
+                                uploadFile(
+                                        widget.imageFile,
+                                        _info.info.uid,
+                                        captionController.text,
+                                        _info.info.username)
+                                    .then(
+                                  (answer) {
+                                    tLock.releaseLock(key);
+                                    Navigator.popUntil(
+                                        context, ModalRoute.withName('/'));
+                                  },
+                                );
+                                Future(() {
+                                  setState(
+                                    () {
+                                      _isLoading = true;
+                                    },
+                                  );
+                                });
+                              }
+                            }
+                            return Dialog(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(4)),
+                              child: SizedBox(
+                                width: 60,
+                                height: 60,
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: <Widget>[
+                                    Text(
+                                      'Uploading',
+                                      style: body5Style(),
+                                    ),
+                                    ICProcessIndicator(
+                                      size: 32,
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          );
-                        },
-                      );
-                    },
-              text: 'Share',
-              textSize: 16,
-            ),
+                            );
+                          },
+                        );
+                      },
+                text: 'Share',
+                textSize: 16,
+              );
+            }),
           ),
         ],
       ),
@@ -323,6 +344,7 @@ Future uploadFile(
       .child('posts/$uid/${DateTime.now().millisecondsSinceEpoch}');
   StorageUploadTask uploadTask = storageReference.putFile(_image);
   await uploadTask.onComplete;
+  // TODO: ADD CANCELLATION ON CONNECTION TIMEOUT
   print('File Uploaded');
   storageReference.getDownloadURL().then(
     (fileURL) {

@@ -28,25 +28,26 @@ class Story {
     @required this.publisher,
     this.storyKey,
     this.publisherUsername,
-  });
+  }) {
+    DateTime currentTime = new DateTime.now();
+    if (creationTime == null) {
+      creationTime = currentTime.millisecondsSinceEpoch;
+    }
+    if (expiryTime == null) {
+      expiryTime = currentTime.add(Duration(days: 1)).millisecondsSinceEpoch;
+    }
+  }
 
   Story.fromMap(DataSnapshot snapshot, String publisher)
       : storyKey = snapshot.key,
-        creationTime = snapshot.value['creationTime'] ?? '',
-        expiryTime = snapshot.value['expiryTime'] ?? '',
+        creationTime = snapshot?.value['creationTime'],
+        expiryTime = snapshot?.value['expiryTime'],
         imageURL = snapshot.value['imageURL'] ?? '',
-  publisherUsername = snapshot.value['publisherUsername'] ?? '',
+        publisherUsername = snapshot.value['publisherUsername'] ?? '',
         publisher = publisher ?? '';
 
   /// Provides data in JSON format. Provides current time if not optionally disabled.
-  Map<String, dynamic> toJson({bool provideWithCurrentTime = true}) {
-    /// Gets Current time
-    if (provideWithCurrentTime == true) {
-      DateTime currentTime = new DateTime.now();
-      creationTime = currentTime.millisecondsSinceEpoch;
-      expiryTime = currentTime.add(Duration(days: 1)).millisecondsSinceEpoch;
-    }
-
+  Map<String, dynamic> toJson() {
     return {
       "creationTime": creationTime,
       "expiryTime": expiryTime,
@@ -55,6 +56,7 @@ class Story {
       "publisherUsername": publisherUsername,
     };
   }
+
   List _getFromArray(data) {
     // When creating a child by pushing, only the last post pushed has a unique key, the previous ones are altered with incremented numbers on push. Thus
     // on removing the last child, list is parsed instead of a Map. The below workaround try/catch deals with it.
@@ -71,11 +73,11 @@ class Story {
 
   Story.createFromMap(Map dataMap, String key) {
     storyKey = key;
-//    views = _getFromArray(dataMap['likes'] ?? []);
+//    views = _getFromArray(dataMap['views'] ?? []);
     creationTime = dataMap['creationTime'] ?? null;
     imageURL = dataMap['imageURL'] ?? '';
     publisher = dataMap['publisher'] ?? '';
     publisherUsername = dataMap['publisherUsername'] ?? '';
-    creationTime = dataMap['expiryTime'] ?? null;
+    expiryTime = dataMap['expiryTime'] ?? null;
   }
 }

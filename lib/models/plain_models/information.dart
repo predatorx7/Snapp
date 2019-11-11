@@ -7,13 +7,29 @@ import 'profile.dart';
 class InfoModel with ChangeNotifier {
   Profile _info = Profile();
   double _heightOfFlexSpace;
+  List<dynamic> _posts = [];
+
+  Future<List<dynamic>> get posts async {
+    if (_info.uid?.isNotEmpty ?? null || _posts == []) {
+      DataSnapshot res = await FirebaseDatabase.instance
+          .reference()
+          .child("posts/${_info.uid}")
+          .once();
+      this._posts = res.value.keys.toList();
+      notifyListeners();
+      return _posts;
+    } else {
+      print('Called on null users');
+      return _posts;
+    }
+  }
 
   double get heightOfFlexSpace => _heightOfFlexSpace;
 
   Adapt _flexibleSpaceHeight = Adapt(size: 260);
   InfoModel();
   Profile get info => _info;
-  void setInfo(Profile information) {
+  Future<void> setInfo(Profile information) async {
     _info = information;
     _heightOfFlexSpace = _flexibleSpaceHeight.withText(text: _info.bio);
     notifyListeners();
@@ -23,7 +39,7 @@ class InfoModel with ChangeNotifier {
     notifyListeners();
   }
 
-  void setInfoSilently(Profile information) {
+  Future<void> setInfoSilently(Profile information) async {
     _info = information;
     _heightOfFlexSpace = _flexibleSpaceHeight.withText(text: _info.bio);
   }

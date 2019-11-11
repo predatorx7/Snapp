@@ -1,11 +1,13 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:instagram/commons/assets.dart';
 import 'package:instagram/commons/styles.dart';
 import 'package:instagram/core/services/profile.dart';
 import 'package:instagram/models/plain_models/feed_model.dart';
 import 'package:instagram/models/plain_models/information.dart';
+import 'package:instagram/models/plain_models/story.dart';
 import 'package:instagram/models/plain_models/story_model.dart';
 import 'package:instagram/ui/components/profile_avatar.dart';
 import 'package:instagram/ui/screens/post/feed_post_list.dart';
@@ -15,6 +17,7 @@ import '../../models/view_models/message_notification.dart';
 import 'package:provider/provider.dart';
 
 import 'messaging/messaging.dart';
+import 'story/story_view.dart';
 
 class HomeView extends StatefulWidget {
   @override
@@ -123,36 +126,44 @@ class _HomeViewState extends State<HomeView> {
         child: ScopedModel<FeedModel>(
           model: FeedModel(),
           child: ScopedModelDescendant<StoryModel>(
-              builder: (context, child, story) {
-            return ScopedModelDescendant<FeedModel>(
-              builder: (context, child, cfeed) {
-                if (_loaded) {
-                  cfeed.fetch(_data.info.follows);
-                  story.fetch(_data.info.follows);
-                }
-                return RefreshIndicator(
-                  onRefresh: () async {
+            builder: (context, child, story) {
+              return ScopedModelDescendant<FeedModel>(
+                builder: (context, child, cfeed) {
+                  if (_loaded) {
                     cfeed.fetch(_data.info.follows);
                     story.fetch(_data.info.follows);
-                  },
-                  child: Builder(builder: (context) {
-                    return NestedScrollView(
-                      controller: _scrollViewController,
-                      headerSliverBuilder:
-                          (BuildContext context, bool boxIsScrolled) {
-                        return <Widget>[
-                          SliverAppBar(
-                            title: _StoryView(),
-                          ),
-                        ];
-                      },
-                      body: _FeedView(),
-                    );
-                  }),
-                );
-              },
-            );
-          }),
+                  }
+                  return Builder(
+                    builder: (context) {
+                      print(
+                          'Stories gathered: ${story.collection.length}, Posts gathered ${cfeed.posts.length}');
+                      return NestedScrollView(
+                        controller: _scrollViewController,
+                        headerSliverBuilder:
+                            (BuildContext context, bool boxIsScrolled) {
+                          return <Widget>[
+                            SliverAppBar(
+                              expandedHeight: 100,
+                              flexibleSpace: FlexibleSpaceBar(
+                                background: _StoryView(),
+                              ),
+                            ),
+                          ];
+                        },
+                        body: RefreshIndicator(
+                          onRefresh: () async {
+                            await cfeed.fetch(_data.info.follows);
+                            await story.fetch(_data.info.follows);
+                          },
+                          child: _FeedView(),
+                        ),
+                      );
+                    },
+                  );
+                },
+              );
+            },
+          ),
         ),
       ),
     );
@@ -175,6 +186,12 @@ class _StoryViewState extends State<_StoryView> {
     _data = Provider.of<InfoModel>(context);
     followList = _data.info.follows;
     story = ScopedModel.of<StoryModel>(context);
+    switch (story.status) {
+      case StoryStatus.idle:
+        story.fetch(followList);
+        break;
+      default:
+    }
     super.didChangeDependencies();
   }
 
@@ -182,49 +199,113 @@ class _StoryViewState extends State<_StoryView> {
   Widget build(BuildContext context) {
     if (followList.isNotEmpty || followList != null) {
       return Container(
-        height: 50,
+//        height: 65,
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
             children: <Widget>[
-              ICProfileAvatar(
-                profileURL: _data.info.profileImage,
+              Padding(
+                padding: const EdgeInsets.only(top: 4, left: 6, right: 6),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Stack(
+                      children: <Widget>[
+                        ICProfileAvatar(
+                          profileURL: _data.info.profileImage,
+                          size: 26,
+                        ),
+                        Positioned(
+                          right: 0,
+                          bottom: 0,
+                          child: Visibility(
+//                           visible: if has stories
+                            child: Container(
+                              padding: const EdgeInsets.all(1.0),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Container(
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  color: Color(actionColor),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.add,
+                                  size: 16,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      child: Text(
+                        'Your story',
+                        style: TextStyle(fontSize: 10),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
+                ),
               ),
               ListView.builder(
                 scrollDirection: Axis.horizontal,
                 shrinkWrap: true,
-                itemCount: story.stories.length,
-                itemBuilder: (context, index){
-                  return Text(story.stories[index].publisher);
+                itemCount: story.collection.length,
+                itemBuilder: (context, index) {
+                  String publisherUID = story.collection.keys.toList()[index];
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => StoryView(
+                            stories: story.collection[publisherUID],
+                            publisherUID: publisherUID,
+                          ),
+                        ),
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 4, left: 6, right: 6),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Hero(
+                            tag: 'aStory',
+                            child: ICProfileAvatar(
+                              profileOf: publisherUID,
+                              size: 26,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: Text(
+                              story.collection[publisherUID][0]
+                                  .publisherUsername,
+                              style: TextStyle(fontSize: 10),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
                 },
               ),
             ],
           ),
         ),
       );
-//      return SliverList(
-//        delegate: SliverChildBuilderDelegate((context, index) {
-//          return Container(
-//            height: 50,
-//            child: Row(
-//              children: <Widget>[
-//                ICProfileAvatar(
-//                  profileURL: _data.info.profileImage,
-//                ),
-////                      ListView(
-////                        scrollDirection: Axis.horizontal,
-////                        children: <Widget>[
-////
-////                        ],
-////                      ),
-//              ],
-//            ),
-//          );
-//        },
-////        childCount: ScopedModel.of<StoryModel>(context).stories.length,
-//          childCount: story.stories.length,
-//        ),
-//      );
     } else {
       return SizedBox(
         height: 0,
@@ -260,17 +341,9 @@ class _FeedViewState extends State<_FeedView> {
           switch (cfeed.status) {
             case FeedStatus.idle:
               cfeed.fetch(followList);
-              return Center(
-                child: Text('Wait'),
-              );
+              return child;
             case FeedStatus.busy:
-              return Center(
-                child: Container(
-                  height: 40,
-                  width: 40,
-                  child: icProcessIndicator(context),
-                ),
-              );
+              return child;
             case FeedStatus.nothing:
               return Center(
                 child: Text(
@@ -283,13 +356,19 @@ class _FeedViewState extends State<_FeedView> {
                 size: MediaQuery.of(context).size.width,
               );
             default:
-              return child;
+              return Center(
+                child: Text(
+                  'There\'s an issue',
+                  style: body3Style(),
+                ),
+              );
           }
         },
         child: Center(
-          child: Text(
-            'There\'s an issue',
-            style: body3Style(),
+          child: Container(
+            height: 40,
+            width: 40,
+            child: icProcessIndicator(context),
           ),
         ),
       );

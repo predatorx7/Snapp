@@ -24,18 +24,13 @@ class Profile {
   /// Gender Should be: Male, Female, <custom>, and Prefer not to say.
   String gender;
 
-  /// List of postIds of posts posted by this user.
-  List<dynamic> posts;
-
-  /// List of storyId of stories by this user.
-  List<dynamic> stories;
-
   /// ProfileImageId for this user.
   String profileImage;
 
   /// Firebase uid of this user.
   String uid;
 
+  List posts;
   /// App username of this user.
   String username;
 
@@ -49,9 +44,7 @@ class Profile {
       this.follows,
       this.fullName,
       this.gender,
-      this.posts,
       this.profileImage,
-      this.stories,
       this.uid,
       this.username});
 
@@ -80,9 +73,7 @@ class Profile {
     follows = _getFromArray(mainData['follows']);
     fullName = mainData['fullName'] ?? '';
     gender = mainData['gender'] ?? '';
-    posts = _getFromArray(mainData['posts']);
     profileImage = mainData['profileImage'] ?? '';
-    stories = _getFromArray(mainData['stories']);
     username = mainData['username'] ?? '';
   }
 
@@ -107,9 +98,7 @@ class Profile {
     follows = _getFromArray(mainData['follows']);
     fullName = mainData['fullName'] ?? '';
     gender = mainData['gender'] ?? '';
-    posts = _getFromArray(mainData['posts']);
     profileImage = mainData['profileImage'] ?? '';
-    stories = _getFromArray(mainData['stories']);
     username = mainData['username'] ?? '';
   }
 
@@ -131,9 +120,7 @@ class Profile {
     follows = _getFromArray(mainData['follows'] ?? []);
     fullName = _tryAssign('fullName', mainData, '');
     gender = _tryAssign('gender', mainData, '');
-    posts = _getFromArray(mainData['posts'] ?? []);
     profileImage = _tryAssign('profileImage', mainData, '');
-    stories = _getFromArray(mainData['stories'] ?? []);
     username = _tryAssign('username', mainData, '');
   }
 
@@ -146,9 +133,7 @@ class Profile {
       "follows": follows,
       "fullName": fullName,
       "gender": gender,
-      "posts": posts,
       "profileImage": profileImage,
-      "stories": stories,
       "uid": uid,
       "username": username
     };
@@ -169,17 +154,3 @@ class KeyEmail {
     return keyEmail.replaceAll(":", ".");
   }
 }
-
-// void main() {
-//   var emailHandle = KeyEmail();
-//   print(Profile(
-//           email: 'smushaheed@gmail.com',
-//           fullName: 'Syed Mushaheed',
-//           gender: 'Prefer Not to say',
-//           uid: 'kjsbcjBS8',
-//           username: 'SMUSHAHEED')
-//       .toJson());
-//   print(' . => : & : => .');
-//   print(emailHandle.getEmailAsValidKey('smushaheed@outlook.com'));
-//   print(emailHandle.getEmailfromKey('smushaheed@outlook:com'));
-// }

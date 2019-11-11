@@ -34,6 +34,7 @@ class _ProfilePageState extends State<ProfilePage>
   TextStyle stateless = TextStyle();
   ProfileService profileAdapter = ProfileService();
   FirebaseDatabase _database = FirebaseDatabase();
+  List postList = [];
   @override
   void initState() {
     super.initState();
@@ -44,6 +45,9 @@ class _ProfilePageState extends State<ProfilePage>
   @override
   void didChangeDependencies() {
     _data = Provider.of<InfoModel>(context);
+    _data.posts.then((val){
+      postList = val;
+    });
     super.didChangeDependencies();
   }
 
@@ -80,18 +84,7 @@ class _ProfilePageState extends State<ProfilePage>
                         },
                         child: Stack(
                           children: <Widget>[
-                            // CircleAvatar(
-                            //   radius: 45,
-                            //   backgroundColor: Colors.grey[200],
-                            //   backgroundImage: data.profileImage.isNotEmpty
-                            //       ? NetworkImage(
-                            //           data.profileImage,
-                            //         )
-                            //       : CommonImages.profilePic1.image,
-                            // ),
                             ICProfileAvatar(
-                              // database: FirebaseDatabase.instance,
-                              // profileOf: data.uid,
                               profileURL: data.profileImage,
                               size: 45,
                             ),
@@ -123,16 +116,28 @@ class _ProfilePageState extends State<ProfilePage>
                       ),
                     ),
                     // Posts
-                    Column(
-                      children: <Widget>[
-                        Text(
-                          '${data.posts.length ?? 0}',
-                          style: stateful,
-                        ),
-                        Text(
-                          'Posts',
-                        ),
-                      ],
+                    StreamBuilder(
+                      stream: FirebaseDatabase.instance.reference()
+                        .child("posts/${data.uid}").onValue,
+                      builder: (context,AsyncSnapshot<Event> asyncSnapshot) {
+                        List postList = [];
+                        if(asyncSnapshot.hasData){
+                          if(asyncSnapshot.data.snapshot.value != null){
+                            postList = asyncSnapshot.data.snapshot.value.keys.toList();
+                          }
+                        }
+                        return Column(
+                          children: <Widget>[
+                            Text(
+                              '${postList.length}',
+                              style: stateful,
+                            ),
+                            Text(
+                              'Posts',
+                            ),
+                          ],
+                        );
+                      }
                     ),
                     // Followers
                     GestureDetector(
@@ -160,7 +165,7 @@ class _ProfilePageState extends State<ProfilePage>
                     ),
                     // Following
                     GestureDetector(
-                      onTap: (){
+                      onTap: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => ListUsers(
@@ -302,79 +307,79 @@ class _ProfilePageState extends State<ProfilePage>
           ],
         ),
       ),
-      body: RefreshIndicator(
-        displacement: 20,
-        onRefresh: () async {
-          await Future.delayed(Duration(seconds: 1));
-          await FirebaseDatabase.instance
-              .reference()
-              .child("profiles")
-              .orderByChild("uid")
-              .equalTo(_data.info.uid)
-              .once()
-              .then((DataSnapshot dataSnap) {
-            if (dataSnap.value != null) {
-              print('RefreshedInfo: ${dataSnap.value.toString()}');
-              _data.setInfo(Profile.fromMap(dataSnap));
-            }
-          });
-        },
-        child: NestedScrollView(
-          controller: _scrollViewController,
-          headerSliverBuilder: (BuildContext context, bool boxIsScrolled) {
-            return <Widget>[
-              SliverAppBar(
-                automaticallyImplyLeading: false,
-                backgroundColor: Colors.grey[50],
-                floating: true,
-                pinned: true,
-                // snap: true,
-                expandedHeight: _data.heightOfFlexSpace,
-                flexibleSpace: FlexibleSpaceBar(
-                  collapseMode: CollapseMode.pin,
-                  background: profileWidget(context, _data.info),
-                ),
-                actions: <Widget>[Container()],
-                bottom: TabBar(
-                  indicatorColor: notBlack,
-                  tabs: <Widget>[
-                    Tab(
-                      icon: Icon(
-                        Icons.grid_on,
-                        color: Colors.black,
-                      ),
-                    ),
-                    Tab(
-                      icon: Icon(
-                        Icons.image,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ],
-                  controller: _tabController,
-                ),
+      body: NestedScrollView(
+        controller: _scrollViewController,
+        headerSliverBuilder: (BuildContext context, bool boxIsScrolled) {
+          return <Widget>[
+            SliverAppBar(
+              automaticallyImplyLeading: false,
+              backgroundColor: Colors.grey[50],
+              floating: true,
+              pinned: true,
+              // snap: true,
+              expandedHeight: _data.heightOfFlexSpace,
+              flexibleSpace: FlexibleSpaceBar(
+                collapseMode: CollapseMode.pin,
+                background: profileWidget(context, _data.info),
               ),
-            ];
-          },
-          body: Container(
-            color: Colors.grey[50],
+              actions: <Widget>[Container()],
+              bottom: TabBar(
+                indicatorColor: notBlack,
+                tabs: <Widget>[
+                  Tab(
+                    icon: Icon(
+                      Icons.grid_on,
+                      color: Colors.black,
+                    ),
+                  ),
+                  Tab(
+                    icon: Icon(
+                      Icons.image,
+                      color: Colors.black,
+                    ),
+                  ),
+                ],
+                controller: _tabController,
+              ),
+            ),
+          ];
+        },
+        body: Container(
+          color: Colors.grey[50],
+          child: RefreshIndicator(
+            displacement: 20,
+            onRefresh: () async {
+              await Future.delayed(Duration(seconds: 1));
+              await FirebaseDatabase.instance
+                  .reference()
+                  .child("profiles")
+                  .orderByChild("uid")
+                  .equalTo(_data.info.uid)
+                  .once()
+                  .then((DataSnapshot dataSnap) {
+                if (dataSnap.value != null) {
+                  print('RefreshedInfo: ${dataSnap.value.toString()}');
+                  _data.setInfo(Profile.fromMap(dataSnap));
+                }
+              });
+            },
             child: Visibility(
               visible: (_data.info != null),
-              child: (_data.info.posts.isNotEmpty)
+              child: (postList.isNotEmpty)
                   ? TabBarView(
                       controller: _tabController,
                       children: <Widget>[
                         new GridView.builder(
                           physics: AlwaysScrollableScrollPhysics(
                               parent: BouncingScrollPhysics()),
-                          itemCount: _data.info.posts.length ?? 0,
+                          itemCount: postList.length ?? 0,
                           gridDelegate:
                               new SliverGridDelegateWithFixedCrossAxisCount(
                                   crossAxisCount: 3),
                           itemBuilder: (BuildContext context, int index) {
                             return PostAdapters(
                               uid: _data.info.uid,
-                              creationTime: _data.info.posts[index],
+                              creationTime: postList[index].creationTime,
                               isInGrid: true,
                               database: _database,
                               height: MediaQuery.of(context).size.width,

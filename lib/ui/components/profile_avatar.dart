@@ -7,6 +7,7 @@ import 'package:instagram/models/plain_models/profile.dart';
 class ICProfileAvatar extends StatefulWidget {
   final FirebaseDatabase database;
   final String profileOf;
+  /// default size 18
   final double size;
 
   /// Don't provide [profileOf] if setting this (profileURL could be null)

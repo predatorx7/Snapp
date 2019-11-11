@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:instagram/commons/routes.dart';
 import 'package:instagram/commons/styles.dart';
+import 'package:instagram/core/services/transactions.dart';
 import 'package:instagram/models/view_models/signup_page.dart';
 import 'package:instagram/ui/components/network_sensitive.dart';
 import 'package:instagram/ui/screens/instagram.dart';
@@ -21,6 +22,9 @@ void main() {
       providers: [
         ChangeNotifierProvider(
           builder: (context) => AuthNotifier.instance(),
+        ),
+        ChangeNotifierProvider(
+          builder: (context) => Transactions(),
         ),
         ChangeNotifierProvider(
           builder: (context) => InfoModel(),

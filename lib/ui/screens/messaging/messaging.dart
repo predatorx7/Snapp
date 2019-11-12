@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:instagram/commons/styles.dart';
-import 'package:instagram/models/plain_models/information.dart';
+import 'package:instagram/repository/information.dart';
 import 'package:outline_material_icons/outline_material_icons.dart';
 import 'package:provider/provider.dart';
 
@@ -12,10 +12,10 @@ class MessagingPage extends StatefulWidget {
 }
 
 class _MessagingPageState extends State<MessagingPage> {
-  InfoModel _user;
+  InfoRepo _user;
   @override
   void didChangeDependencies() {
-    _user = Provider.of<InfoModel>(context);
+    _user = Provider.of<InfoRepo>(context);
     super.didChangeDependencies();
   }
 

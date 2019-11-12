@@ -5,7 +5,7 @@ import 'package:instagram/core/services/posts.dart';
 import 'package:instagram/core/services/profile.dart';
 import 'package:instagram/models/plain_models/app_notification.dart';
 import 'package:instagram/models/plain_models/feed_model.dart';
-import 'package:instagram/models/plain_models/information.dart';
+import 'package:instagram/repository/information.dart';
 import 'package:instagram/models/plain_models/post.dart';
 import 'package:instagram/ui/components/profile_avatar.dart';
 import 'package:outline_material_icons/outline_material_icons.dart';
@@ -22,11 +22,11 @@ class FeedPostList extends StatefulWidget {
 class _FeedPostListState extends State<FeedPostList>
     with TickerProviderStateMixin {
   FeedModel cFeed;
-  InfoModel _observer;
+  InfoRepo _observer;
   @override
   void didChangeDependencies() {
     cFeed = ScopedModel.of<FeedModel>(context);
-    _observer = Provider.of<InfoModel>(context);
+    _observer = Provider.of<InfoRepo>(context);
     super.didChangeDependencies();
   }
 
@@ -89,7 +89,7 @@ class _FeedPostListState extends State<FeedPostList>
                                             _observer.info, metadata.publisher);
                                         _observer.info.follows
                                             .remove(metadata.publisher);
-                                        _observer.shout();
+                                        _observer.notifyChanges();
                                         Navigator.maybePop(context);
                                       },
                                       title: Text(

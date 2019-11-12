@@ -6,12 +6,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram/commons/assets.dart';
 import 'package:instagram/commons/routing_constants.dart';
-import 'package:instagram/commons/styles.dart';
-import 'package:instagram/models/plain_models/information.dart';
-import 'package:instagram/models/plain_models/profile.dart';
+import 'package:instagram/repository/information.dart';
 import 'package:instagram/models/view_models/instagram.dart';
 import 'package:instagram/models/view_models/notification_page.dart';
 import 'package:instagram/ui/components/bottom_navbar.dart';
+import 'package:instagram/ui/components/process_indicator.dart';
 import 'package:instagram/ui/screens/notification_page.dart';
 import 'package:instagram/ui/screens/profile_page.dart';
 import 'package:instagram/ui/screens/search_page.dart';
@@ -32,7 +31,7 @@ class Instagram extends StatefulWidget {
 class _InstagramState
     extends State<Instagram> /*with TickerProviderStateMixin*/ {
   FirebaseDatabase _database = new FirebaseDatabase();
-  InfoModel data;
+  InfoRepo data;
   PageController _pageController;
 
   @override
@@ -43,7 +42,7 @@ class _InstagramState
 
   @override
   void didChangeDependencies() {
-    data = Provider.of<InfoModel>(context);
+    data = Provider.of<InfoRepo>(context);
     super.didChangeDependencies();
   }
 
@@ -54,7 +53,6 @@ class _InstagramState
 
   @override
   Widget build(BuildContext context) {
-    print('[Instagram] User ${widget.user.email}');
     return ScopedModel<InstagramPaginationModel>(
       model: InstagramPaginationModel(),
       child: ScopedModelDescendant<InstagramPaginationModel>(
@@ -82,113 +80,41 @@ class _InstagramState
               },
             ),
             Scaffold(
-              body: StreamBuilder(
-                stream: _database
-                    .reference()
-                    .child("profiles")
-                    .orderByChild("email")
-                    .equalTo(widget.user.email)
-                    .onValue,
-                builder:
-                    (BuildContext context, AsyncSnapshot<Event> eventSnapshot) {
-                  switch (eventSnapshot.connectionState) {
-                    case ConnectionState.waiting:
-                      return Center(
-                        child: icProcessIndicator(context),
-                      );
-                      break;
-                    default:
-                      if (!eventSnapshot.hasData) {
-                        return Center(
-                          child: Text(':('),
-                        );
-                      } else {
-                        data.setInfoSilently(
-                            Profile.fromMap(eventSnapshot.data.snapshot));
-                        if (data.info.email != null) {
-                          return Stack(
-                            children: <Widget>[
-                              Visibility(
-                                maintainState: true,
-                                visible: _pageView.viewIndex == 0,
-                                child: HomeView(),
-                              ),
-                              // TRY
-                              // new Offstage(
-                              //   offstage: _pageView.viewIndex != 0,
-                              //   child: new TickerMode(
-                              //     enabled: _pageView.viewIndex == 0,
-                              //     child: new HomeView(),
-                              //   ),
-                              // ),
-                              Visibility(
-                                maintainState: true,
-                                visible: _pageView.viewIndex == 1,
-                                child: SearchPage(
-                                  observer: data.info.uid,
-                                ),
-                              ),
-                              // new Offstage(
-                              //   offstage: _pageView.viewIndex != 1,
-                              //   child: new TickerMode(
-                              //     enabled: _pageView.viewIndex == 1,
-                              //     child: new SearchPage(
-                              //       observer: data.info.uid,
-                              //     ),
-                              //   ),
-                              // ),
-                              Visibility(
-                                maintainState: true,
-                                visible: _pageView.viewIndex == 3,
-                                child: ScopedModel<NotificationPageModel>(
-                                  model: NotificationPageModel(),
-                                  child: NotificationsPage(),
-                                ),
-                              ),
-                              // new Offstage(
-                              //   offstage: _pageView.viewIndex != 3,
-                              //   child: new TickerMode(
-                              //     enabled: _pageView.viewIndex == 3,
-                              //     child:
-                              //         new ScopedModel<NotificationPageModel>(
-                              //       model: NotificationPageModel(),
-                              //       child: NotificationsPage(),
-                              //     ),
-                              //   ),
-                              // ),
-                              Visibility(
-                                maintainState: true,
-                                visible: _pageView.viewIndex == 4,
-                                child: ProfilePage(),
-                              ),
-                              // new Offstage(
-                              //   offstage: _pageView.viewIndex != 4,
-                              //   child: new TickerMode(
-                              //     enabled: _pageView.viewIndex == 4,
-                              //     child: ProfilePage(),
-                              //   ),
-                              // ),
-                            ],
-                          );
-                        } else {
-                          data.setInfo(
-                              Profile.fromMap(eventSnapshot.data.snapshot));
-                          return Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text('There\'s an issue'),
-                              Text(Profile.fromMap(eventSnapshot.data.snapshot)
-                                  .toJson()
-                                  .toString()),
-                              Text(
-                                data.info.toJson().toString(),
-                              )
-                            ],
-                          );
-                        }
-                      }
-                  }
-                },
+              body: Visibility(
+                visible:
+                    (data.profile.uid != null),
+                child: Stack(
+                  children: <Widget>[
+                    Visibility(
+                      maintainState: true,
+                      visible: _pageView.viewIndex == 0,
+                      child: HomeView(),
+                    ),
+                    Visibility(
+                      maintainState: true,
+                      visible: _pageView.viewIndex == 1,
+                      child: SearchPage(
+                        observer: data.info.uid,
+                      ),
+                    ),
+                    Visibility(
+                      maintainState: true,
+                      visible: _pageView.viewIndex == 3,
+                      child: ScopedModel<NotificationPageModel>(
+                        model: NotificationPageModel(),
+                        child: NotificationsPage(),
+                      ),
+                    ),
+                    Visibility(
+                      maintainState: true,
+                      visible: _pageView.viewIndex == 4,
+                      child: ProfilePage(),
+                    ),
+                  ],
+                ),
+                replacement: Center(
+                  child: ICProcessIndicator(size: 34),
+                ),
               ),
               bottomNavigationBar:
                   ScopedModelDescendant<InstagramPaginationModel>(

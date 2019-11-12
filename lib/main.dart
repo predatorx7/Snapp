@@ -9,7 +9,7 @@ import 'package:instagram/ui/screens/instagram.dart';
 import 'package:instagram/ui/screens/login.dart';
 import 'package:provider/provider.dart';
 import 'models/plain_models/auth.dart';
-import 'models/plain_models/information.dart';
+import 'repository/information.dart';
 import 'models/view_models/login_page.dart';
 
 void main() {
@@ -21,9 +21,6 @@ void main() {
       providers: [
         ChangeNotifierProvider(
           builder: (context) => AuthNotifier.instance(),
-        ),
-        ChangeNotifierProvider(
-          builder: (context) => InfoModel(),
         ),
         // Needed for not letting new users go directly to the home
         ChangeNotifierProvider(
@@ -42,24 +39,45 @@ class Root extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return NetworkSensitiveWidget(
-      child: MaterialApp(
-        theme: mainTheme,
-        onGenerateRoute: generateRoute,
-        home: Consumer(
-          builder: (context, AuthNotifier userAuth, _) {
-            switch (userAuth.status) {
-              case Status.Uninitialized:
-                return Splash();
-              case Status.Unauthenticated:
-              case Status.Authenticating:
-                return LoginPage();
-              case Status.Authenticated:
-                return Instagram(user: userAuth.user);
-              default:
-                return new Text('Error');
-            }
-          },
-        ),
+      child: Consumer(
+        builder: (context, AuthNotifier userAuth, _) {
+          if (userAuth.status == Status.Authenticated) {
+            return ChangeNotifierProvider(
+              builder: (context) => InfoRepo(userAuth.user.uid),
+              child: MaterialApp(
+                theme: mainTheme,
+                onGenerateRoute: generateRoute,
+                home: Builder(
+                  builder: (context) {
+                    return ChangeNotifierProvider(
+                      builder: (context) => InfoRepo(userAuth.user.uid),
+                      child: Instagram(user: userAuth.user),
+                    );
+                  },
+                ),
+              ),
+            );
+          } else {
+            print('Not authenticated');
+            return MaterialApp(
+              theme: mainTheme,
+              onGenerateRoute: generateRoute,
+              home:Builder(
+                builder: (context){
+                  switch (userAuth.status) {
+                    case Status.Uninitialized:
+                      return Splash();
+                    case Status.Unauthenticated:
+                    case Status.Authenticating:
+                      return LoginPage();
+                    default:
+                      return Splash();
+                  }
+                },
+              ),
+            );
+          }
+        },
       ),
     );
   }

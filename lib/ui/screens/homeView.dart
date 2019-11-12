@@ -5,7 +5,7 @@ import 'package:instagram/commons/assets.dart';
 import 'package:instagram/commons/styles.dart';
 import 'package:instagram/core/services/profile.dart';
 import 'package:instagram/models/plain_models/feed_model.dart';
-import 'package:instagram/models/plain_models/information.dart';
+import 'package:instagram/repository/information.dart';
 import 'package:instagram/models/plain_models/story_model.dart';
 import 'package:instagram/ui/components/profile_avatar.dart';
 import 'package:instagram/ui/screens/post/feed_post_list.dart';
@@ -25,7 +25,7 @@ class _HomeViewState extends State<HomeView> {
   bool _loaded = false;
   ProfileService profileAdapter = ProfileService();
   ScrollController _scrollViewController;
-  InfoModel _data;
+  InfoRepo _data;
   @override
   void initState() {
     _scrollViewController = ScrollController();
@@ -34,7 +34,7 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   void didChangeDependencies() {
-    _data = Provider.of<InfoModel>(context);
+    _data = Provider.of<InfoRepo>(context);
     super.didChangeDependencies();
   }
 
@@ -167,12 +167,12 @@ class _StoryView extends StatefulWidget {
 class _StoryViewState extends State<_StoryView> {
   bool isListNotEmpty;
   ProfileService profileAdapter = ProfileService();
-  InfoModel _data;
+  InfoRepo _data;
   List<dynamic> followList;
   StoryModel story;
   @override
   void didChangeDependencies() {
-    _data = Provider.of<InfoModel>(context);
+    _data = Provider.of<InfoRepo>(context);
     followList = _data.info.follows;
     story = ScopedModel.of<StoryModel>(context);
     super.didChangeDependencies();
@@ -242,11 +242,11 @@ class _FeedView extends StatefulWidget {
 class _FeedViewState extends State<_FeedView> {
   bool isListNotEmpty;
   ProfileService profileAdapter = ProfileService();
-  InfoModel _data;
+  InfoRepo _data;
   List<dynamic> followList;
   @override
   void didChangeDependencies() {
-    _data = Provider.of<InfoModel>(context);
+    _data = Provider.of<InfoRepo>(context);
     followList = _data.info.follows;
     super.didChangeDependencies();
   }

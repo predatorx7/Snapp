@@ -1,5 +1,3 @@
-import 'package:meta/meta.dart';
-
 class Comment {
   /// Comment `required`
   String comment;
@@ -19,12 +17,12 @@ class Comment {
   String pulisherUsername;
 
   Comment({
-    @required this.comment,
+    this.comment,
     this.commentKey,
     this.creationTime,
-    @required this.postKey,
-    @required this.publisher,
-    @required this.pulisherUsername,
+    this.postKey,
+    this.publisher,
+    this.pulisherUsername,
   });
 
   Comment.fromMap(Map data, commentKey)

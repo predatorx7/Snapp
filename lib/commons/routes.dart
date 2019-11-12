@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:instagram/models/plain_models/ex_information.dart';
+import 'package:instagram/repository/ex_information.dart';
+import 'package:instagram/models/plain_models/profile.dart';
 import 'package:instagram/models/view_models/change_username.dart';
 import 'package:instagram/models/view_models/edit_profile.dart';
 import 'package:instagram/ui/screens/post/comments_page.dart';
@@ -34,8 +35,12 @@ Route<dynamic> generateRoute(RouteSettings settings) {
 
     case HomeRoute:
       return MaterialPageRoute(
-        builder: (context) => ChangeNotifierProvider(
-          builder: (context) => MessageNotificationModel(),
+        builder: (context) => MultiProvider(
+          providers: [
+            ChangeNotifierProvider(
+              builder: (context) => MessageNotificationModel(),
+            ),
+          ],
           child: Instagram(),
         ),
       );
@@ -108,9 +113,10 @@ Route<dynamic> generateRoute(RouteSettings settings) {
         builder: (context) => ProfilePicEditPage(),
       );
     case SomeoneProfileRoute:
+      Profile x = settings.arguments;
       return MaterialPageRoute(
-        builder: (context) => ChangeNotifierProvider<ExInfoModel>(
-          builder: (context) => ExInfoModel(),
+        builder: (context) => ChangeNotifierProvider<ExInfoRepo>(
+          builder: (context) => ExInfoRepo(x.uid),
           child: VisitedProfilePage(someone: settings.arguments),
         ),
       );

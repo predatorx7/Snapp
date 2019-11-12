@@ -4,7 +4,7 @@ import 'package:instagram/commons/styles.dart';
 import 'package:instagram/core/services/comments.dart';
 import 'package:instagram/models/plain_models/app_notification.dart';
 import 'package:instagram/models/plain_models/comments.dart';
-import 'package:instagram/models/plain_models/information.dart';
+import 'package:instagram/repository/information.dart';
 import 'package:instagram/models/plain_models/post.dart';
 import 'package:instagram/models/view_models/comment_page.dart';
 import 'package:instagram/ui/components/profile_avatar.dart';
@@ -22,7 +22,7 @@ class CommentsPage extends StatefulWidget {
 
 class _CommentsPageState extends State<CommentsPage> {
   TextEditingController _addCommentController;
-  InfoModel observer;
+  InfoRepo observer;
   List<Comment> commentList = [];
   @override
   void initState() {
@@ -40,7 +40,7 @@ class _CommentsPageState extends State<CommentsPage> {
 
   @override
   void didChangeDependencies() {
-    observer = Provider.of<InfoModel>(context);
+    observer = Provider.of<InfoRepo>(context);
     super.didChangeDependencies();
   }
 

@@ -7,7 +7,7 @@ import 'package:instagram/commons/styles.dart';
 import 'package:instagram/ui/components/process_indicator.dart';
 import 'package:instagram/ui/components/profile_avatar.dart';
 import 'package:provider/provider.dart';
-import '../../../models/plain_models/information.dart';
+import '../../../repository/information.dart';
 import '../../../core/services/posts.dart';
 import '../../components/buttons.dart';
 
@@ -218,99 +218,102 @@ class _UploadMediaState extends State<UploadMedia> {
 
   @override
   Widget build(BuildContext context) {
-    final _info = Provider.of<InfoModel>(context);
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'New Post',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-        ),
-        actions: <Widget>[
-          Center(
-            child: TappableText(
-              onTap: _isLoading
-                  ? null
-                  : () async {
-                      setState(() {
-                        _isLoading = true;
-                      });
-                      captionFocus.unfocus();
-                      await showDialog(
-                        barrierDismissible: false,
-                        context: context,
-                        builder: (BuildContext context) {
-                          // Call
-                          uploadFile(widget.imageFile, _info.info.uid,
-                                  captionController.text, _info.info.username)
-                              .then((answer) {
-                            Navigator.popUntil(
-                                context, ModalRoute.withName('/'));
+    return Consumer<InfoRepo>(
+      builder: (context, _info, child) {
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(
+              'New Post',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            ),
+            actions: <Widget>[
+              Center(
+                child: TappableText(
+                  onTap: _isLoading
+                      ? null
+                      : () async {
+                          setState(() {
+                            _isLoading = true;
                           });
-                          return Dialog(
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(4)),
-                            child: SizedBox(
-                              width: 60,
-                              height: 60,
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: <Widget>[
-                                  Text(
-                                    'Uploading',
-                                    style: body5Style(),
+                          captionFocus.unfocus();
+                          await showDialog(
+                            barrierDismissible: false,
+                            context: context,
+                            builder: (BuildContext context) {
+                              // Call
+                              uploadFile(widget.imageFile, _info.userUID,
+                                      captionController.text, _info.profile.username)
+                                  .then((answer) {
+                                Navigator.popUntil(
+                                    context, ModalRoute.withName('/'));
+                              });
+                              return Dialog(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(4)),
+                                child: SizedBox(
+                                  width: 60,
+                                  height: 60,
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: <Widget>[
+                                      Text(
+                                        'Uploading',
+                                        style: body5Style(),
+                                      ),
+                                      ICProcessIndicator(
+                                        size: 32,
+                                      ),
+                                    ],
                                   ),
-                                  ICProcessIndicator(
-                                    size: 32,
-                                  ),
-                                ],
-                              ),
-                            ),
+                                ),
+                              );
+                            },
                           );
                         },
-                      );
-                    },
-              text: 'Share',
-              textSize: 16,
-            ),
-          ),
-        ],
-      ),
-      body: ListView(
-        // mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Container(
-            padding: EdgeInsets.all(15),
-            height: 300,
-            // width: 300,
-            child: Image.file(
-              widget.imageFile,
-              fit: BoxFit.fitWidth,
-            ),
-          ),
-          Container(
-            padding: EdgeInsets.all(15),
-            child: TextField(
-              focusNode: captionFocus,
-              minLines: 1,
-              maxLines: 20,
-              controller: captionController,
-              textInputAction: TextInputAction.newline,
-              maxLength: 150,
-              decoration: InputDecoration(
-                border: InputBorder.none,
-                icon: ICProfileAvatar(
-                  profileURL: _info.info.profileImage,
-                ),
-                hintText: 'Write a caption...',
-                hintStyle: TextStyle(
-                  color: Colors.grey[400],
+                  text: 'Share',
+                  textSize: 16,
                 ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
+          body: ListView(
+            // mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Container(
+                padding: EdgeInsets.all(15),
+                height: 300,
+                // width: 300,
+                child: Image.file(
+                  widget.imageFile,
+                  fit: BoxFit.fitWidth,
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.all(15),
+                child: TextField(
+                  focusNode: captionFocus,
+                  minLines: 1,
+                  maxLines: 20,
+                  controller: captionController,
+                  textInputAction: TextInputAction.newline,
+                  maxLength: 150,
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    icon: ICProfileAvatar(
+                      profileURL: _info.info.profileImage,
+                    ),
+                    hintText: 'Write a caption...',
+                    hintStyle: TextStyle(
+                      color: Colors.grey[400],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      }
     );
   }
 }

@@ -2,7 +2,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram/models/plain_models/app_notification.dart';
-import 'package:instagram/models/plain_models/ex_information.dart';
+import 'package:instagram/repository/ex_information.dart';
 import 'package:instagram/ui/components/profile_avatar.dart';
 import '../listusers.dart';
 import 'visited_post_list.dart';
@@ -11,7 +11,7 @@ import '../../../core/adapters/posts.dart';
 import '../../../commons/styles.dart';
 import '../../../core/services/profile.dart';
 import '../../../models/plain_models/auth.dart';
-import '../../../models/plain_models/information.dart';
+import '../../../repository/information.dart';
 import '../../../models/plain_models/profile.dart';
 
 class VisitedProfilePage extends StatefulWidget {
@@ -29,8 +29,8 @@ class _VisitedProfilePageState extends State<VisitedProfilePage>
   bool gridView = true;
   String url;
   bool firstTime = true;
-  ExInfoModel _data;
-  InfoModel _observer;
+  ExInfoRepo _data;
+  InfoRepo _observer;
   TabController _tabController;
   ScrollController _scrollViewController;
   TextStyle stateful = TextStyle(fontWeight: FontWeight.bold, fontSize: 16);
@@ -48,8 +48,8 @@ class _VisitedProfilePageState extends State<VisitedProfilePage>
 
   @override
   void didChangeDependencies() {
-    _data = Provider.of<ExInfoModel>(context);
-    _observer = Provider.of<InfoModel>(context, listen: false);
+    _data = Provider.of<ExInfoRepo>(context);
+    _observer = Provider.of<InfoRepo>(context, listen: false);
     if (firstTime) {
       _data.setInfoSilently(widget.someone);
       firstTime = false;
@@ -241,7 +241,7 @@ class _VisitedProfilePageState extends State<VisitedProfilePage>
                                                       _observer.info.follows
                                                           .remove(
                                                               _data.info.uid);
-                                                      _observer.shout();
+                                                      _observer.notifyChanges();
                                                       Navigator.maybePop(
                                                           context);
                                                     },
@@ -314,7 +314,7 @@ class _VisitedProfilePageState extends State<VisitedProfilePage>
                                 // Follow
                                 await _data.doFollow(_observer.info);
                                 _observer.info.follows.add(_data.info.uid);
-                                _observer.shout();
+                                _observer.notifyChanges();
                                 await AppNotification.notify(
                                   AppNotification(
                                     notifyTo: _data.info.uid,
@@ -419,7 +419,7 @@ class _VisitedProfilePageState extends State<VisitedProfilePage>
                       itemBuilder: (BuildContext context, int index) {
                         return PostAdapters(
                           uid: _data.info.uid,
-                          creationTime: _data.info.posts[index],
+                          metadata: _data.posts[index],
                           isInGrid: true,
                           database: _database,
                           height: MediaQuery.of(context).size.width,

@@ -5,19 +5,18 @@ import 'package:instagram/ui/screens/visited/visited_post.dart';
 
 class PostAdapters extends StatelessWidget {
   final String uid;
-  final int creationTime;
   final bool isInGrid;
   final FirebaseDatabase database;
   final double height;
   final int index;
-
+  final Post metadata;
   const PostAdapters(
       {this.uid,
-      this.creationTime,
       this.isInGrid,
       this.database,
       this.height,
-      this.index});
+      this.index,
+      this.metadata,});
   EdgeInsetsGeometry paddingForPost(int index, bool isInGrid) {
     double right = 2, left = 2;
 
@@ -49,104 +48,86 @@ class PostAdapters extends StatelessWidget {
   Widget build(BuildContext context) {
     EdgeInsetsGeometry postPadding;
     postPadding = paddingForPost(index, isInGrid);
+    print('Attached post: ${metadata.imageURL}');
     return Padding(
       padding: postPadding,
       child: Container(
         color: Colors.grey[300],
-        child: FutureBuilder(
-          future: database
-              .reference()
-              .child('posts/$uid')
-              .orderByChild("creationTime")
-              .equalTo(this.creationTime)
-              .once(),
-          builder: (context, AsyncSnapshot snapshot) {
-            if (snapshot.hasError)
-              return new Text('Error: ${snapshot.error}');
-            else {
-              if (!snapshot.hasData) {
-                return Container();
-              } else {
-                Post metadata = Post.fromMap(snapshot.data);
-                return GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        maintainState: true,
-                        builder: (context) => VisitedPost(
-                          post: metadata,
-                        ),
+        child: GestureDetector(
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                maintainState: true,
+                builder: (context) => VisitedPost(
+                  post: metadata,
+                ),
+              ),
+            );
+          },
+          onLongPressStart: (gesture) {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                double constr = MediaQuery.of(context).size.width / 1.2;
+                return Dialog(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4)),
+                  child: GestureDetector(
+                    onLongPressEnd: (gesture) {
+                      Navigator.pop(context);
+                    },
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxHeight: constr,
+                        minHeight: constr,
+                        maxWidth: constr,
+                        minWidth: constr,
                       ),
-                    );
-                  },
-                  onLongPressStart: (gesture) {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        double constr = MediaQuery.of(context).size.width / 1.2;
-                        return Dialog(
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(4)),
-                          child: GestureDetector(
-                            onLongPressEnd: (gesture) {
-                              Navigator.pop(context);
-                            },
-                            child: ConstrainedBox(
-                              constraints: BoxConstraints(
-                                maxHeight: constr,
-                                minHeight: constr,
-                                maxWidth: constr,
-                                minWidth: constr,
-                              ),
-                              child: Image.network(
-                                metadata.imageURL,
-                                height: constr,
-                                width: constr,
-                                fit: BoxFit.fitWidth,
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    );
-                  },
-                  child: new Material(
-                    child: new GridTile(
-                      child: new Image.network(
+                      child: Image.network(
                         metadata.imageURL,
-                        loadingBuilder: (BuildContext context, Widget child,
-                            ImageChunkEvent loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return Center(
-                            child: Theme(
-                              data: Theme.of(context).copyWith(
-                                accentColor: Colors.grey[300],
-                                primaryColor: Colors.grey,
-                              ),
-                              child: SizedBox(
-                                height: 28,
-                                width: 28,
-                                child: new CircularProgressIndicator(
-                                  value: loadingProgress.expectedTotalBytes !=
-                                          null
-                                      ? loadingProgress.cumulativeBytesLoaded /
-                                          loadingProgress.expectedTotalBytes
-                                      : null,
-                                  strokeWidth: 2,
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                        height: height,
+                        height: constr,
+                        width: constr,
                         fit: BoxFit.fitWidth,
                       ),
                     ),
                   ),
                 );
-              }
-            }
+              },
+            );
           },
+          child: new Material(
+            child: new GridTile(
+              child: new Image.network(
+                metadata.imageURL,
+                loadingBuilder: (BuildContext context, Widget child,
+                    ImageChunkEvent loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Center(
+                    child: Theme(
+                      data: Theme.of(context).copyWith(
+                        accentColor: Colors.grey[300],
+                        primaryColor: Colors.grey,
+                      ),
+                      child: SizedBox(
+                        height: 28,
+                        width: 28,
+                        child: new CircularProgressIndicator(
+                          value: loadingProgress.expectedTotalBytes !=
+                              null
+                              ? loadingProgress.cumulativeBytesLoaded /
+                              loadingProgress.expectedTotalBytes
+                              : null,
+                          strokeWidth: 2,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+                height: height,
+                fit: BoxFit.fitWidth,
+              ),
+            ),
+          ),
         ),
       ),
     );

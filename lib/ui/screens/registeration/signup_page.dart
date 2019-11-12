@@ -524,17 +524,20 @@ class _SignStep3State extends State<SignStep3> {
                     ? null
                     : () async {
                         print('[Sign Up Page 3] Username: ${_view.username}');
-                        bool result = await userAuth.signUp(
-                            widget.email,
-                            widget.fullName,
-                            widget.password,
-                            context,
-                            _view.username);
-                        result
-                            ? Navigator.popUntil(
-                                context, ModalRoute.withName('/'))
-                            : print('Something unexpected happened');
-                        print('Finished');
+                        if(!_view.isDone){
+                          _view.setDone(true);
+                          bool result = await userAuth.signUp(
+                              widget.email,
+                              widget.fullName,
+                              widget.password,
+                              context,
+                              _view.username);
+                          result
+                              ? Navigator.popUntil(
+                              context, ModalRoute.withName('/'))
+                              : print('Something unexpected happened');
+                          print('Finished');
+                        }
                       },
               ),
             ),

@@ -140,6 +140,14 @@ class SignUp3ViewModel with ChangeNotifier {
   bool _isButtonDisabled = false, _isTapped = false, _showError = false;
   String _username, _oldUsername;
   bool hasUsername = false;
+  bool _isDone = false;
+
+  bool get isDone => _isDone;
+
+  setDone(bool isDone) {
+    _isDone = isDone;
+    notifyListeners();
+  }
   String get username => _username;
   String get oldUsername => _oldUsername;
   set oldUsername(String x) => _oldUsername = x;

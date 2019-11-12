@@ -57,6 +57,7 @@ class Post {
 
   Post.createFromMap(Map dataMap, String key) {
     postKey = key;
+    print(dataMap);
     likes = _getFromArray(dataMap['likes'] ?? []);
     creationTime = dataMap['creationTime'] ?? null;
     description = dataMap['description'] ?? '';

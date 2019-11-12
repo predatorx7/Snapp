@@ -5,7 +5,7 @@ import 'package:instagram/commons/routing_constants.dart';
 import 'package:instagram/commons/styles.dart';
 import 'package:instagram/core/services/profile.dart';
 import 'package:instagram/core/utils/namegen.dart';
-import 'package:instagram/models/plain_models/information.dart';
+import 'package:instagram/repository/information.dart';
 import 'package:instagram/models/plain_models/profile.dart';
 import 'package:instagram/models/view_models/edit_profile.dart';
 import 'package:instagram/ui/components/process_indicator.dart';
@@ -28,7 +28,7 @@ class _EditProfileState extends State<EditProfile> {
       bioController,
       emailController,
       genderController;
-  InfoModel info;
+  InfoRepo info;
   EditProfileModel view;
   @override
   void initState() {
@@ -43,7 +43,7 @@ class _EditProfileState extends State<EditProfile> {
   @override
   void didChangeDependencies() {
     if (!loaded) {
-      info = Provider.of<InfoModel>(context);
+      info = Provider.of<InfoRepo>(context);
       view = Provider.of<EditProfileModel>(context);
       nameController.text = info.info.fullName;
       usernameController.text = info.info.username;
@@ -64,7 +64,7 @@ class _EditProfileState extends State<EditProfile> {
       await storageReference.delete();
       print('File Deleted');
       info.info.profileImage = "";
-      info.shout();
+      info.notifyChanges();
       await ProfileService().updateProfile(info.info);
       return true;
     } catch (e) {
@@ -218,7 +218,7 @@ class _EditProfileState extends State<EditProfile> {
                     },
                   );
                   if (xx) {
-                    info.setInfo(information);
+                    info.updateInfo(information);
                     Navigator.maybePop(context);
                   } else {
                     Scaffold.of(recContext).showSnackBar(

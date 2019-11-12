@@ -4,7 +4,7 @@ import 'package:instagram/commons/styles.dart';
 import 'package:instagram/core/services/posts.dart';
 import 'package:instagram/core/services/profile.dart';
 import 'package:instagram/models/plain_models/app_notification.dart';
-import 'package:instagram/models/plain_models/information.dart';
+import 'package:instagram/repository/information.dart';
 import 'package:instagram/models/plain_models/post.dart';
 import 'package:instagram/ui/components/profile_avatar.dart';
 import 'package:outline_material_icons/outline_material_icons.dart';
@@ -24,7 +24,7 @@ class VisitedPost extends StatefulWidget {
 
 class _VisitedPostState extends State<VisitedPost> {
   Post metadata;
-  InfoModel _observer;
+  InfoRepo _observer;
   @override
   void initState() {
     if (widget.post == null) {
@@ -45,7 +45,7 @@ class _VisitedPostState extends State<VisitedPost> {
 
   @override
   void didChangeDependencies() {
-    _observer = Provider.of<InfoModel>(context);
+    _observer = Provider.of<InfoRepo>(context);
     super.didChangeDependencies();
   }
 
@@ -111,7 +111,7 @@ class _VisitedPostState extends State<VisitedPost> {
                                             _observer.info, metadata.publisher);
                                         _observer.info.follows
                                             .remove(metadata.publisher);
-                                        _observer.shout();
+                                        _observer.notifyChanges();
                                         Navigator.maybePop(context);
                                       },
                                       title: Text(

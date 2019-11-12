@@ -5,7 +5,7 @@ import 'package:camera/camera.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram/core/services/story.dart';
-import 'package:instagram/models/plain_models/information.dart';
+import 'package:instagram/repository/information.dart';
 import 'package:path/path.dart' show join;
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -150,7 +150,7 @@ class DisplayPictureScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    InfoModel user = Provider.of<InfoModel>(context);
+    InfoRepo user = Provider.of<InfoRepo>(context);
     return Scaffold(
       // The image is stored as a file on the device. Use the `Image.file`
       // constructor with the given path to display the image.

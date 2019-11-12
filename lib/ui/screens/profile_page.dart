@@ -11,7 +11,7 @@ import '../../core/adapters/posts.dart';
 import '../../commons/styles.dart';
 import '../../core/services/profile.dart';
 import '../../models/plain_models/auth.dart';
-import '../../models/plain_models/information.dart';
+import '../../repository/information.dart';
 import '../../models/plain_models/profile.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -27,7 +27,7 @@ class _ProfilePageState extends State<ProfilePage>
   bool gridView = true;
   String url;
   bool firstTime = true;
-  InfoModel _data;
+  InfoRepo _data;
   TabController _tabController;
   ScrollController _scrollViewController;
   TextStyle stateful = TextStyle(fontWeight: FontWeight.bold, fontSize: 16);
@@ -43,7 +43,7 @@ class _ProfilePageState extends State<ProfilePage>
 
   @override
   void didChangeDependencies() {
-    _data = Provider.of<InfoModel>(context);
+    _data = Provider.of<InfoRepo>(context);
     super.didChangeDependencies();
   }
 
@@ -80,18 +80,7 @@ class _ProfilePageState extends State<ProfilePage>
                         },
                         child: Stack(
                           children: <Widget>[
-                            // CircleAvatar(
-                            //   radius: 45,
-                            //   backgroundColor: Colors.grey[200],
-                            //   backgroundImage: data.profileImage.isNotEmpty
-                            //       ? NetworkImage(
-                            //           data.profileImage,
-                            //         )
-                            //       : CommonImages.profilePic1.image,
-                            // ),
                             ICProfileAvatar(
-                              // database: FirebaseDatabase.instance,
-                              // profileOf: data.uid,
                               profileURL: data.profileImage,
                               size: 45,
                             ),
@@ -126,7 +115,7 @@ class _ProfilePageState extends State<ProfilePage>
                     Column(
                       children: <Widget>[
                         Text(
-                          '${data.posts.length ?? 0}',
+                          '${_data.posts.length ?? 0}',
                           style: stateful,
                         ),
                         Text(
@@ -160,7 +149,7 @@ class _ProfilePageState extends State<ProfilePage>
                     ),
                     // Following
                     GestureDetector(
-                      onTap: (){
+                      onTap: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => ListUsers(
@@ -256,15 +245,6 @@ class _ProfilePageState extends State<ProfilePage>
                     ),
                   ),
                   Divider(),
-                  // ListTile(
-                  //   onTap: () {},
-                  //   title: Text("Ttem 1"),
-                  //   trailing: Icon(Icons.arrow_forward),
-                  // ),
-                  // ListTile(
-                  //   title: Text("Item 2"),
-                  //   trailing: Icon(Icons.arrow_forward),
-                  // ),
                 ],
               ),
             ),
@@ -302,93 +282,101 @@ class _ProfilePageState extends State<ProfilePage>
           ],
         ),
       ),
-      body: RefreshIndicator(
-        displacement: 20,
-        onRefresh: () async {
-          await Future.delayed(Duration(seconds: 1));
-          await FirebaseDatabase.instance
-              .reference()
-              .child("profiles")
-              .orderByChild("uid")
-              .equalTo(_data.info.uid)
-              .once()
-              .then((DataSnapshot dataSnap) {
-            if (dataSnap.value != null) {
-              print('RefreshedInfo: ${dataSnap.value.toString()}');
-              _data.setInfo(Profile.fromMap(dataSnap));
-            }
-          });
-        },
-        child: NestedScrollView(
-          controller: _scrollViewController,
-          headerSliverBuilder: (BuildContext context, bool boxIsScrolled) {
-            return <Widget>[
-              SliverAppBar(
-                automaticallyImplyLeading: false,
-                backgroundColor: Colors.grey[50],
-                floating: true,
-                pinned: true,
-                // snap: true,
-                expandedHeight: _data.heightOfFlexSpace,
-                flexibleSpace: FlexibleSpaceBar(
-                  collapseMode: CollapseMode.pin,
-                  background: profileWidget(context, _data.info),
-                ),
-                actions: <Widget>[Container()],
-                bottom: TabBar(
-                  indicatorColor: notBlack,
-                  tabs: <Widget>[
-                    Tab(
-                      icon: Icon(
-                        Icons.grid_on,
-                        color: Colors.black,
-                      ),
-                    ),
-                    Tab(
-                      icon: Icon(
-                        Icons.image,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ],
-                  controller: _tabController,
-                ),
+      body: NestedScrollView(
+        controller: _scrollViewController,
+        headerSliverBuilder: (BuildContext context, bool boxIsScrolled) {
+          return <Widget>[
+            SliverAppBar(
+              automaticallyImplyLeading: false,
+              backgroundColor: Colors.grey[50],
+              floating: true,
+              pinned: true,
+              // snap: true,
+              expandedHeight: _data.heightOfFlexSpace,
+              flexibleSpace: FlexibleSpaceBar(
+                collapseMode: CollapseMode.pin,
+                background: profileWidget(context, _data.info),
               ),
-            ];
-          },
-          body: Container(
-            color: Colors.grey[50],
-            child: Visibility(
-              visible: (_data.info != null),
-              child: (_data.info.posts.isNotEmpty)
-                  ? TabBarView(
-                      controller: _tabController,
-                      children: <Widget>[
-                        new GridView.builder(
-                          physics: AlwaysScrollableScrollPhysics(
-                              parent: BouncingScrollPhysics()),
-                          itemCount: _data.info.posts.length ?? 0,
-                          gridDelegate:
-                              new SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 3),
-                          itemBuilder: (BuildContext context, int index) {
-                            return PostAdapters(
-                              uid: _data.info.uid,
-                              creationTime: _data.info.posts[index],
-                              isInGrid: true,
-                              database: _database,
-                              height: MediaQuery.of(context).size.width,
-                              index: index,
-                            );
-                          },
-                        ),
-                        PostsList(
-                          height: MediaQuery.of(context).size.width,
-                        ),
-                      ],
-                    )
-                  : SizedBox(),
+              actions: <Widget>[Container()],
+              bottom: TabBar(
+                indicatorColor: notBlack,
+                tabs: <Widget>[
+                  Tab(
+                    icon: Icon(
+                      Icons.grid_on,
+                      color: Colors.black,
+                    ),
+                  ),
+                  Tab(
+                    icon: Icon(
+                      Icons.image,
+                      color: Colors.black,
+                    ),
+                  ),
+                ],
+                controller: _tabController,
+              ),
             ),
+          ];
+        },
+        body: Container(
+          color: Colors.grey[50],
+          child: Visibility(
+            visible: (_data.posts != null),
+            child: Visibility(
+              visible: (_data.posts?.isNotEmpty ?? false),
+              child: TabBarView(
+                controller: _tabController,
+                children: <Widget>[
+                  RefreshIndicator(
+                    displacement: 20,
+                    onRefresh: () async {
+                      await Future.delayed(Duration(milliseconds: 1000));
+                      await _data.refreshAll();
+                    },
+                    child: new GridView.builder(
+                      physics: AlwaysScrollableScrollPhysics(
+                          parent: BouncingScrollPhysics()),
+                      itemCount: _data.posts.length ?? 0,
+                      gridDelegate: new SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3),
+                      itemBuilder: (BuildContext context, int index) {
+                        return PostAdapters(
+                          uid: _data.userUID,
+                          metadata: _data.posts[index],
+                          isInGrid: true,
+                          database: _database,
+                          height: MediaQuery.of(context).size.width,
+                          index: index,
+                        );
+                      },
+                    ),
+                  ),
+                  RefreshIndicator(
+                    displacement: 20,
+                    onRefresh: () async {
+                      await Future.delayed(Duration(milliseconds: 1000));
+                      await _data.refreshAll();
+                    },
+                    child: PostsList(
+                      height: MediaQuery.of(context).size.width,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            replacement: Center(
+                child: OutlineButton(
+              onPressed: () async {
+                await _data.refreshAll();
+              },
+              child: Icon(Icons.refresh, color: Colors.black),
+              color: Colors.transparent,
+              highlightedBorderColor: Colors.grey,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(40),
+              ),
+            )),
           ),
         ),
       ),
@@ -424,7 +412,7 @@ class Menu extends StatelessWidget {
           ListTile(
             onTap: () async {
               Provider.of<AuthNotifier>(context).signOut();
-              Navigator.pop(context);
+//              Navigator.pop(context);
             },
             title: Text(
               'Log out of ${userInfo.username}',

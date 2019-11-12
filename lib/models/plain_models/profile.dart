@@ -70,8 +70,9 @@ class Profile {
   }
 
   Profile.fromMap(DataSnapshot snapshotData) {
-    key = snapshotData.value.keys.first;
-    var mainData = snapshotData.value[key];
+    Map mainData = snapshotData.value;
+    key = mainData['uid'];
+    print('SNapshot: ${snapshotData.value.toString()}');
     uid = mainData['uid'] ?? '';
     bio = mainData['bio'] ?? '';
     email = mainData['email'] ?? '';

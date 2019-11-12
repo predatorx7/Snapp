@@ -5,8 +5,8 @@ import 'package:instagram/commons/routing_constants.dart';
 import 'package:instagram/commons/styles.dart';
 import 'package:instagram/core/services/posts.dart';
 import 'package:instagram/models/plain_models/app_notification.dart';
-import 'package:instagram/models/plain_models/ex_information.dart';
-import 'package:instagram/models/plain_models/information.dart';
+import 'package:instagram/repository/ex_information.dart';
+import 'package:instagram/repository/information.dart';
 import 'package:instagram/models/plain_models/post.dart';
 import 'package:outline_material_icons/outline_material_icons.dart';
 import 'package:provider/provider.dart';
@@ -24,14 +24,14 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
   String uid;
   List postList;
   double heartSize = 100;
-  ExInfoModel _data;
-  InfoModel _observer;
+  ExInfoRepo _data;
+  InfoRepo _observer;
   bool firstTime = true;
 
   @override
   void didChangeDependencies() {
-    _data = Provider.of<ExInfoModel>(context);
-    _observer = Provider.of<InfoModel>(context, listen: false);
+    _data = Provider.of<ExInfoRepo>(context);
+    _observer = Provider.of<InfoRepo>(context, listen: false);
     if (firstTime) {
       _data.setInfoSilently(_data.info);
       firstTime = false;
@@ -135,7 +135,7 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
                                                     .doUnFollow(_observer.info);
                                                 _observer.info.follows
                                                     .remove(_data.info.uid);
-                                                _observer.shout();
+                                                _observer.notifyChanges();
                                                 Navigator.maybePop(context);
                                               },
                                               title: Text(

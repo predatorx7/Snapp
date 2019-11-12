@@ -1,18 +1,20 @@
 import 'package:firebase_database/firebase_database.dart';
-import 'package:instagram/models/plain_models/information.dart';
-import 'profile.dart';
+import 'package:instagram/repository/information.dart';
+import '../models/plain_models/profile.dart';
 
-class ExInfoModel extends InfoModel {
+class ExInfoRepo extends InfoRepo {
   bool _observerFollows = false;
   bool _isBusy = false;
+
+  ExInfoRepo(String userUID) : super(userUID);
+
+  ExInfoRepo.setInfo(Profile information) : super.setInfo(information);
 
   bool get isBusy => _isBusy;
 
   DatabaseReference dr =
       FirebaseDatabase.instance.reference().child('profiles');
   bool get observerFollows => _observerFollows;
-
-  ExInfoModel();
 
   setFollow(bool value) {
     _observerFollows = value;

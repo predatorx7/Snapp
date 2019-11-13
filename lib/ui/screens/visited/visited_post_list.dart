@@ -5,6 +5,7 @@ import 'package:instagram/commons/routing_constants.dart';
 import 'package:instagram/commons/styles.dart';
 import 'package:instagram/core/services/posts.dart';
 import 'package:instagram/models/plain_models/app_notification.dart';
+import 'package:instagram/models/plain_models/profile.dart';
 import 'package:instagram/repository/ex_information.dart';
 import 'package:instagram/repository/information.dart';
 import 'package:instagram/models/plain_models/post.dart';
@@ -35,14 +36,17 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
     if (firstTime) {
       _data.setInfoSilently(_data.info);
       firstTime = false;
-      if (_data.info.followers != null) {
-        if (_data.info.followers.contains(_observer.info.uid)) {
-          _data.setFollow(true);
+      if (_observer.following.isNotEmpty) {
+        for (Profile follower in _observer.following) {
+          if (follower.uid == _data.userUID) {
+            _data.setFollow(true);
+            break;
+          }
         }
       }
     }
     uid = _data.info.uid;
-    postList = _data.info.posts;
+    postList = _data.posts;
     super.didChangeDependencies();
   }
 
@@ -50,7 +54,7 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return GridView.builder(
       physics: AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-      itemCount: _data.info.posts.length ?? 0,
+      itemCount: _data.posts.length ?? 0,
       gridDelegate:
           new SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 1),
       itemBuilder: (BuildContext context, int index) {
@@ -133,9 +137,6 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
                                               onTap: () async {
                                                 await _data
                                                     .doUnFollow(_observer.info);
-                                                _observer.info.follows
-                                                    .remove(_data.info.uid);
-                                                _observer.notifyChanges();
                                                 Navigator.maybePop(context);
                                               },
                                               title: Text(

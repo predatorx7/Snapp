@@ -1,5 +1,6 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:instagram/core/services/profile.dart';
 import 'package:instagram/core/utils/Adapt_widget.dart';
 import 'package:instagram/models/plain_models/post.dart';
 import 'package:instagram/models/plain_models/story.dart';
@@ -12,6 +13,8 @@ class InfoRepo with ChangeNotifier {
   Profile _profile = Profile();
   List<Story> activeStory = [];
   List<Story> storyArchive = [];
+  List<Profile> followers = [];
+  List<Profile> following = [];
   List<Post> posts = [];
   DatabaseReference _dr = FirebaseDatabase.instance.reference();
   Profile get profile => _profile;
@@ -28,6 +31,7 @@ class InfoRepo with ChangeNotifier {
     this.userUID = this._profile.uid;
     refreshPosts();
     refreshStory();
+    refreshFollow();
     _heightOfFlexSpace = _flexibleSpaceHeight.withText(text: _profile.bio);
     notifyListeners();
   }
@@ -58,7 +62,7 @@ class InfoRepo with ChangeNotifier {
       DataSnapshot snapshot =
           await _dr.child('profiles/${this.userUID}').once();
       if (snapshot.value != null) {
-        this._profile = Profile.fromMap(snapshot);
+        this._profile = Profile.fromDataSnapshot(snapshot);
       }
       notifyListeners();
     } on Exception catch (e) {
@@ -99,9 +103,79 @@ class InfoRepo with ChangeNotifier {
     }
   }
 
+  /// Refresh followers & followings list
+  Future<void> refreshFollow() async {
+    try {
+      // Fetching list of followers for this user
+      DataSnapshot snapshot =
+          await _dr.child('followers_of/${this.userUID}').once();
+      if (snapshot.value != null) {
+        List<Profile> _followers = [];
+        for (var followerID in snapshot.value.keys.toList()) {
+          // Getting Profile snapshot of this follower using his followerID
+          var snap = await ProfileService()
+              .getProfileSnapshot(snapshot.value[followerID]);
+          String key = snap.value.keys.first;
+          // Adding this follower's Profile in followers list
+          _followers.add(Profile.fromMap(
+            snap.value[key],
+          ));
+        }
+        this.followers = _followers;
+      }
+      notifyListeners();
+    } on Exception catch (e) {
+      print('An Exception happened while refreshing profile information: $e');
+    }
+    try {
+      // Fetching list of follows for this user
+      DataSnapshot snapshot =
+          await _dr.child('followings_of/${this.userUID}').once();
+      if (snapshot.value != null) {
+        List<Profile> _following = [];
+        for (var followID in snapshot.value.keys.toList()) {
+          // Getting Profile snapshot of this followed user using his followID
+          DataSnapshot snap = await ProfileService()
+              .getProfileSnapshot(snapshot.value[followID]);
+          String key = snap.value.keys.first;
+          // Adding this followed user's Profile in following list
+          _following.add(Profile.fromMap(snap.value[key]));
+        }
+        this.following = _following;
+      }
+      notifyListeners();
+    } on Exception catch (e) {
+      print('An Exception happened while refreshing profile information: $e');
+    }
+  }
+
   Future<void> refreshAll() async {
-    refreshProfile();
-    refreshPosts();
-    refreshStory();
+    this.refreshProfile();
+    this.refreshPosts();
+    this.refreshStory();
+    this.refreshFollow();
+  }
+
+  Profile getFollower(String uid) {
+    for (Profile follower in this.followers) {
+      if (follower.uid == uid) {
+        return follower;
+      }
+    }
+    return null;
+  }
+
+  bool removePost(Post postToRemove) {
+    var index = 0;
+    for (Post aPost in this.posts) {
+      if (aPost.publisher == postToRemove.publisher &&
+          aPost.creationTime == postToRemove.creationTime) {
+        this.posts.removeAt(index);
+        notifyListeners();
+        return true;
+      }
+      index++;
+    }
+    return false;
   }
 }

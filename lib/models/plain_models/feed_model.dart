@@ -1,5 +1,6 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:instagram/models/plain_models/post.dart';
+import 'package:instagram/models/plain_models/profile.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 enum FeedStatus {
@@ -20,14 +21,15 @@ class FeedModel extends Model {
   FeedStatus get status => _status;
 
   DatabaseReference dr = FirebaseDatabase.instance.reference().child('posts');
-  Future<void> fetch(List<dynamic> followers) async {
+  Future<void> fetch(List<Profile> followers) async {
     _status = FeedStatus.busy;
     notifyListeners();
     print('[FeedModel] Started fetching posts');
     Map<String, Post> postMap = {};
-    for (String follower in followers) {
-      DataSnapshot ds = await dr.child(follower).once();
+    for (Profile follower in followers) {
+      DataSnapshot ds = await dr.child(follower.uid).once();
       if (ds.value != null) {
+        print('Post retrieved: ${ds.value}');
         for (String postKey in ds.value.keys) {
           var post = Post.createFromMap(ds.value[postKey], postKey);
           postMap[postKey] = post;

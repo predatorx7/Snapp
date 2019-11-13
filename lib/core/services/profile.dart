@@ -21,13 +21,13 @@ class ProfileService {
         username: _username);
 
     print(
-        '[Profile Service] Pushing profile to database: ${_profile.toJson()}');
+        '[Profile Service] Pushing profile to database: ${_profile.toMap()}');
 
     try {
       await _database
           .reference()
           .child("profiles/${user.uid}")
-          .set(_profile.toJson());
+          .set(_profile.toMap());
       print(
           '[Profile Service] Profile creation successful: username: $_username for ${user.email}');
     } catch (e) {
@@ -74,7 +74,7 @@ class ProfileService {
         .then((DataSnapshot snapshot) {
       if (snapshot.value != null) {
         print('Snapshot: ${snapshot.value}');
-        String username = Profile.fromMap(snapshot).username;
+        String username = Profile.fromDataSnapshot(snapshot).username;
         return username;
         //use Profile.fromMap(snapshot.value, user.uid);
       } else {
@@ -94,7 +94,7 @@ class ProfileService {
             .reference()
             .child("profiles")
             .child(profile.uid)
-            .update(profile.toJson());
+            .update(profile.toMap());
       }
     } catch (e) {
       print('[Profile Service] update profile: Error: $e');

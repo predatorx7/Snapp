@@ -87,7 +87,6 @@ class _ICBottomNavBarState extends State<ICBottomNavBar> {
         ),
       ),
     );
-    ;
   }
 }
 

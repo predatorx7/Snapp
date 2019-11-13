@@ -9,6 +9,10 @@ class SearchModel extends Model {
   Map<String, Profile> get results => _results;
 
   Future<void> search(String key) async {
+    if(key.isEmpty){
+      print('No search keyword entered');
+      return;
+    }
     this._results = {};
     notifyListeners();
     queryPerform("username", key);
@@ -25,7 +29,7 @@ class SearchModel extends Model {
             String _filter;
             _filter = values.value[i][orderBy];
             if (_filter.startsWith(key)) {
-              this._results.addAll({i: Profile.createFromMap(values.value[i])});
+              this._results.addAll({i: Profile.fromMap(values.value[i])});
             }
           }
           notifyListeners();

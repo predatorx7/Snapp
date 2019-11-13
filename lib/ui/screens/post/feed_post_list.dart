@@ -5,6 +5,7 @@ import 'package:instagram/core/services/posts.dart';
 import 'package:instagram/core/services/profile.dart';
 import 'package:instagram/models/plain_models/app_notification.dart';
 import 'package:instagram/models/plain_models/feed_model.dart';
+import 'package:instagram/models/plain_models/profile.dart';
 import 'package:instagram/repository/information.dart';
 import 'package:instagram/models/plain_models/post.dart';
 import 'package:instagram/ui/components/profile_avatar.dart';
@@ -40,6 +41,7 @@ class _FeedPostListState extends State<FeedPostList>
       itemBuilder: (BuildContext context, int index) {
         Post metadata = cFeed.posts[index];
         bool postLiked = metadata.likes.contains(_observer.info.uid);
+        Profile pubProf = _observer.getFollower(metadata.publisher);
         return ScopedModel<SubPostModel>(
           model: SubPostModel(),
           child: new Material(
@@ -49,17 +51,29 @@ class _FeedPostListState extends State<FeedPostList>
                   padding: const EdgeInsets.only(left: 6, top: 4, bottom: 4),
                   child: Row(
                     children: <Widget>[
-                      ICProfileAvatar(
-                        profileOf: metadata.publisher,
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).pushNamed(SomeoneProfileRoute,
+                              arguments: pubProf);
+                        },
+                        child: ICProfileAvatar(
+                          profileOf: metadata.publisher,
+                        ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 8.0),
-                        child: Text(
-                          metadata.publisherUsername,
-                          style: TextStyle(
-                              fontWeight: FontWeight.w700,
-                              fontSize: 14,
-                              color: notBlack),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).pushNamed(SomeoneProfileRoute,
+                              arguments: pubProf);
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 8.0),
+                          child: Text(
+                            metadata.publisherUsername,
+                            style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 14,
+                                color: notBlack),
+                          ),
                         ),
                       ),
                       Spacer(),
@@ -87,7 +101,7 @@ class _FeedPostListState extends State<FeedPostList>
                                       onTap: () async {
                                         await ProfileService().doUnFollow(
                                             _observer.info, metadata.publisher);
-                                        _observer.info.follows
+                                        _observer.following
                                             .remove(metadata.publisher);
                                         _observer.notifyChanges();
                                         Navigator.maybePop(context);

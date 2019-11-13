@@ -1,4 +1,3 @@
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram/commons/assets.dart';
 import 'package:instagram/commons/routing_constants.dart';
@@ -20,10 +19,8 @@ class PostsList extends StatefulWidget {
 
 class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
   String uid;
-  List postList;
   double heartSize = 100;
   InfoRepo _data;
-  bool firstTime = true;
   @override
   void initState() {
     super.initState();
@@ -32,10 +29,6 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
   @override
   void didChangeDependencies() {
     _data = Provider.of<InfoRepo>(context);
-    if (firstTime) {
-      uid = _data.info.uid;
-      postList = _data.posts;
-    }
     super.didChangeDependencies();
   }
 
@@ -47,7 +40,7 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
       gridDelegate:
           new SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 1),
       itemBuilder: (BuildContext context, int index) {
-        Post metadata = postList[index];
+        Post metadata = _data.posts[index];
         return ScopedModel<PostsListModel>(
           model: PostsListModel(),
           child: new Material(
@@ -57,18 +50,17 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
                 return Column(
                   children: <Widget>[
                     Padding(
-                      padding: const EdgeInsets.only(
-                          left: 6, top: 4, bottom: 4),
+                      padding:
+                          const EdgeInsets.only(left: 6, top: 4, bottom: 4),
                       child: Row(
                         children: <Widget>[
                           CircleAvatar(
                             radius: 18,
                             backgroundColor: Colors.grey[200],
-                            backgroundImage:
-                            _data.info.profileImage.isNotEmpty
+                            backgroundImage: _data.info.profileImage.isNotEmpty
                                 ? Image.network(
-                              _data.info.profileImage,
-                            ).image
+                                    _data.info.profileImage,
+                                  ).image
                                 : null,
                             child: Visibility(
                               visible: _data.info.profileImage.isEmpty,
@@ -98,7 +90,7 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
                                     return Dialog(
                                       shape: RoundedRectangleBorder(
                                           borderRadius:
-                                          BorderRadius.circular(4)),
+                                              BorderRadius.circular(4)),
                                       child: Column(
                                         mainAxisSize: MainAxisSize.min,
                                         children: <Widget>[
@@ -109,63 +101,28 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
                                             },
                                             title: Text(
                                               'Edit',
-                                              style:
-                                              actionTitle2Style(),
+                                              style: actionTitle2Style(),
                                             ),
                                           ),
                                           ListTile(
                                             onTap: () async {
-                                              var publisher = metadata
-                                                  .publisher,
-                                                  postKey =
-                                                      metadata.postKey,
-                                                  creationTime =
-                                                      metadata
-                                                          .creationTime;
-                                              var database =
-                                              FirebaseDatabase()
-                                                  .reference();
-                                              database
-                                                  .child(
-                                                  'posts/$publisher/$postKey')
-                                                  .remove();
-                                              database
-                                                  .child(
-                                                  'profiles/$publisher/posts')
-                                                  .once()
-                                                  .then((DataSnapshot
-                                              snapshot) {
-                                                Map postsList =
-                                                    snapshot.value;
-                                                postsList.forEach(
-                                                        (key, value) {
-                                                      if (value ==
-                                                          creationTime) {
-                                                        database
-                                                            .child(
-                                                            'profiles/$publisher/posts/$key')
-                                                            .remove();
-                                                      }
-                                                    });
-                                              });
+                                              PostService.deletePost(metadata);
+                                              print('Post removed? ${_data.removePost(metadata)}');
                                               Navigator.pop(context);
                                             },
                                             title: Text(
                                               'Delete',
-                                              style:
-                                              actionTitle2Style(),
+                                              style: actionTitle2Style(),
                                             ),
                                           ),
                                           ListTile(
                                             onTap: () {
-                                              print(
-                                                  'Turn Off Commenting');
+                                              print('Turn Off Commenting');
                                               Navigator.pop(context);
                                             },
                                             title: Text(
                                               'Turn Off Commenting',
-                                              style:
-                                              actionTitle2Style(),
+                                              style: actionTitle2Style(),
                                             ),
                                           ),
                                         ],
@@ -174,8 +131,7 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
                                   },
                                 );
                               },
-                              icon: Icon(Icons.more_vert,
-                                  color: Colors.black)),
+                              icon: Icon(Icons.more_vert, color: Colors.black)),
                         ],
                       ),
                     ),
@@ -185,8 +141,7 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
                           // Toggle heart animation
                           view.doAnimation();
                           if (!view.liked) {
-                            await PostService.doLike(
-                                _data.info, metadata);
+                            await PostService.doLike(_data.info, metadata);
                             metadata.likes.add(_data.info.uid);
                             view.setliked(true);
                           }
@@ -201,27 +156,24 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
                                   loadingBuilder: (BuildContext context,
                                       Widget child,
                                       ImageChunkEvent loadingProgress) {
-                                    if (loadingProgress == null)
-                                      return child;
+                                    if (loadingProgress == null) return child;
                                     return Center(
                                       child: Theme(
-                                        data:
-                                        Theme.of(context).copyWith(
+                                        data: Theme.of(context).copyWith(
                                           accentColor: Colors.grey[300],
                                           primaryColor: Colors.grey,
                                         ),
                                         child: SizedBox(
                                           height: 28,
                                           width: 28,
-                                          child:
-                                          new CircularProgressIndicator(
+                                          child: new CircularProgressIndicator(
                                             value: loadingProgress
-                                                .expectedTotalBytes !=
-                                                null
+                                                        .expectedTotalBytes !=
+                                                    null
                                                 ? loadingProgress
-                                                .cumulativeBytesLoaded /
-                                                loadingProgress
-                                                    .expectedTotalBytes
+                                                        .cumulativeBytesLoaded /
+                                                    loadingProgress
+                                                        .expectedTotalBytes
                                                 : null,
                                             strokeWidth: 2,
                                           ),
@@ -245,8 +197,8 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
                                         vsync: this,
                                         alignment: Alignment.center,
                                         curve: Curves.easeIn,
-                                        duration: new Duration(
-                                            milliseconds: 900),
+                                        duration:
+                                            new Duration(milliseconds: 900),
                                         child: Align(
                                           child: Icon(
                                             Icons.favorite,
@@ -321,8 +273,7 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
                               child: Padding(
                                 padding: const EdgeInsets.all(6),
                                 child: RotationTransition(
-                                  turns: new AlwaysStoppedAnimation(
-                                      -45 / 360),
+                                  turns: new AlwaysStoppedAnimation(-45 / 360),
                                   child: new Icon(
                                     OMIcons.send,
                                     size: 28,
@@ -337,8 +288,8 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
                             Padding(
                               padding: const EdgeInsets.only(top: 2),
                               child: Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 12, right: 4.0),
+                                padding:
+                                    const EdgeInsets.only(left: 12, right: 4.0),
                                 child: Text(
                                   '${metadata.likes.length} likes',
                                   style: TextStyle(
@@ -352,13 +303,12 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
                           ],
                         ),
                         Padding(
-                          padding:
-                          const EdgeInsets.only(top: 2, bottom: 12),
+                          padding: const EdgeInsets.only(top: 2, bottom: 12),
                           child: Row(
                             children: <Widget>[
                               Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 12, right: 4.0),
+                                padding:
+                                    const EdgeInsets.only(left: 12, right: 4.0),
                                 child: Text(
                                   metadata.publisherUsername,
                                   style: bodyStyle(),

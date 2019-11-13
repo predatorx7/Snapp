@@ -49,7 +49,7 @@ class _ICProfileAvatarState extends State<ICProfileAvatar> {
             .once(),
         builder: (context, AsyncSnapshot<DataSnapshot> snap) {
           if (snap.hasData) {
-            Profile temp = Profile.fromMap(snap.data);
+            Profile temp = Profile.fromDataSnapshot(snap.data);
             String profURL = temp.profileImage;
             return CircleAvatar(
               radius: widget.size,

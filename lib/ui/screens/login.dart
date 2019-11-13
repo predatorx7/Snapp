@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:instagram/commons/assets.dart';
 import 'package:instagram/commons/routing_constants.dart';
-import 'package:instagram/core/services/connectivity_service.dart';
 import 'package:instagram/models/view_models/login_page.dart';
 import 'package:instagram/ui/screens/login_help.dart';
 import '../../commons/styles.dart';
@@ -20,7 +19,6 @@ class _LoginPageState extends State<LoginPage> {
   GlobalKey<ScaffoldState> _key = GlobalKey<ScaffoldState>();
   AuthNotifier user;
   LoginPageViewModel view;
-  ConnectivityStatus connectionStatus;
   @override
   void initState() {
     super.initState();
@@ -31,7 +29,6 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void didChangeDependencies() {
-    connectionStatus = Provider.of<ConnectivityStatus>(context);
     user = Provider.of<AuthNotifier>(context);
     view = Provider.of<LoginPageViewModel>(context, listen: false);
     super.didChangeDependencies();

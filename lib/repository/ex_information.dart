@@ -12,8 +12,7 @@ class ExInfoRepo extends InfoRepo {
 
   bool get isBusy => _isBusy;
 
-  DatabaseReference dr =
-      FirebaseDatabase.instance.reference().child('profiles');
+  DatabaseReference dr = FirebaseDatabase.instance.reference();
   bool get observerFollows => _observerFollows;
 
   setFollow(bool value) {
@@ -29,20 +28,29 @@ class ExInfoRepo extends InfoRepo {
   Future doFollow(Profile observer) async {
     setBusyStatus(true);
     try {
-      await dr.child("${this.info.uid}/followers").push().set(observer.uid);
-      await dr.child("${observer.uid}/follows").push().set(this.info.uid);
+      await dr.child("followers_of/${this.info.uid}").push().set(observer.uid);
+      await dr.child("followings_of/${observer.uid}").push().set(this.info.uid);
       _observerFollows = true;
-      this.info.followers.add(observer.uid);
+      this.followers.add(observer);
     } catch (e) {}
     this._isBusy = false;
     notifyListeners();
+  }
+
+  Profile getFollower(String uid) {
+    for (Profile follower in this.followers) {
+      if (follower.uid == uid) {
+        return follower;
+      }
+    }
+    return null;
   }
 
   doUnFollow(Profile observer) async {
     setBusyStatus(true);
     try {
       await dr
-          .child("${this.info.uid}/followers")
+          .child("followers_of/${this.info.uid}")
           .once()
           .then((DataSnapshot value) {
         print("Recieved this user's profile ${value.value.toString()}");
@@ -54,7 +62,7 @@ class ExInfoRepo extends InfoRepo {
         }
       });
       await dr
-          .child("${observer.uid}/follows")
+          .child("followings_of/${observer.uid}")
           .once()
           .then((DataSnapshot value) {
         print("Recieved observer's profile ${value.value.toString()}");

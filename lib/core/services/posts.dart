@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'profile.dart';
 import '../../models/plain_models/post.dart';
 
@@ -23,19 +26,6 @@ class PostService {
 
     try {
       _database.reference().child("posts/$uid").push().set(_post.toJson());
-      DataSnapshot snapshot = await ProfileService().getProfileSnapshot(uid);
-      Profile data = Profile.fromMap(snapshot);
-      ProfileService().updateProfile(data);
-      if (data != null) {
-        await _database
-            .reference()
-            .child("profiles")
-            .child(data.key)
-            .child('posts')
-            .push()
-            // Reference to post as time to help in provide fuzzy time, fetching post and sorting based on time.
-            .set(_post.creationTime);
-      }
       print('[Post Service] Post creation: successful');
     } catch (e) {
       print(
@@ -46,7 +36,7 @@ class PostService {
   // Returns int which is time of creation and ID of post for this user
   Future getPostList(String uid) async {
     DataSnapshot snapshot = await ProfileService().getProfileSnapshot(uid);
-    Profile data = Profile.fromMap(snapshot);
+    Profile data = Profile.fromDataSnapshot(snapshot);
     ProfileService().updateProfile(data);
     var _readData = await _database
         .reference()
@@ -135,12 +125,40 @@ class PostService {
   }
 
   /// Delete user post
-  deletePost(String postKey) {
-    _database.reference().child("posts").child(postKey).remove().then((_) {
-      print("Delete post $postKey successful");
-      // setState(() {
-      //   // SetState if no listeners
-      // });
-    });
+  static Future<void> deletePost(Post metadata) async {
+    String postKey = metadata.postKey;
+    String publisher = metadata.publisher;
+    var database = FirebaseDatabase().reference();
+    await database.child('posts/$publisher/$postKey').remove();
+    print('[Post Service] Post $postKey by $publisher has been deleted');
+    await deleteFile(metadata);
+  }
+
+  Future uploadFile(
+      File _image, String uid, String caption, String username) async {
+    int time = DateTime.now().millisecondsSinceEpoch;
+    StorageReference storageReference = FirebaseStorage.instance
+        .ref()
+        .child('posts/$uid/${DateTime.now().millisecondsSinceEpoch}');
+    StorageUploadTask uploadTask = storageReference.putFile(_image);
+    await uploadTask.onComplete;
+    print('File Uploaded');
+    storageReference.getDownloadURL().then(
+      (fileURL) {
+        PostService().createPost(fileURL, uid, caption, time, username);
+      },
+    );
+  }
+
+  static Future deleteFile(Post post) async {
+    try {
+      StorageReference storageReference = FirebaseStorage.instance
+          .ref()
+          .child('posts/${post.publisher}/${post.creationTime}');
+      await storageReference.delete();
+      print('File Delete');
+    } on Exception catch (e) {
+      print('Could not delete file: $e');
+    }
   }
 }

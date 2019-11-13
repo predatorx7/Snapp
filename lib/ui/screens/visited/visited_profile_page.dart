@@ -10,14 +10,12 @@ import 'package:provider/provider.dart';
 import '../../../core/adapters/posts.dart';
 import '../../../commons/styles.dart';
 import '../../../core/services/profile.dart';
-import '../../../models/plain_models/auth.dart';
 import '../../../repository/information.dart';
 import '../../../models/plain_models/profile.dart';
 
 class VisitedProfilePage extends StatefulWidget {
   // Profile of this page's owner
-  final Profile someone;
-  const VisitedProfilePage({Key key, this.someone}) : super(key: key);
+  const VisitedProfilePage({Key key}) : super(key: key);
   @override
   _VisitedProfilePageState createState() => _VisitedProfilePageState();
 }
@@ -37,7 +35,6 @@ class _VisitedProfilePageState extends State<VisitedProfilePage>
   TextStyle stateless = TextStyle();
   ProfileService profileAdapter = ProfileService();
   FirebaseDatabase _database = FirebaseDatabase();
-  PersistentBottomSheetController _controller; // <------ Instance variable
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   @override
   void initState() {
@@ -50,15 +47,22 @@ class _VisitedProfilePageState extends State<VisitedProfilePage>
   void didChangeDependencies() {
     _data = Provider.of<ExInfoRepo>(context);
     _observer = Provider.of<InfoRepo>(context, listen: false);
-    if (firstTime) {
-      _data.setInfoSilently(widget.someone);
-      firstTime = false;
-      if (_data.info.followers != null) {
-        if (_data.info.followers.contains(_observer.info.uid)) {
-          _data.setFollow(true);
+    Future.delayed(
+      Duration(seconds: 0),
+      () {
+        if (firstTime) {
+          firstTime = false;
+          if (_observer.following.isNotEmpty) {
+            for (Profile follower in _observer.following) {
+              if (follower.uid == _data.userUID) {
+                _data.setFollow(true);
+                break;
+              }
+            }
+          }
         }
-      }
-    }
+      },
+    );
     super.didChangeDependencies();
   }
 
@@ -99,63 +103,74 @@ class _VisitedProfilePageState extends State<VisitedProfilePage>
                       ),
                     ),
                     // Posts
-                    Column(
-                      children: <Widget>[
-                        Text(
-                          '${_data.info.posts?.length ?? 0}',
-                          style: stateful,
-                        ),
-                        Text(
-                          'Posts',
-                        ),
-                      ],
-                    ),
-                    // Followers
-                    GestureDetector(
-                      onTap: (){
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => ListUsers(
-                              users: _data.info.followers,
-                              title: 'Followers',
-                            ),
-                          ),
-                        );
-                      },
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
                       child: Column(
                         children: <Widget>[
                           Text(
-                            '${_data.info.followers?.length ?? 0}',
+                            '${_data.posts?.length ?? 0}',
                             style: stateful,
                           ),
                           Text(
-                            'Followers',
+                            'Posts',
                           ),
                         ],
                       ),
                     ),
+                    // Followers
+                    GestureDetector(
+                      onTap: () {
+                        if (_data.followers.isNotEmpty)
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => ListUsers(
+                                users: _data.followers,
+                                title: 'Followers',
+                              ),
+                            ),
+                          );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          children: <Widget>[
+                            Text(
+                              '${_data.followers?.length ?? 0}',
+                              style: stateful,
+                            ),
+                            Text(
+                              'Followers',
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                     // Following
                     GestureDetector(
-                      onTap: (){
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => ListUsers(
-                              users: _data.info.follows,
-                              title: 'Following',
+                      onTap: () {
+                        if (_data.following.isNotEmpty)
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => ListUsers(
+                                users: _data.following,
+                                title: 'Following',
+                              ),
                             ),
-                          ),
-                        );
+                          );
                       },
-                      child: Column(
-                        children: <Widget>[
-                          Text(
-                            '${_data.info.follows?.length ?? 0}',
-                            style: stateful,
-                          ),
-                          Text(
-                            'Following',
-                          ),
-                        ],
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          children: <Widget>[
+                            Text(
+                              '${_data.following?.length ?? 0}',
+                              style: stateful,
+                            ),
+                            Text(
+                              'Following',
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],
@@ -182,7 +197,7 @@ class _VisitedProfilePageState extends State<VisitedProfilePage>
                         Expanded(
                           child: OutlineButton(
                             onPressed: () async {
-                              _controller = await showModalBottomSheet(
+                              await showModalBottomSheet(
                                 backgroundColor: Colors.transparent,
                                 useRootNavigator: true,
                                 context: context,
@@ -238,10 +253,6 @@ class _VisitedProfilePageState extends State<VisitedProfilePage>
                                                   : () async {
                                                       await _data.doUnFollow(
                                                           _observer.info);
-                                                      _observer.info.follows
-                                                          .remove(
-                                                              _data.info.uid);
-                                                      _observer.notifyChanges();
                                                       Navigator.maybePop(
                                                           context);
                                                     },
@@ -313,7 +324,7 @@ class _VisitedProfilePageState extends State<VisitedProfilePage>
                             : () async {
                                 // Follow
                                 await _data.doFollow(_observer.info);
-                                _observer.info.follows.add(_data.info.uid);
+                                _observer.following.add(_data.info);
                                 _observer.notifyChanges();
                                 await AppNotification.notify(
                                   AppNotification(
@@ -367,52 +378,66 @@ class _VisitedProfilePageState extends State<VisitedProfilePage>
           )
         ],
       ),
-      body: NestedScrollView(
-        controller: _scrollViewController,
-        headerSliverBuilder: (BuildContext context, bool boxIsScrolled) {
-          return <Widget>[
-            SliverAppBar(
-              automaticallyImplyLeading: false,
-              backgroundColor: Colors.white,
-              floating: true,
-              pinned: true,
-              expandedHeight: _data.heightOfFlexSpace,
-              flexibleSpace: FlexibleSpaceBar(
-                collapseMode: CollapseMode.pin,
-                background: profileWidget(context),
-              ),
-              actions: <Widget>[Container()],
-              bottom: TabBar(
-                indicatorColor: notBlack,
-                tabs: <Widget>[
-                  Tab(
-                    icon: Icon(
-                      Icons.grid_on,
-                      color: Colors.black,
-                    ),
-                  ),
-                  Tab(
-                    icon: Icon(
-                      Icons.image,
-                      color: Colors.black,
-                    ),
-                  ),
-                ],
-                controller: _tabController,
-              ),
-            ),
-          ];
+      body: RefreshIndicator(
+        displacement: 20,
+        onRefresh: () async {
+          await Future.delayed(Duration(milliseconds: 1000));
+          await _data.refreshAll();
+          setState(() {});
         },
-        body: Visibility(
-          visible: (_data.info != null),
-          child: (_data.info.posts?.isNotEmpty ?? false)
-              ? TabBarView(
+        child: NestedScrollView(
+          controller: _scrollViewController,
+          headerSliverBuilder: (BuildContext context, bool boxIsScrolled) {
+            return <Widget>[
+              SliverAppBar(
+                automaticallyImplyLeading: false,
+                backgroundColor: Colors.white,
+                floating: true,
+                pinned: true,
+                expandedHeight: _data.heightOfFlexSpace,
+                flexibleSpace: FlexibleSpaceBar(
+                  collapseMode: CollapseMode.pin,
+                  background: profileWidget(context),
+                ),
+                actions: <Widget>[Container()],
+                bottom: TabBar(
+                  indicatorColor: notBlack,
+                  tabs: <Widget>[
+                    Tab(
+                      icon: Icon(
+                        Icons.grid_on,
+                        color: Colors.black,
+                      ),
+                    ),
+                    Tab(
+                      icon: Icon(
+                        Icons.image,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
                   controller: _tabController,
-                  children: <Widget>[
-                    new GridView.builder(
+                ),
+              ),
+            ];
+          },
+          body: Visibility(
+            visible: (_data.info != null),
+            child: Visibility(
+              visible: (_data.posts?.isNotEmpty ?? false),
+              child: TabBarView(
+                controller: _tabController,
+                children: <Widget>[
+                  RefreshIndicator(
+                    displacement: 20,
+                    onRefresh: () async {
+                      await Future.delayed(Duration(milliseconds: 1000));
+                      await _data.refreshAll();
+                    },
+                    child: new GridView.builder(
                       physics: AlwaysScrollableScrollPhysics(
                           parent: BouncingScrollPhysics()),
-                      itemCount: _data.info.posts.length ?? 0,
+                      itemCount: _data.posts.length ?? 0,
                       gridDelegate:
                           new SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 3),
@@ -427,64 +452,35 @@ class _VisitedProfilePageState extends State<VisitedProfilePage>
                         );
                       },
                     ),
-                    PostsList(
+                  ),
+                  RefreshIndicator(
+                    displacement: 20,
+                    onRefresh: () async {
+                      await Future.delayed(Duration(milliseconds: 1000));
+                      await _data.refreshAll();
+                    },
+                    child: PostsList(
                       height: MediaQuery.of(context).size.width,
                     ),
-                  ],
-                )
-              : SizedBox(),
-        ),
-      ),
-    );
-  }
-}
-
-class Menu extends StatelessWidget {
-  final Profile userInfo;
-  Menu({Key key, this.userInfo}) : super(key: key);
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: BackButtonIcon(),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        titleSpacing: 0.0,
-        title: Text(
-          'Settings',
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            color: notBlack,
-            fontSize: 18,
-          ),
-        ),
-      ),
-      body: ListView(
-        children: <Widget>[
-          ListTile(
-            onTap: () async {
-              Provider.of<AuthNotifier>(context).signOut();
-              Navigator.pop(context);
-            },
-            title: Text(
-              'Log out of ${userInfo.username}',
-              style: TextStyle(
-                color: Color(0xff3897f0),
-                //  Color(0xcc3897f0)
-                fontSize: 16,
-                fontWeight: FontWeight.normal,
+                  ),
+                ],
+              ),
+              replacement: Center(
+                child: OutlineButton(
+                  onPressed: () async {
+                    await _data.refreshAll();
+                  },
+                  child: Icon(Icons.refresh, color: Colors.black),
+                  color: Colors.transparent,
+                  highlightedBorderColor: Colors.grey,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(40),
+                  ),
+                ),
               ),
             ),
           ),
-          Divider(),
-          Padding(
-            padding: EdgeInsets.all(10),
-            child: Text('Instagram clone'),
-          ),
-        ],
+        ),
       ),
     );
   }

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:instagram/commons/styles.dart';
+import 'package:instagram/core/utils/transactions.dart';
 import 'package:instagram/ui/components/process_indicator.dart';
 import 'package:instagram/ui/components/profile_avatar.dart';
 import 'package:provider/provider.dart';
@@ -192,7 +193,6 @@ class _PostUploadPageState extends State<PostUploadPage> {
 
 class UploadMedia extends StatefulWidget {
   final File imageFile;
-
   const UploadMedia({Key key, this.imageFile}) : super(key: key);
   @override
   _UploadMediaState createState() => _UploadMediaState();
@@ -202,11 +202,18 @@ class _UploadMediaState extends State<UploadMedia> {
   TextEditingController captionController;
   bool _isLoading = false;
   FocusNode captionFocus;
+  InfoRepo thisUser;
   @override
   void initState() {
     captionFocus = FocusNode();
     captionController = TextEditingController();
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    thisUser = Provider.of<InfoRepo>(context);
+    super.didChangeDependencies();
   }
 
   @override
@@ -218,17 +225,18 @@ class _UploadMediaState extends State<UploadMedia> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<InfoRepo>(
-      builder: (context, _info, child) {
-        return Scaffold(
-          appBar: AppBar(
-            title: Text(
-              'New Post',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-            ),
-            actions: <Widget>[
-              Center(
-                child: TappableText(
+    return Consumer<InfoRepo>(builder: (context, _info, child) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(
+            'New Post',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+          ),
+          actions: <Widget>[
+            Center(
+              child: Consumer<Transactions>(
+                  builder: (context, transact, snapshot) {
+                return TappableText(
                   onTap: _isLoading
                       ? null
                       : () async {
@@ -240,12 +248,28 @@ class _UploadMediaState extends State<UploadMedia> {
                             barrierDismissible: false,
                             context: context,
                             builder: (BuildContext context) {
-                              // Call
-                              uploadFile(widget.imageFile, _info.userUID,
-                                      captionController.text, _info.profile.username)
-                                  .then((answer) {
-                                Navigator.popUntil(
-                                    context, ModalRoute.withName('/'));
+//                                  if(!transact.isLocked){
+//                                    int key = transact.acquireLock();
+//                                    uploadFile(widget.imageFile, _info.userUID,
+//                                        captionController.text, _info.profile.username)
+//                                        .then((answer) {
+//                                      thisUser.refreshPosts();
+//                                      Navigator.popUntil(
+//                                          context, ModalRoute.withName('/'));
+//                                    });
+//                                    transact.releaseLock(key);
+//                                  }
+                              transact.perform(() {
+                                uploadFile(
+                                        widget.imageFile,
+                                        _info.userUID,
+                                        captionController.text,
+                                        _info.profile.username)
+                                    .then((answer) {
+                                  thisUser.refreshPosts();
+                                  Navigator.popUntil(
+                                      context, ModalRoute.withName('/'));
+                                });
                               });
                               return Dialog(
                                 shape: RoundedRectangleBorder(
@@ -273,48 +297,48 @@ class _UploadMediaState extends State<UploadMedia> {
                         },
                   text: 'Share',
                   textSize: 16,
-                ),
+                );
+              }),
+            ),
+          ],
+        ),
+        body: ListView(
+          // mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              padding: EdgeInsets.all(15),
+              height: 300,
+              // width: 300,
+              child: Image.file(
+                widget.imageFile,
+                fit: BoxFit.fitWidth,
               ),
-            ],
-          ),
-          body: ListView(
-            // mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.all(15),
-                height: 300,
-                // width: 300,
-                child: Image.file(
-                  widget.imageFile,
-                  fit: BoxFit.fitWidth,
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.all(15),
-                child: TextField(
-                  focusNode: captionFocus,
-                  minLines: 1,
-                  maxLines: 20,
-                  controller: captionController,
-                  textInputAction: TextInputAction.newline,
-                  maxLength: 150,
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    icon: ICProfileAvatar(
-                      profileURL: _info.info.profileImage,
-                    ),
-                    hintText: 'Write a caption...',
-                    hintStyle: TextStyle(
-                      color: Colors.grey[400],
-                    ),
+            ),
+            Container(
+              padding: EdgeInsets.all(15),
+              child: TextField(
+                focusNode: captionFocus,
+                minLines: 1,
+                maxLines: 20,
+                controller: captionController,
+                textInputAction: TextInputAction.newline,
+                maxLength: 150,
+                decoration: InputDecoration(
+                  border: InputBorder.none,
+                  icon: ICProfileAvatar(
+                    profileURL: _info.info.profileImage,
+                  ),
+                  hintText: 'Write a caption...',
+                  hintStyle: TextStyle(
+                    color: Colors.grey[400],
                   ),
                 ),
               ),
-            ],
-          ),
-        );
-      }
-    );
+            ),
+          ],
+        ),
+      );
+    });
   }
 }
 

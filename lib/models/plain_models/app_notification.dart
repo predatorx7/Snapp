@@ -73,13 +73,13 @@ class AppNotification {
   /// Get all notifications
   static Future<List<AppNotification>> fetchAll(String fetchFor) async {
     List<AppNotification> _notificationList = [];
+    Map<String, Map<String, AppNotification>> _notificationMap = {};
     DataSnapshot snap = await FirebaseDatabase.instance
         .reference()
         .child('notifications/for/$fetchFor/from')
         .once();
     if (snap.value != null) {
       for (var i in snap.value.keys.toList()) {
-        print('notification: ${snap.value[i]}');
         Map x = snap.value[i];
         String from = x.keys.first;
         OnEvent event;
@@ -99,23 +99,29 @@ class AppNotification {
             break;
           default:
         }
-        _notificationList.add(
-          AppNotification(
-            notifyTo: fetchFor,
-            notificationFrom: from,
-            atTime: x[from]['time'],
-            event: event,
-            postKey: link ?? null,
-          ),
-        );
+        _notificationMap.addAll({
+          "$from": {
+            "${event.toString()}": AppNotification(
+              notifyTo: fetchFor,
+              notificationFrom: from,
+              atTime: x[from]['time'],
+              event: event,
+              postKey: link ?? null,
+            ),
+          },
+        });
       }
     } else {
       print('No notifications');
     }
+
+    for (Map<String, AppNotification> i in _notificationMap.values.toList()){
+      _notificationList.addAll(i.values);
+    }
     return _notificationList;
   }
 
-  String message(OnEvent event, String username) {
+  String message(String username) {
     String message = "";
     switch (event) {
       case OnEvent.likedPost:

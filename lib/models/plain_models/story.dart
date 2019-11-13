@@ -55,19 +55,6 @@ class Story {
       "publisherUsername": publisherUsername,
     };
   }
-  List _getFromArray(data) {
-    // When creating a child by pushing, only the last post pushed has a unique key, the previous ones are altered with incremented numbers on push. Thus
-    // on removing the last child, list is parsed instead of a Map. The below workaround try/catch deals with it.
-    List listIs;
-    try {
-      Map rawPostsMap = data ?? {};
-      listIs = rawPostsMap.values.toList() ?? [];
-    } catch (e) {
-      List rawPostsList = data ?? [];
-      listIs = rawPostsList ?? [];
-    }
-    return listIs;
-  }
 
   Story.createFromMap(Map dataMap, String key) {
     storyKey = key;

@@ -34,7 +34,7 @@ class _MessagingPageState extends State<MessagingPage> {
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => ListUsers(
-                    users: _user.info.follows,
+                    users: _user.following,
                     title: 'Following',
                   ),
                 ),

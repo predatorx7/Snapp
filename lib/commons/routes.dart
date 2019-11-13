@@ -116,8 +116,8 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       Profile x = settings.arguments;
       return MaterialPageRoute(
         builder: (context) => ChangeNotifierProvider<ExInfoRepo>(
-          builder: (context) => ExInfoRepo(x.uid),
-          child: VisitedProfilePage(someone: settings.arguments),
+          builder: (context) => ExInfoRepo.setInfo(x),
+          child: VisitedProfilePage(),
         ),
       );
     case CommentsPageRoute:

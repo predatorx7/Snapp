@@ -14,7 +14,7 @@ Future<String> doesIdExists({@required String text}) async {
     DataSnapshot snapshot = await _databaseUsernameQuery.equalTo(text).once();
     print('[Check] Snapshot Value: ${snapshot.value}');
     if (snapshot.value != null) {
-      var profile = Profile.fromMap(snapshot);
+      var profile = Profile.fromDataSnapshot(snapshot);
       print('Profile found! ${profile.email}');
       return profile.email;
     }

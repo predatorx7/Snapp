@@ -1,3 +1,4 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram/commons/routing_constants.dart';
 import 'package:instagram/commons/styles.dart';
@@ -93,43 +94,86 @@ class _VisitedPostState extends State<VisitedPost> {
                               return Dialog(
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(4)),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: <Widget>[
-                                    ListTile(
-                                      onTap: () async {
-                                        Navigator.pop(context);
-                                      },
-                                      title: Text(
-                                        'Share to...',
-                                        style: actionTitle2Style(),
+                                child: Visibility(
+                                  visible:
+                                      _observer.userUID != metadata.publisher,
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: <Widget>[
+                                      ListTile(
+                                        onTap: () async {
+                                          Navigator.pop(context);
+                                        },
+                                        title: Text(
+                                          'Share to...',
+                                          style: actionTitle2Style(),
+                                        ),
                                       ),
-                                    ),
-                                    ListTile(
-                                      onTap: () async {
-                                        await ProfileService().doUnFollow(
-                                            _observer.info, metadata.publisher);
-                                        _observer.info.follows
-                                            .remove(metadata.publisher);
-                                        _observer.notifyChanges();
-                                        Navigator.maybePop(context);
-                                      },
-                                      title: Text(
-                                        'Unfollow',
-                                        style: actionTitle2Style(),
+                                      ListTile(
+                                        onTap: () async {
+                                          await ProfileService().doUnFollow(
+                                              _observer.info,
+                                              metadata.publisher);
+                                          _observer.following
+                                              .remove(metadata.publisher);
+                                          _observer.notifyChanges();
+                                          Navigator.maybePop(context);
+                                        },
+                                        title: Text(
+                                          'Unfollow',
+                                          style: actionTitle2Style(),
+                                        ),
                                       ),
-                                    ),
-                                    ListTile(
-                                      onTap: () {
-                                        print('Mute');
-                                        Navigator.pop(context);
-                                      },
-                                      title: Text(
-                                        'Mute',
-                                        style: actionTitle2Style(),
+                                      ListTile(
+                                        onTap: () {
+                                          print('Mute');
+                                          Navigator.pop(context);
+                                        },
+                                        title: Text(
+                                          'Mute',
+                                          style: actionTitle2Style(),
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
+                                  replacement: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: <Widget>[
+                                      ListTile(
+                                        onTap: () {
+                                          print('Edit');
+                                          Navigator.pop(context);
+                                        },
+                                        title: Text(
+                                          'Edit',
+                                          style: actionTitle2Style(),
+                                        ),
+                                      ),
+                                      ListTile(
+                                        onTap: () async {
+                                          PostService.deletePost(metadata);
+                                          Navigator.popUntil(
+                                            context,
+                                            ModalRoute.withName('/'),
+                                          );
+                                        },
+                                        title: Text(
+                                          'Delete',
+                                          style: actionTitle2Style(),
+                                        ),
+                                      ),
+                                      ListTile(
+                                        onTap: () {
+                                          print('Turn Off Commenting');
+                                          Navigator.pop(context);
+                                        },
+                                        title: Text(
+                                          'Turn Off Commenting',
+                                          style: actionTitle2Style(),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               );
                             },
@@ -277,7 +321,9 @@ class _VisitedPostState extends State<VisitedPost> {
                             ),
                             GestureDetector(
                               onTap: () {
-                                Navigator.of(context).pushNamed(CommentsPageRoute, arguments: metadata);
+                                Navigator.of(context).pushNamed(
+                                    CommentsPageRoute,
+                                    arguments: metadata);
                               },
                               child: Padding(
                                 padding: const EdgeInsets.all(6.0),

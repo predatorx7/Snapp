@@ -22,7 +22,7 @@ class StoryService {
     try {
       _database.reference().child("stories/$uid").push().set(_story.toJson());
       DataSnapshot snapshot = await ProfileService().getProfileSnapshot(uid);
-      Profile data = Profile.fromMap(snapshot);
+      Profile data = Profile.fromDataSnapshot(snapshot);
       ProfileService().updateProfile(data);
       if (data != null) {
         await _database

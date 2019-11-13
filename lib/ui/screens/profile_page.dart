@@ -58,7 +58,6 @@ class _ProfilePageState extends State<ProfilePage>
     if (_data.info.email == null) {
       return Text(':(');
     }
-    print(data.bio);
     return SingleChildScrollView(
       child: Column(
         children: <Widget>[
@@ -112,63 +111,76 @@ class _ProfilePageState extends State<ProfilePage>
                       ),
                     ),
                     // Posts
-                    Column(
-                      children: <Widget>[
-                        Text(
-                          '${_data.posts.length ?? 0}',
-                          style: stateful,
-                        ),
-                        Text(
-                          'Posts',
-                        ),
-                      ],
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        children: <Widget>[
+                          Text(
+                            '${_data.posts.length ?? 0}',
+                            style: stateful,
+                          ),
+                          Text(
+                            'Posts',
+                          ),
+                        ],
+                      ),
                     ),
                     // Followers
                     GestureDetector(
                       onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => ListUsers(
-                              users: data.followers,
-                              title: 'Followers',
+                        if (_data.followers != null ||
+                            _data.followers.isNotEmpty)
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => ListUsers(
+                                users: _data.followers,
+                                title: 'Followers',
+                              ),
                             ),
-                          ),
-                        );
+                          );
                       },
-                      child: Column(
-                        children: <Widget>[
-                          Text(
-                            '${data.followers.length ?? 0}',
-                            style: stateful,
-                          ),
-                          Text(
-                            'Followers',
-                          ),
-                        ],
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          children: <Widget>[
+                            Text(
+                              '${_data.followers.length ?? 0}',
+                              style: stateful,
+                            ),
+                            Text(
+                              'Followers',
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     // Following
                     GestureDetector(
                       onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => ListUsers(
-                              users: data.follows,
-                              title: 'Following',
+                        if (_data.following != null ||
+                            _data.following.isNotEmpty)
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => ListUsers(
+                                users: _data.following,
+                                title: 'Following',
+                              ),
                             ),
-                          ),
-                        );
+                          );
                       },
-                      child: Column(
-                        children: <Widget>[
-                          Text(
-                            '${data.follows.length ?? 0}',
-                            style: stateful,
-                          ),
-                          Text(
-                            'Following',
-                          ),
-                        ],
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          children: <Widget>[
+                            Text(
+                              '${_data.following.length ?? 0}',
+                              style: stateful,
+                            ),
+                            Text(
+                              'Following',
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],
@@ -282,101 +294,109 @@ class _ProfilePageState extends State<ProfilePage>
           ],
         ),
       ),
-      body: NestedScrollView(
-        controller: _scrollViewController,
-        headerSliverBuilder: (BuildContext context, bool boxIsScrolled) {
-          return <Widget>[
-            SliverAppBar(
-              automaticallyImplyLeading: false,
-              backgroundColor: Colors.grey[50],
-              floating: true,
-              pinned: true,
-              // snap: true,
-              expandedHeight: _data.heightOfFlexSpace,
-              flexibleSpace: FlexibleSpaceBar(
-                collapseMode: CollapseMode.pin,
-                background: profileWidget(context, _data.info),
-              ),
-              actions: <Widget>[Container()],
-              bottom: TabBar(
-                indicatorColor: notBlack,
-                tabs: <Widget>[
-                  Tab(
-                    icon: Icon(
-                      Icons.grid_on,
-                      color: Colors.black,
-                    ),
-                  ),
-                  Tab(
-                    icon: Icon(
-                      Icons.image,
-                      color: Colors.black,
-                    ),
-                  ),
-                ],
-                controller: _tabController,
-              ),
-            ),
-          ];
+      body: RefreshIndicator(
+        displacement: 20,
+        onRefresh: () async {
+          await Future.delayed(Duration(milliseconds: 1000));
+          await _data.refreshAll();
         },
-        body: Container(
-          color: Colors.grey[50],
-          child: Visibility(
-            visible: (_data.posts != null),
+        child: NestedScrollView(
+          controller: _scrollViewController,
+          headerSliverBuilder: (BuildContext context, bool boxIsScrolled) {
+            return <Widget>[
+              SliverAppBar(
+                automaticallyImplyLeading: false,
+                backgroundColor: Colors.grey[50],
+                floating: true,
+                pinned: true,
+                // snap: true,
+                expandedHeight: _data.heightOfFlexSpace,
+                flexibleSpace: FlexibleSpaceBar(
+                  collapseMode: CollapseMode.pin,
+                  background: profileWidget(context, _data.info),
+                ),
+                actions: <Widget>[Container()],
+                bottom: TabBar(
+                  indicatorColor: notBlack,
+                  tabs: <Widget>[
+                    Tab(
+                      icon: Icon(
+                        Icons.grid_on,
+                        color: Colors.black,
+                      ),
+                    ),
+                    Tab(
+                      icon: Icon(
+                        Icons.image,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                  controller: _tabController,
+                ),
+              ),
+            ];
+          },
+          body: Container(
+            color: Colors.grey[50],
             child: Visibility(
-              visible: (_data.posts?.isNotEmpty ?? false),
-              child: TabBarView(
-                controller: _tabController,
-                children: <Widget>[
-                  RefreshIndicator(
-                    displacement: 20,
-                    onRefresh: () async {
-                      await Future.delayed(Duration(milliseconds: 1000));
-                      await _data.refreshAll();
-                    },
-                    child: new GridView.builder(
-                      physics: AlwaysScrollableScrollPhysics(
-                          parent: BouncingScrollPhysics()),
-                      itemCount: _data.posts.length ?? 0,
-                      gridDelegate: new SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3),
-                      itemBuilder: (BuildContext context, int index) {
-                        return PostAdapters(
-                          uid: _data.userUID,
-                          metadata: _data.posts[index],
-                          isInGrid: true,
-                          database: _database,
-                          height: MediaQuery.of(context).size.width,
-                          index: index,
-                        );
+              visible: (_data.posts != null),
+              child: Visibility(
+                visible: (_data.posts?.isNotEmpty ?? false),
+                child: TabBarView(
+                  controller: _tabController,
+                  children: <Widget>[
+                    RefreshIndicator(
+                      displacement: 20,
+                      onRefresh: () async {
+                        await Future.delayed(Duration(milliseconds: 1000));
+                        await _data.refreshAll();
                       },
+                      child: new GridView.builder(
+                        physics: AlwaysScrollableScrollPhysics(
+                            parent: BouncingScrollPhysics()),
+                        itemCount: _data.posts.length ?? 0,
+                        gridDelegate:
+                            new SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 3),
+                        itemBuilder: (BuildContext context, int index) {
+                          return PostAdapters(
+                            uid: _data.userUID,
+                            metadata: _data.posts[index],
+                            isInGrid: true,
+                            database: _database,
+                            height: MediaQuery.of(context).size.width,
+                            index: index,
+                          );
+                        },
+                      ),
                     ),
-                  ),
-                  RefreshIndicator(
-                    displacement: 20,
-                    onRefresh: () async {
-                      await Future.delayed(Duration(milliseconds: 1000));
-                      await _data.refreshAll();
-                    },
-                    child: PostsList(
-                      height: MediaQuery.of(context).size.width,
+                    RefreshIndicator(
+                      displacement: 20,
+                      onRefresh: () async {
+                        await Future.delayed(Duration(milliseconds: 1000));
+                        await _data.refreshAll();
+                      },
+                      child: PostsList(
+                        height: MediaQuery.of(context).size.width,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
+              replacement: Center(
+                  child: OutlineButton(
+                onPressed: () async {
+                  await _data.refreshAll();
+                },
+                child: Icon(Icons.refresh, color: Colors.black),
+                color: Colors.transparent,
+                highlightedBorderColor: Colors.grey,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(40),
+                ),
+              ),),
             ),
-            replacement: Center(
-                child: OutlineButton(
-              onPressed: () async {
-                await _data.refreshAll();
-              },
-              child: Icon(Icons.refresh, color: Colors.black),
-              color: Colors.transparent,
-              highlightedBorderColor: Colors.grey,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(40),
-              ),
-            )),
           ),
         ),
       ),

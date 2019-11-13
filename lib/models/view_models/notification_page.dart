@@ -5,6 +5,7 @@ class NotificationPageModel extends Model {
   List<AppNotification> _notificationList = [];
 
   List get getNotifications => _notificationList;
+
   Future<void> fetch(String uid) async {
     _notificationList = await AppNotification.fetchAll(uid);
     notifyListeners();

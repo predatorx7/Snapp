@@ -82,14 +82,14 @@ class _EditProfileState extends State<EditProfile> {
           iconSize: 35,
           icon: Icon(Icons.close),
           onPressed: () async {
-            Profile information = Profile.createFromMap(info.info.toJson());
+            Profile information = Profile.fromMap(info.info.toMap());
             information.fullName = nameController.text;
             information.username = usernameController.text;
             information.bio = bioController.text;
             information.email = emailController.text;
             information.gender = genderController.text;
-            if (information.toJson().toString() !=
-                info.info.toJson().toString()) {
+            if (information.toMap().toString() !=
+                info.info.toMap().toString()) {
               bool value = false;
               await showDialog(
                 barrierDismissible: false,
@@ -172,14 +172,14 @@ class _EditProfileState extends State<EditProfile> {
               color: Color(actionColor),
               icon: Icon(Icons.done),
               onPressed: () async {
-                Profile information = Profile.createFromMap(info.info.toJson());
+                Profile information = Profile.fromMap(info.info.toMap());
                 information.fullName = nameController.text;
                 information.username = usernameController.text;
                 information.bio = bioController.text;
                 information.email = emailController.text;
                 information.gender = genderController.text;
-                if (information.toJson().toString() !=
-                    info.info.toJson().toString()) {
+                if (information.toMap().toString() !=
+                    info.info.toMap().toString()) {
                   var xx;
                   await showDialog(
                     barrierDismissible: false,

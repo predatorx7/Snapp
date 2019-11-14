@@ -42,8 +42,8 @@ List<Shadow> icShadows = <Shadow>[
 ];
 
 const Widget gradientBG = SizedBox(
-  height: 65,
-  width: 65,
+  height: 60,
+  width: 60,
   child: Image(
     image: CommonImages.circleGradientAsset,
     fit: BoxFit.fill,

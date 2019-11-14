@@ -39,11 +39,11 @@ class StoryModel extends Model {
           .orderByChild('creationTime')
           .once();
       if (ds.value != null) {
-        for (String storyKey in ds.value.keys) {
-          print('Value: ${ds.value.values.toString()}');
+        List storyKeys = ds.value.keys;
+        storyKeys.sort();
+        for (String storyKey in storyKeys) {
           var story = Story.createFromMap(ds.value[storyKey], storyKey);
           storyMap[storyKey] = story;
-          print('Difference ${DateTime.fromMillisecondsSinceEpoch(startFromTime).difference(_time).inSeconds} > ${Duration(days: 1).inSeconds} ?');
           if (_time.difference(DateTime.fromMillisecondsSinceEpoch(startFromTime)).inSeconds < Duration(days: 1).inSeconds) {
             print('$storyKey is a valid story');
             _collection.putIfAbsent(

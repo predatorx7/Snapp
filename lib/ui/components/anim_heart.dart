@@ -1,30 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 
-class AnimatedHeart extends StatefulWidget {
+class AnimatedHeart extends StatelessWidget {
   final Widget child;
   final double size;
   final int milliseconds;
   const AnimatedHeart({Key key, this.child, this.size = 200, this.milliseconds})
       : super(key: key);
-  @override
-  _AnimateState createState() => _AnimateState();
-}
-
-class _AnimateState extends State<AnimatedHeart> {
-  double size;
-  AnimatedHeartModel model;
-  @override
-  void initState() {
-    size = widget.size;
-    super.initState();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-  }
-
   @override
   Widget build(BuildContext context) {
     return ScopedModel<AnimatedHeartModel>(
@@ -33,10 +15,10 @@ class _AnimateState extends State<AnimatedHeart> {
           builder: (context, _, model) {
         return AnimatedContainer(
           color: Colors.amber,
-          duration: new Duration(milliseconds: widget.milliseconds),
+          duration: new Duration(milliseconds: milliseconds),
           height: size,
           width: size,
-          child: widget.child,
+          child: child,
         );
       }),
     );

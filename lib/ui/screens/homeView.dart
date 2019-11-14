@@ -197,7 +197,9 @@ class _StoryViewState extends State<_StoryView> {
           scrollDirection: Axis.horizontal,
           child: Row(
             children: <Widget>[
-              SizedBox(width: 6,),
+              SizedBox(
+                width: 6,
+              ),
               Padding(
                 padding: const EdgeInsets.only(top: 4, left: 6, right: 6),
                 child: Column(
@@ -207,8 +209,9 @@ class _StoryViewState extends State<_StoryView> {
                   children: <Widget>[
                     GestureDetector(
                       onTap: () async {
-                        if(_data.activeStory.isEmpty){
-                          List<CameraDescription> camera = await availableCameras();
+                        if (_data.activeStory.isEmpty) {
+                          List<CameraDescription> camera =
+                              await availableCameras();
                           Navigator.push(
                             context,
                             CupertinoPageRoute(
@@ -235,6 +238,10 @@ class _StoryViewState extends State<_StoryView> {
                           Visibility(
                             visible: _data.activeStory.isNotEmpty,
                             child: gradientBG,
+                            replacement: SizedBox(
+                              height: 60,
+                              width: 60,
+                            ),
                           ),
                           ICProfileAvatar(
                             profileURL: _data.info.profileImage,

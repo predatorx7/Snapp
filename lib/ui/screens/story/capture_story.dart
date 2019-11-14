@@ -4,12 +4,16 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:instagram/commons/styles.dart';
 import 'package:instagram/core/services/story.dart';
 import 'package:instagram/core/utils/transactions.dart';
 import 'package:instagram/repository/information.dart';
+import 'package:instagram/ui/components/process_indicator.dart';
 import 'package:path/path.dart' show join;
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+
+import '../../../main.dart';
 
 //Future<void> main() async {
 //  // Obtain a list of the available cameras on the device.
@@ -183,45 +187,76 @@ class DisplayPictureScreen extends StatelessWidget {
                 right: 20,
                 bottom: 15,
               ),
-              child: Consumer<Transactions>(
-                builder: (context, transact, child) {
-                  return FlatButton(
-                    color: Colors.white,
-                    onPressed: () {
-                      transact.perform((){
-                        uploadFile(File(imagePath), user.info.uid, user.info.username)
-                            .then((answer) {
-                          Navigator.popUntil(context, ModalRoute.withName('/'));
+              child:
+                  Consumer<Transactions>(builder: (context, transact, child) {
+                return FlatButton(
+                  color: Colors.white,
+                  onPressed: () async {
+                    await showDialog(
+                      barrierDismissible: false,
+                      context: context,
+                      builder: (BuildContext context) {
+                        transact.perform(() {
+                          uploadFile(File(imagePath), user.info.uid,
+                                  user.info.username)
+                              .then((answer) {
+                            Navigator.popUntil(
+                                context, ModalRoute.withName('/'));
+                          });
                         });
-                      });
-                    },
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.only(top: 5, bottom: 5),
-                          child: Text(
-                            'Set story',
-                            style: TextStyle(
-                              color: Colors.black,
+                        return Dialog(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4)),
+                          child: SizedBox(
+                            width: 60,
+                            height: 60,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: <Widget>[
+                                Text(
+                                  'Uploading Story',
+                                  style: body5Style(),
+                                ),
+                                SizedBox(
+                                  height: 5,
+                                ),
+                                // TODO: Check
+                                ICLinearProcessIndicator(),
+                              ],
                             ),
                           ),
+                        );
+                      },
+                    );
+                  },
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.only(top: 5, bottom: 5),
+                        child: Text(
+                          'Set story',
+                          style: TextStyle(
+                            color: Colors.black,
+                          ),
                         ),
-                        SizedBox(
-                          width: 2,
-                        ),
-                        Icon(Icons.chevron_right, color: Colors.black)
-                      ],
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: new BorderRadius.circular(18.0),
-                      side: BorderSide(
-                        color: Colors.white,
                       ),
+                      SizedBox(
+                        width: 2,
+                      ),
+                      Icon(Icons.chevron_right, color: Colors.black)
+                    ],
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: new BorderRadius.circular(18.0),
+                    side: BorderSide(
+                      color: Colors.white,
                     ),
-                  );
-                }
-              ),
+                  ),
+                );
+              }),
             ),
           ),
         ],

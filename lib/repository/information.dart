@@ -20,7 +20,7 @@ class InfoRepo with ChangeNotifier {
   Profile get profile => _profile;
   double get heightOfFlexSpace => _heightOfFlexSpace;
 
-  Adapt _flexibleSpaceHeight = Adapt(size: 260);
+  Adapt _flexibleSpaceHeight = Adapt(size: 270);
   Profile get info => _profile;
   InfoRepo(this.userUID) {
     refreshAll();
@@ -138,6 +138,7 @@ class InfoRepo with ChangeNotifier {
     }on Exception catch (e) {
       print('An Exception happened while refreshing profile information: $e');
     }
+    notifyChanges();
   }
 
     Future<void> refreshPosts() async {

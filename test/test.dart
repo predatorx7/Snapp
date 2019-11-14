@@ -1,6 +1,4 @@
-// import 'package:inse of Visual Studio Code. There are a number of updates in this version that we hope you will like, some of the key highlights include:
-
-// tagram/src/models/plain_models/story.dart';
+// import 'package:instagram/src/models/plain_models/story.dart';
 
 // void test() async {
 //   var story = Story(imageURL: '/samplestory.jpg', publisher: 'smushaheed');

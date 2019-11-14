@@ -113,4 +113,26 @@ class CommonImages {
 
   static const AssetImage userFilledAsset =
       AssetImage('assets/res_icons/userFilled.png');
+
+  // res_image
+  static const Image logoBlack = Image(
+    image: logoBlackAsset,
+  );
+
+  static const AssetImage logoBlackAsset =
+      AssetImage('assets/res_image/logo_black.png');
+
+  static const Image logoGradient = Image(
+    image: logoGradientAsset,
+  );
+
+  static const AssetImage logoGradientAsset =
+      AssetImage('assets/res_image/logo_circle.png');
+
+  static const Image circleGradient = Image(
+    image: logoGradientAsset,
+  );
+
+  static const AssetImage circleGradientAsset =
+  AssetImage('assets/res_image/circle_gradient.png');
 }

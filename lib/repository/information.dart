@@ -84,25 +84,77 @@ class InfoRepo with ChangeNotifier {
     } on Exception catch (e) {
       print('An Exception happened while refreshing profile information: $e');
     }
-  }
 
-  Future<void> refreshPosts() async {
     try {
-      DataSnapshot snapshot = await _dr.child('posts/${this.userUID}').once();
-      if (snapshot.value != null) {
-        List<Post> _posts = [];
-        print(snapshot.value);
-        for (var i in snapshot.value.keys.toList()) {
-          _posts.add(Post.createFromMap(snapshot.value[i], i));
+      /// Collection of stories for a user
+      Map<String, List<Story>> collection = {};
+      /// Extracting active stories
+      DateTime _time = DateTime.now();
+      int startFromTime =
+          new DateTime.now()
+              .add(Duration(days: 1))
+              .millisecondsSinceEpoch;
+      Map<String, Story> storyMap = {};
+      Map<String, List<Story>> _collection = {};
+      DataSnapshot ds = await FirebaseDatabase.instance.reference().child(
+          'stories')
+          .child(this.userUID)
+          .orderByChild('creationTime')
+          .once();
+      if (ds.value != null) {
+        for (String storyKey in ds.value.keys) {
+          print('Value: ${ds.value.values.toString()}');
+          var story = Story.createFromMap(ds.value[storyKey], storyKey);
+          storyMap[storyKey] = story;
+          print('Difference ${DateTime
+              .fromMillisecondsSinceEpoch(startFromTime)
+              .difference(_time)
+              .inSeconds} > ${Duration(days: 1).inSeconds} ?');
+          if (_time
+              .difference(DateTime.fromMillisecondsSinceEpoch(startFromTime))
+              .inSeconds < Duration(days: 1).inSeconds) {
+            print('$storyKey is a valid story');
+            _collection.putIfAbsent(
+              story.publisher,
+                  () => [],
+            );
+            _collection[story.publisher].add(story);
+          }
         }
-        this.posts = _posts;
+      } else {
       }
-      notifyListeners();
-    } on Exception catch (e) {
+      collection = {};
+      collection.addAll(_collection);
+//    }
+      if (collection.keys
+          .toList()
+          .isEmpty) {
+        print('No stories found');
+      } else {
+        this.activeStory=collection[this.userUID].toList();
+        print(
+            'stories fetched! These users uploaded Stories: $collection.length}');
+      }
+    }on Exception catch (e) {
       print('An Exception happened while refreshing profile information: $e');
     }
   }
 
+    Future<void> refreshPosts() async {
+      try {
+        DataSnapshot snapshot = await _dr.child('posts/${this.userUID}').once();
+        if (snapshot.value != null) {
+          List<Post> _posts = [];
+          print(snapshot.value);
+          for (var i in snapshot.value.keys.toList()) {
+            _posts.add(Post.createFromMap(snapshot.value[i], i));
+          }
+          this.posts = _posts;
+        }
+      } on Exception catch (e) {
+        print('An Exception happened while refreshing profile information: $e');
+      }
+  }
   /// Refresh followers & followings list
   Future<void> refreshFollow() async {
     try {
@@ -157,9 +209,9 @@ class InfoRepo with ChangeNotifier {
   }
 
   Profile getFollower(String uid) {
-    for (Profile follower in this.followers) {
-      if (follower.uid == uid) {
-        return follower;
+    for (Profile thisFollower in this.following) {
+      if (thisFollower.uid == uid) {
+        return thisFollower;
       }
     }
     return null;

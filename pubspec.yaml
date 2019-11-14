@@ -139,6 +139,9 @@ flutter:
    - assets/res_image/logo.png
    - assets/res_image/placeholder.png
    - assets/res_image/mother_res.png
+   - assets/res_image/logo_black.png
+   - assets/res_image/logo_circle.png
+   - assets/res_image/circle_gradient.png
   # Resource Icons
    - assets/res_icons/directOutline.png
    - assets/res_icons/userOutline.png

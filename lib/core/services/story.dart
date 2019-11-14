@@ -3,6 +3,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'profile.dart';
 import '../../models/plain_models/profile.dart';
 import '../../models/plain_models/story.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 /// Provides CRUD operations with story info in database
 class StoryService {
@@ -21,19 +22,6 @@ class StoryService {
 
     try {
       _database.reference().child("stories/$uid").push().set(_story.toJson());
-      DataSnapshot snapshot = await ProfileService().getProfileSnapshot(uid);
-      Profile data = Profile.fromDataSnapshot(snapshot);
-      ProfileService().updateProfile(data);
-      if (data != null) {
-        await _database
-            .reference()
-            .child("profiles")
-            .child(data.key)
-            .child('stories')
-            .push()
-        // Reference to post as time to help in provide fuzzy time, fetching post and sorting based on time.
-            .set(_story.creationTime);
-      }
       print('[Story Service] Story creation: successful');
     } catch (e) {
       print(

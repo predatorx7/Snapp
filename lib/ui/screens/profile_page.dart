@@ -1,3 +1,4 @@
+import 'package:camera/camera.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -5,6 +6,8 @@ import 'package:instagram/commons/assets.dart';
 import 'package:instagram/ui/components/profile_avatar.dart';
 import 'package:instagram/ui/screens/listusers.dart';
 import 'package:instagram/ui/screens/post/user_post_list.dart';
+import 'package:instagram/ui/screens/story/capture_story.dart';
+import 'package:instagram/ui/screens/story/story_view.dart';
 import 'package:provider/provider.dart';
 import '../../commons/routing_constants.dart';
 import '../../core/adapters/posts.dart';
@@ -13,6 +16,7 @@ import '../../core/services/profile.dart';
 import '../../models/plain_models/auth.dart';
 import '../../repository/information.dart';
 import '../../models/plain_models/profile.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key key}) : super(key: key);
@@ -77,36 +81,76 @@ class _ProfilePageState extends State<ProfilePage>
                         onTap: () {
                           print('To change profile photo');
                         },
-                        child: Stack(
-                          children: <Widget>[
-                            ICProfileAvatar(
-                              profileURL: data.profileImage,
-                              size: 45,
-                            ),
-                            Positioned(
-                              right: 0,
-                              bottom: 0,
-                              child: Container(
-                                padding: const EdgeInsets.all(1.0),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Container(
-                                  alignment: Alignment.center,
-                                  decoration: BoxDecoration(
-                                    color: Color(actionColor),
-                                    shape: BoxShape.circle,
+                        child: GestureDetector(
+                          onTap: () async {
+                            if(_data.activeStory.isEmpty){
+                              List<CameraDescription> camera = await availableCameras();
+                              Navigator.push(
+                                context,
+                                CupertinoPageRoute(
+                                  builder: (context) => TakePictureScreen(
+                                    // Pass the appropriate camera to the TakePictureScreen widget.
+                                    camera: camera.first,
                                   ),
-                                  child: Icon(
-                                    Icons.add,
-                                    size: 20,
-                                    color: Colors.white,
+                                ),
+                              );
+                            } else {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => StoryView(
+                                    stories: _data.activeStory,
+                                    publisherUID: _data.userUID,
+                                  ),
+                                ),
+                              );
+                            }
+                          },
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: <Widget>[
+                              Visibility(
+                                visible: _data.activeStory.isNotEmpty,
+                                child: SizedBox(
+                                  height: 100,
+                                  width: 100,
+                                  child: Image(
+                                    image: CommonImages.circleGradientAsset,
+                                    fit: BoxFit.fill,
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
+                              ICProfileAvatar(
+                                profileURL: data.profileImage,
+                                size: 45,
+                              ),
+                              Positioned(
+                                right: 0,
+                                bottom: 0,
+                                child: Visibility(
+                                  visible: _data.activeStory.isEmpty,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(1.0),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Container(
+                                      alignment: Alignment.center,
+                                      decoration: BoxDecoration(
+                                        color: Color(actionColor),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Icon(
+                                        Icons.add,
+                                        size: 20,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),

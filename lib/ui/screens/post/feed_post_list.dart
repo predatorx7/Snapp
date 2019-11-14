@@ -54,7 +54,7 @@ class _FeedPostListState extends State<FeedPostList>
                       GestureDetector(
                         onTap: () {
                           Navigator.of(context).pushNamed(SomeoneProfileRoute,
-                              arguments: pubProf);
+                              arguments: metadata.publisher);
                         },
                         child: ICProfileAvatar(
                           profileOf: metadata.publisher,

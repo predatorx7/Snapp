@@ -1,5 +1,6 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:instagram/models/plain_models/post.dart';
+import 'package:instagram/models/plain_models/profile.dart';
 import 'package:instagram/models/plain_models/story.dart';
 import 'package:scoped_model/scoped_model.dart';
 
@@ -23,7 +24,7 @@ class StoryModel extends Model {
   StoryStatus get status => _status;
 
   DatabaseReference dr = FirebaseDatabase.instance.reference().child('stories');
-  Future<void> fetch(List<dynamic> followers) async {
+  Future<void> fetch(List<Profile> followers) async {
     _status = StoryStatus.busy;
     notifyListeners();
     print('[StoryModel] Started fetching stories');
@@ -32,9 +33,9 @@ class StoryModel extends Model {
         new DateTime.now().add(Duration(days: 1)).millisecondsSinceEpoch;
     Map<String, Story> storyMap = {};
     Map<String, List<Story>> _collection = {};
-    for (String follower in followers) {
+    for (Profile follower in followers) {
       DataSnapshot ds = await dr
-          .child(follower)
+          .child(follower.uid)
           .orderByChild('creationTime')
           .once();
       if (ds.value != null) {

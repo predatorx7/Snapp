@@ -23,33 +23,29 @@ class Story {
 
   Story({
     this.creationTime,
-    this.expiryTime,
     @required this.imageURL,
     @required this.publisher,
     this.storyKey,
     this.publisherUsername,
-  });
+  }) {
+    this.expiryTime = Duration(days: 1).inMilliseconds + this.creationTime;
+  }
 
   Story.fromMap(DataSnapshot snapshot, String publisher)
       : storyKey = snapshot.key,
         creationTime = snapshot.value['creationTime'] ?? '',
         expiryTime = snapshot.value['expiryTime'] ?? '',
         imageURL = snapshot.value['imageURL'] ?? '',
-  publisherUsername = snapshot.value['publisherUsername'] ?? '',
+        publisherUsername = snapshot.value['publisherUsername'] ?? '',
         publisher = publisher ?? '';
 
   /// Provides data in JSON format. Provides current time if not optionally disabled.
-  Map<String, dynamic> toJson({bool provideWithCurrentTime = true}) {
-    /// Gets Current time
-    if (provideWithCurrentTime == true) {
-      DateTime currentTime = new DateTime.now();
-      creationTime = currentTime.millisecondsSinceEpoch;
-      expiryTime = currentTime.add(Duration(days: 1)).millisecondsSinceEpoch;
-    }
-
+  Map<String, dynamic> toJson() {
+    assert(creationTime != null,
+        "Creation time for a story should not be null: $creationTime");
     return {
       "creationTime": creationTime,
-      "expiryTime": expiryTime,
+      "expiryTime": expiryTime ?? Duration(days: 1).inMilliseconds + creationTime,
       "imageURL": imageURL,
       "publisher": publisher,
       "publisherUsername": publisherUsername,
@@ -58,11 +54,10 @@ class Story {
 
   Story.createFromMap(Map dataMap, String key) {
     storyKey = key;
-//    views = _getFromArray(dataMap['likes'] ?? []);
+//    views = _getFromArray(dataMap['views'] ?? []);
     creationTime = dataMap['creationTime'] ?? null;
     imageURL = dataMap['imageURL'] ?? '';
     publisher = dataMap['publisher'] ?? '';
     publisherUsername = dataMap['publisherUsername'] ?? '';
-    creationTime = dataMap['expiryTime'] ?? null;
   }
 }

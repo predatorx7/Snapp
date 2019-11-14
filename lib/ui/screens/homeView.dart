@@ -9,7 +9,7 @@ import 'package:instagram/repository/information.dart';
 import 'package:instagram/models/plain_models/story_model.dart';
 import 'package:instagram/ui/components/profile_avatar.dart';
 import 'package:instagram/ui/screens/post/feed_post_list.dart';
-import 'package:instagram/ui/screens/story/camera.dart';
+import 'package:instagram/ui/screens/story/capture_story.dart';
 import 'package:instagram/ui/screens/story/story_view.dart';
 import 'package:scoped_model/scoped_model.dart';
 import '../../models/view_models/message_notification.dart';
@@ -167,6 +167,7 @@ class _StoryView extends StatefulWidget {
   @override
   _StoryViewState createState() => _StoryViewState();
 }
+
 class _StoryViewState extends State<_StoryView> {
   bool isListNotEmpty;
   ProfileService profileAdapter = ProfileService();
@@ -191,11 +192,12 @@ class _StoryViewState extends State<_StoryView> {
   Widget build(BuildContext context) {
     if (followList.isNotEmpty || followList != null) {
       return Container(
-//        height: 65,
+        color: Colors.white,
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
             children: <Widget>[
+              SizedBox(width: 6,),
               Padding(
                 padding: const EdgeInsets.only(top: 4, left: 6, right: 6),
                 child: Column(
@@ -203,39 +205,69 @@ class _StoryViewState extends State<_StoryView> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
-                    Stack(
-                      children: <Widget>[
-                        ICProfileAvatar(
-                          profileURL: _data.info.profileImage,
-                          size: 26,
-                        ),
-                        Positioned(
-                          right: 0,
-                          bottom: 0,
-                          child: Visibility(
-//                           visible: if has stories
-                            child: Container(
-                              padding: const EdgeInsets.all(1.0),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                shape: BoxShape.circle,
+                    GestureDetector(
+                      onTap: () async {
+                        if(_data.activeStory.isEmpty){
+                          List<CameraDescription> camera = await availableCameras();
+                          Navigator.push(
+                            context,
+                            CupertinoPageRoute(
+                              builder: (context) => TakePictureScreen(
+                                // Pass the appropriate camera to the TakePictureScreen widget.
+                                camera: camera.first,
                               ),
+                            ),
+                          );
+                        } else {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => StoryView(
+                                stories: _data.activeStory,
+                                publisherUID: _data.userUID,
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: <Widget>[
+                          Visibility(
+                            visible: _data.activeStory.isNotEmpty,
+                            child: gradientBG,
+                          ),
+                          ICProfileAvatar(
+                            profileURL: _data.info.profileImage,
+                            size: 26,
+                          ),
+                          Positioned(
+                            right: 0,
+                            bottom: 0,
+                            child: Visibility(
+                              visible: _data.activeStory.isEmpty,
                               child: Container(
-                                alignment: Alignment.center,
+                                padding: const EdgeInsets.all(1.0),
                                 decoration: BoxDecoration(
-                                  color: Color(actionColor),
+                                  color: Colors.white,
                                   shape: BoxShape.circle,
                                 ),
-                                child: Icon(
-                                  Icons.add,
-                                  size: 16,
-                                  color: Colors.white,
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                    color: Color(actionColor),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    Icons.add,
+                                    size: 16,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(4.0),
@@ -272,12 +304,18 @@ class _StoryViewState extends State<_StoryView> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
-                          Hero(
-                            tag: 'aStory',
-                            child: ICProfileAvatar(
-                              profileOf: publisherUID,
-                              size: 26,
-                            ),
+                          Stack(
+                            alignment: Alignment.center,
+                            children: <Widget>[
+                              gradientBG,
+                              Hero(
+                                tag: 'aStory',
+                                child: ICProfileAvatar(
+                                  profileOf: publisherUID,
+                                  size: 26,
+                                ),
+                              ),
+                            ],
                           ),
                           Padding(
                             padding: const EdgeInsets.all(4.0),
@@ -306,6 +344,7 @@ class _StoryViewState extends State<_StoryView> {
     }
   }
 }
+
 class _FeedView extends StatefulWidget {
   @override
   _FeedViewState createState() => _FeedViewState();
@@ -315,9 +354,11 @@ class _FeedViewState extends State<_FeedView> {
   bool isListNotEmpty;
   ProfileService profileAdapter = ProfileService();
   InfoRepo _data;
+  StoryModel story;
   @override
   void didChangeDependencies() {
     _data = Provider.of<InfoRepo>(context);
+    story = ScopedModel.of<StoryModel>(context);
     super.didChangeDependencies();
   }
 
@@ -348,8 +389,14 @@ class _FeedViewState extends State<_FeedView> {
                 ),
               );
             case FeedStatus.fruitful:
-              return FeedPostList(
-                size: MediaQuery.of(context).size.width,
+              return RefreshIndicator(
+                onRefresh: () async {
+                  cfeed.fetch(_data.following);
+                  story.fetch(_data.following);
+                },
+                child: FeedPostList(
+                  size: MediaQuery.of(context).size.width,
+                ),
               );
             default:
               return child;

@@ -30,7 +30,6 @@ class Transactions extends ChangeNotifier {
         if (x != _tid) break;
       }
       _tid = x;
-      notifyListeners();
       return _tid;
     } else {
       print('Cannot acquire lock. Another transaction is in process.');
@@ -42,7 +41,6 @@ class Transactions extends ChangeNotifier {
     if (_tid == tid && _isLocked == true) {
       _isLocked = false;
       _tid = null;
-      notifyListeners();
       print('Transaction lock released!');
       return true;
     } else {

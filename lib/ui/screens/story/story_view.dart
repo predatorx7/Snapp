@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:instagram/commons/styles.dart';
 import 'package:instagram/models/plain_models/story.dart';
 import 'package:instagram/ui/components/profile_avatar.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -46,21 +47,28 @@ class _StoryViewState extends State<StoryView> {
                       profileOf: widget.stories[0].publisher,
                       size: 20,
                     ),
-
                     title: Text(
                       widget.stories[0].publisherUsername,
-                      style: TextStyle(fontSize: 14, color: Colors.white),
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        shadows: icShadows,
+                      ),
                     ),
                     subtitle: Text(
                       timeago.format(
                         DateTime.fromMillisecondsSinceEpoch(
                             widget.stories[pubsIndex].creationTime),
                       ),
-                      style: TextStyle(fontSize: 12, color: Colors.grey[200]),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.white70,
+                        fontWeight: FontWeight.bold,
+                        shadows: icShadows,
+                      ),
                     ),
-                    trailing: Text('${DateTime.fromMillisecondsSinceEpoch(widget.stories[pubsIndex].creationTime)}\n${DateTime.now()}', style: TextStyle(color: Colors.white),),
                   ),
-
                 ],
               );
             },

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'assets.dart';
+
 Widget icProcessIndicator(context) => Theme(
       data: Theme.of(context).copyWith(
         accentColor: Colors.grey[300],
@@ -30,6 +32,23 @@ ThemeData mainTheme = ThemeData(
 int actionColor = 0xff3897f0;
 
 Color notBlack = Color(0xff262626);
+
+List<Shadow> icShadows = <Shadow>[
+  Shadow(
+    offset: Offset(0.0, 0.0),
+    blurRadius: 8.0,
+    color: Color.fromARGB(150, 0, 0, 0),
+  ),
+];
+
+const Widget gradientBG = SizedBox(
+  height: 65,
+  width: 65,
+  child: Image(
+    image: CommonImages.circleGradientAsset,
+    fit: BoxFit.fill,
+  ),
+);
 
 TextStyle headStyle() => TextStyle(
       fontWeight: FontWeight.bold,

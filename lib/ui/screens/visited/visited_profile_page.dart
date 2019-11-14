@@ -1,9 +1,11 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:instagram/commons/assets.dart';
 import 'package:instagram/models/plain_models/app_notification.dart';
 import 'package:instagram/repository/ex_information.dart';
 import 'package:instagram/ui/components/profile_avatar.dart';
+import 'package:instagram/ui/screens/story/story_view.dart';
 import '../listusers.dart';
 import 'visited_post_list.dart';
 import 'package:provider/provider.dart';
@@ -94,11 +96,62 @@ class _VisitedProfilePageState extends State<VisitedProfilePage>
                       padding: const EdgeInsets.all(4),
                       child: GestureDetector(
                         onTap: () {
-                          print('To change profile photo');
+                          if(_data.activeStory.isNotEmpty){
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => StoryView(
+                                  stories: _data.activeStory,
+                                  publisherUID: _data.userUID,
+                                ),
+                              ),
+                            );
+                          }
                         },
-                        child: ICProfileAvatar(
-                          profileURL: _data.info.profileImage,
-                          size: 45,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: <Widget>[
+                            Visibility(
+                              visible: _data.activeStory.isNotEmpty,
+                              child: SizedBox(
+                                height: 100,
+                                width: 100,
+                                child: Image(
+                                  image: CommonImages.circleGradientAsset,
+                                  fit: BoxFit.fill,
+                                ),
+                              ),
+                            ),
+                            ICProfileAvatar(
+                              profileURL: _data.info.profileImage,
+                              size: 45,
+                            ),
+                            Positioned(
+                              right: 0,
+                              bottom: 0,
+                              child: Visibility(
+                                visible: _data.activeStory.isEmpty,
+                                child: Container(
+                                  padding: const EdgeInsets.all(1.0),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Container(
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      color: Color(actionColor),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(
+                                      Icons.add,
+                                      size: 20,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -465,19 +518,19 @@ class _VisitedProfilePageState extends State<VisitedProfilePage>
                   ),
                 ],
               ),
-              replacement: Center(
-                child: OutlineButton(
-                  onPressed: () async {
-                    await _data.refreshAll();
-                  },
-                  child: Icon(Icons.refresh, color: Colors.black),
-                  color: Colors.transparent,
-                  highlightedBorderColor: Colors.grey,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(40),
-                  ),
-                ),
-              ),
+//              replacement: Center(
+//                child: OutlineButton(
+//                  onPressed: () async {
+//                    await _data.refreshAll();
+//                  },
+//                  child: Icon(Icons.refresh, color: Colors.black),
+//                  color: Colors.transparent,
+//                  highlightedBorderColor: Colors.grey,
+//                  shape: RoundedRectangleBorder(
+//                    borderRadius: BorderRadius.circular(40),
+//                  ),
+//                ),
+//              ),
             ),
           ),
         ),

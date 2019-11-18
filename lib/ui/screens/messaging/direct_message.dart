@@ -83,7 +83,6 @@ class _DirectMessageScreenState extends State<DirectMessageScreen> {
           mainAxisAlignment: MainAxisAlignment.end,
           children: <Widget>[
             // Messages View
-            // TODO test
             FirebaseAnimatedList(
               reverse: true,
               shrinkWrap: true,

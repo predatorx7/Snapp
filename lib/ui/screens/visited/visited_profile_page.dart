@@ -2,6 +2,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram/commons/assets.dart';
+import 'package:instagram/commons/routing_constants.dart';
 import 'package:instagram/models/plain_models/app_notification.dart';
 import 'package:instagram/repository/ex_information.dart';
 import 'package:instagram/ui/components/profile_avatar.dart';
@@ -96,7 +97,7 @@ class _VisitedProfilePageState extends State<VisitedProfilePage>
                       padding: const EdgeInsets.all(4),
                       child: GestureDetector(
                         onTap: () {
-                          if(_data.activeStory.isNotEmpty){
+                          if (_data.activeStory.isNotEmpty) {
                             Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (context) => StoryView(
@@ -362,7 +363,10 @@ class _VisitedProfilePageState extends State<VisitedProfilePage>
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(4)),
                             onPressed: () {
-                              // Follow
+                              Navigator.of(context).pushNamed(
+                                DirectMessagePageRoute,
+                                arguments: [_observer.userUID, _data.userUID],
+                              );
                             },
                           ),
                         ),

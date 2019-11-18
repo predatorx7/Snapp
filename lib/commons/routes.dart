@@ -1,8 +1,11 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:instagram/models/view_models/direct_message.dart';
 import 'package:instagram/repository/ex_information.dart';
 import 'package:instagram/models/plain_models/profile.dart';
 import 'package:instagram/models/view_models/change_username.dart';
 import 'package:instagram/models/view_models/edit_profile.dart';
+import 'package:instagram/ui/screens/messaging/direct_message.dart';
 import 'package:instagram/ui/screens/post/comments_page.dart';
 import 'package:instagram/ui/screens/profile_pic_edit.dart';
 import 'package:instagram/ui/screens/edit_profile.dart';
@@ -124,6 +127,27 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return MaterialPageRoute(
         builder: (context) => CommentsPage(
           postData: settings.arguments,
+        ),
+      );
+    case DirectMessagePageRoute:
+      List args = settings.arguments;
+      return CupertinoPageRoute(
+        builder: (context) => MultiProvider(
+          providers: [
+            ChangeNotifierProvider<DirectMessageModel>(
+              builder: (context) =>
+                  DirectMessageModel.initialize(
+                thisUser: args[0],
+                thatUser: args[1],
+              ),
+            ),
+            ChangeNotifierProvider<ExInfoRepo>(
+              builder: (context) => ExInfoRepo(
+                args[1],
+              ),
+            ),
+          ],
+          child: DirectMessageScreen(),
         ),
       );
     default:

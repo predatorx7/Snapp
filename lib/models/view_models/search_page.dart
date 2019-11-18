@@ -15,10 +15,13 @@ class SearchModel extends Model {
     }
     this._results = {};
     notifyListeners();
-    queryPerform("username", key);
-    queryPerform("email", key);
-    queryPerform("fullName", key);
-    queryPerform("fullName", key.substring(0, 1).toUpperCase()+key.substring(1));
+    await queryPerform("username", key);
+    await queryPerform("email", key);
+    await queryPerform("fullName", key);
+    await queryPerform("fullName", key.substring(0, 1).toUpperCase()+key.substring(1)).then((x){
+      print("[Search Model] From $key Full name search 2: ${this._results}");
+    });
+    print("[Search Model] $key = ${this._results}");
   }
 
   Future<void> queryPerform(String orderBy, key) async {

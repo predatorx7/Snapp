@@ -1,4 +1,3 @@
-// View with DATA after Authenticated Login
 import 'package:camera/camera.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -84,7 +83,9 @@ class _InstagramState
                   Visibility(
                     maintainState: true,
                     visible: _pageView.viewIndex == 0,
-                    child: HomeView(),
+                    child: HomeView(
+                      pageController: _pageController,
+                    ),
                   ),
                   Visibility(
                     maintainState: true,
@@ -163,7 +164,9 @@ class _InstagramState
               },
             ),
           ),
-          MessagingPage(),
+          MessagingPage(
+            pageController: _pageController,
+          ),
         ],
       );
     });

@@ -1,5 +1,5 @@
 import 'package:firebase_database/firebase_database.dart';
-import 'package:instagram/models/plain_models/message.dart';
+import 'package:instagram/models/plain_models/message_model.dart';
 
 // TODO: test
 class MessagingService {
@@ -7,14 +7,15 @@ class MessagingService {
       FirebaseDatabase.instance.reference().child('chat');
 
   Future<bool> sendMessage(
-    Message message,
+    Message message
   ) async {
     print("[Messaging Service] Sending message");
     try {
-      String chatId = await getChatID(message.sender, message.sendee);
-      DatabaseReference key =
+      String chatId = message.chatID;
+      DatabaseReference messageRef =
           rootRef.child('messages/$chatId').push().reference();
-      await key.child(key.key).set(message.toMap());
+      message.key = messageRef.key;
+      await messageRef.set(message.toMap());
       return true;
     } catch (e) {
       return false;

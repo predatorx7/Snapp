@@ -18,6 +18,9 @@ import 'package:provider/provider.dart';
 import 'messaging/messaging.dart';
 
 class HomeView extends StatefulWidget {
+  final PageController pageController;
+
+  const HomeView({Key key, @required this.pageController}) : super(key: key);
   @override
   _HomeViewState createState() => _HomeViewState();
 }
@@ -72,12 +75,17 @@ class _HomeViewState extends State<HomeView> {
         actions: <Widget>[
           GestureDetector(
             onTap: () {
-              Navigator.push(
-                context,
-                CupertinoPageRoute(
-                  builder: (context) => MessagingPage(),
-                ),
-              );
+//              Navigator.push(
+//                context,
+//                CupertinoPageRoute(
+//                  builder: (context) => MessagingPage(
+//                    pageController: widget.pageController,
+//                  ),
+//                ),
+//              );
+              setState(() {
+                widget.pageController.animateToPage(2, duration: Duration(milliseconds: 700), curve: Curves.easeIn);
+              });
             },
             child: Stack(
               alignment: Alignment.center,
@@ -378,7 +386,11 @@ class _FeedViewState extends State<_FeedView> {
             case FeedStatus.idle:
               cfeed.fetch(_data.following);
               return Center(
-                child: Text('Wait'),
+                child: Container(
+                  height: 40,
+                  width: 40,
+                  child: icProcessIndicator(context),
+                ),
               );
             case FeedStatus.busy:
               return Center(

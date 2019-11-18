@@ -10,3 +10,4 @@ const String EditProfileRoute = 'editProfile';
 const String ChangeProfilePicRoute = 'changeProfilePic';
 const String SomeoneProfileRoute = 'someoneProfileRoute';
 const String CommentsPageRoute = 'commentPageRoute';
+const String DirectMessagePageRoute = 'directMessagePageRoute';

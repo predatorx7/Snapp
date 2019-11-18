@@ -61,6 +61,13 @@ TextStyle head2Style() => TextStyle(
       fontSize: 16,
     );
 
+TextStyle head3Style() => TextStyle(
+  fontWeight: FontWeight.w600,
+  color: notBlack,
+  fontSize: 16,
+);
+
+
 TextStyle actionTitleStyle() => TextStyle(
       fontWeight: FontWeight.normal,
       color: notBlack,
@@ -86,6 +93,7 @@ TextStyle actionTitle5Style() => TextStyle(
       color: notBlack,
       fontSize: 14,
     );
+
 InputDecoration editPageInputBorder(String label) => InputDecoration(
       labelText: label,
       alignLabelWithHint: true,

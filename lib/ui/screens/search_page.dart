@@ -20,13 +20,17 @@ class _SearchPageState extends State<SearchPage> {
   // controls the text label we use as a search bar
   TextEditingController _filter;
   FirebaseDatabase fd;
+
   @override
   void initState() {
     _filter = new TextEditingController();
     fd = FirebaseDatabase.instance;
     super.initState();
   }
-
+@override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+  }
   @override
   void dispose() {
     _filter.dispose();

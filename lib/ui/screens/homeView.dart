@@ -5,7 +5,7 @@ import 'package:instagram/commons/assets.dart';
 import 'package:instagram/commons/styles.dart';
 import 'package:instagram/core/services/profile.dart';
 import 'package:instagram/models/plain_models/feed_model.dart';
-import 'package:instagram/repository/information.dart';
+import 'package:instagram/models/plain_models/info.dart';
 import 'package:instagram/models/plain_models/story_model.dart';
 import 'package:instagram/ui/components/profile_avatar.dart';
 import 'package:instagram/ui/screens/post/feed_post_list.dart';
@@ -29,7 +29,7 @@ class _HomeViewState extends State<HomeView> {
   bool _loaded = false;
   ProfileService profileAdapter = ProfileService();
   ScrollController _scrollViewController;
-  InfoRepo _data;
+  InfoModel _data;
   @override
   void initState() {
     _scrollViewController = ScrollController();
@@ -38,7 +38,7 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   void didChangeDependencies() {
-    _data = Provider.of<InfoRepo>(context);
+    _data = Provider.of<InfoModel>(context);
     super.didChangeDependencies();
   }
 
@@ -84,7 +84,11 @@ class _HomeViewState extends State<HomeView> {
 //                ),
 //              );
               setState(() {
-                widget.pageController.animateToPage(2, duration: Duration(milliseconds: 700), curve: Curves.easeIn);
+                widget.pageController.animateToPage(
+                  2,
+                  duration: Duration(seconds: 1),
+                  curve: Curves.ease,
+                );
               });
             },
             child: Stack(
@@ -179,12 +183,12 @@ class _StoryView extends StatefulWidget {
 class _StoryViewState extends State<_StoryView> {
   bool isListNotEmpty;
   ProfileService profileAdapter = ProfileService();
-  InfoRepo _data;
+  InfoModel _data;
   List<dynamic> followList;
   StoryModel story;
   @override
   void didChangeDependencies() {
-    _data = Provider.of<InfoRepo>(context);
+    _data = Provider.of<InfoModel>(context);
     followList = _data.following;
     story = ScopedModel.of<StoryModel>(context);
     switch (story.status) {
@@ -368,11 +372,11 @@ class _FeedView extends StatefulWidget {
 class _FeedViewState extends State<_FeedView> {
   bool isListNotEmpty;
   ProfileService profileAdapter = ProfileService();
-  InfoRepo _data;
+  InfoModel _data;
   StoryModel story;
   @override
   void didChangeDependencies() {
-    _data = Provider.of<InfoRepo>(context);
+    _data = Provider.of<InfoModel>(context);
     story = ScopedModel.of<StoryModel>(context);
     super.didChangeDependencies();
   }

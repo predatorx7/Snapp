@@ -6,6 +6,7 @@ import 'package:instagram/core/services/registration_service.dart';
 
 enum Status { Uninitialized, Authenticated, Authenticating, Unauthenticated }
 
+/// This model provides notifications of authentication & registration/login APIs
 class AuthNotifier with ChangeNotifier {
   FirebaseAuth _auth = FirebaseAuth.instance;
   FirebaseUser _user;

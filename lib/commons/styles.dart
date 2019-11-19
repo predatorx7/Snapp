@@ -142,6 +142,13 @@ TextStyle body5Style() => TextStyle(
       color: notBlack,
       fontSize: 16,
     );
+InputBorder replyInputBorder({Color borderColor}) => OutlineInputBorder(
+  borderRadius: BorderRadius.circular(25),
+  borderSide: BorderSide(
+    width: 1,
+    color: borderColor ?? Colors.grey[350],
+  ),
+);
 InputBorder fieldInputBorder({Color borderColor}) => OutlineInputBorder(
       borderRadius: BorderRadius.circular(5),
       borderSide: BorderSide(

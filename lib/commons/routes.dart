@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram/models/view_models/direct_message.dart';
-import 'package:instagram/repository/ex_information.dart';
-import 'package:instagram/models/plain_models/profile.dart';
+import 'package:instagram/models/plain_models/visited_info.dart';
+import 'package:instagram/repository/profile.dart';
 import 'package:instagram/models/view_models/change_username.dart';
 import 'package:instagram/models/view_models/edit_profile.dart';
 import 'package:instagram/ui/screens/messaging/direct_message.dart';
@@ -16,7 +16,7 @@ import '../models/view_models/login_page.dart';
 import '../models/view_models/message_notification.dart';
 import '../models/view_models/signup_page.dart';
 import '../ui/screens/instagram.dart';
-import '../ui/screens/login.dart';
+import '../ui/screens/login/login.dart';
 import '../ui/screens/profile_page.dart';
 import '../ui/screens/registeration/signup_page.dart';
 import '../ui/screens/post/post_upload.dart';
@@ -118,8 +118,8 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case SomeoneProfileRoute:
       Profile x = settings.arguments;
       return MaterialPageRoute(
-        builder: (context) => ChangeNotifierProvider<ExInfoRepo>(
-          builder: (context) => ExInfoRepo.setInfo(x),
+        builder: (context) => ChangeNotifierProvider<VisitedInfoModel>(
+          builder: (context) => VisitedInfoModel.setInfo(x),
           child: VisitedProfilePage(),
         ),
       );
@@ -141,8 +141,8 @@ Route<dynamic> generateRoute(RouteSettings settings) {
                 thatUser: args[1],
               ),
             ),
-            ChangeNotifierProvider<ExInfoRepo>(
-              builder: (context) => ExInfoRepo(
+            ChangeNotifierProvider<VisitedInfoModel>(
+              builder: (context) => VisitedInfoModel(
                 args[1],
               ),
             ),

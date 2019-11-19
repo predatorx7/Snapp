@@ -5,6 +5,7 @@ enum MStatus {
   fruitful,
   none,
   busy,
+  searchMode,
 }
 
 class MessageAll extends Model {

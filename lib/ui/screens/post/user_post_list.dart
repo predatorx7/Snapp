@@ -3,8 +3,9 @@ import 'package:instagram/commons/assets.dart';
 import 'package:instagram/commons/routing_constants.dart';
 import 'package:instagram/commons/styles.dart';
 import 'package:instagram/core/services/posts.dart';
-import 'package:instagram/repository/information.dart';
-import 'package:instagram/models/plain_models/post.dart';
+import 'package:instagram/models/plain_models/info.dart';
+import 'package:instagram/repository/post.dart';
+import 'package:instagram/ui/components/bottom_sheet_share.dart';
 import 'package:outline_material_icons/outline_material_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:scoped_model/scoped_model.dart';
@@ -20,7 +21,7 @@ class PostsList extends StatefulWidget {
 class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
   String uid;
   double heartSize = 100;
-  InfoRepo _data;
+  InfoModel _data;
   @override
   void initState() {
     super.initState();
@@ -28,7 +29,7 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
 
   @override
   void didChangeDependencies() {
-    _data = Provider.of<InfoRepo>(context);
+    _data = Provider.of<InfoModel>(context);
     super.didChangeDependencies();
   }
 
@@ -267,8 +268,9 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
                               ),
                             ),
                             GestureDetector(
-                              onTap: () {
+                              onTap: () async {
                                 print('pressed send');
+                                await directShare(context, _data, metadata);
                               },
                               child: Padding(
                                 padding: const EdgeInsets.all(6),

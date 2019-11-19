@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:instagram/models/plain_models/comments.dart';
+import 'package:instagram/repository/comments.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class CommentPageModel extends Model{

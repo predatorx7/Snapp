@@ -8,7 +8,7 @@ import 'package:instagram/core/utils/transactions.dart';
 import 'package:instagram/ui/components/process_indicator.dart';
 import 'package:instagram/ui/components/profile_avatar.dart';
 import 'package:provider/provider.dart';
-import '../../../repository/information.dart';
+import '../../../models/plain_models/info.dart';
 import '../../../core/services/posts.dart';
 import '../../components/buttons.dart';
 
@@ -202,7 +202,7 @@ class _UploadMediaState extends State<UploadMedia> {
   TextEditingController captionController;
   bool _isLoading = false;
   FocusNode captionFocus;
-  InfoRepo thisUser;
+  InfoModel thisUser;
   @override
   void initState() {
     captionFocus = FocusNode();
@@ -212,7 +212,7 @@ class _UploadMediaState extends State<UploadMedia> {
 
   @override
   void didChangeDependencies() {
-    thisUser = Provider.of<InfoRepo>(context);
+    thisUser = Provider.of<InfoModel>(context);
     super.didChangeDependencies();
   }
 
@@ -225,7 +225,7 @@ class _UploadMediaState extends State<UploadMedia> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<InfoRepo>(builder: (context, _info, child) {
+    return Consumer<InfoModel>(builder: (context, _info, child) {
       return Scaffold(
         appBar: AppBar(
           title: Text(
@@ -248,17 +248,6 @@ class _UploadMediaState extends State<UploadMedia> {
                             barrierDismissible: false,
                             context: context,
                             builder: (BuildContext context) {
-//                                  if(!transact.isLocked){
-//                                    int key = transact.acquireLock();
-//                                    uploadFile(widget.imageFile, _info.userUID,
-//                                        captionController.text, _info.profile.username)
-//                                        .then((answer) {
-//                                      thisUser.refreshPosts();
-//                                      Navigator.popUntil(
-//                                          context, ModalRoute.withName('/'));
-//                                    });
-//                                    transact.releaseLock(key);
-//                                  }
                               transact.perform(() {
                                 uploadFile(
                                         widget.imageFile,

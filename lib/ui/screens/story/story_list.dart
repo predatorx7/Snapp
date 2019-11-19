@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:instagram/repository/information.dart';
-import 'package:instagram/models/plain_models/story.dart';
+import 'package:instagram/models/plain_models/info.dart';
+import 'package:instagram/repository/story.dart';
 import 'package:instagram/models/plain_models/story_model.dart';
 import 'package:provider/provider.dart';
 import 'package:scoped_model/scoped_model.dart';
@@ -15,11 +15,11 @@ class StoryList extends StatefulWidget {
 class _StoryListState extends State<StoryList>
     with TickerProviderStateMixin {
   StoryModel cFeed;
-  InfoRepo _observer;
+  InfoModel _observer;
   @override
   void didChangeDependencies() {
     cFeed = ScopedModel.of<StoryModel>(context);
-    _observer = Provider.of<InfoRepo>(context);
+    _observer = Provider.of<InfoModel>(context);
     super.didChangeDependencies();
   }
 

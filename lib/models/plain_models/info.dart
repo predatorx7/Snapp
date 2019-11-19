@@ -2,11 +2,13 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram/core/services/profile.dart';
 import 'package:instagram/core/utils/Adapt_widget.dart';
-import 'package:instagram/models/plain_models/post.dart';
-import 'package:instagram/models/plain_models/story.dart';
-import '../models/plain_models/profile.dart';
+import 'package:instagram/repository/post.dart';
+import 'package:instagram/repository/story.dart';
+import '../../repository/profile.dart';
 
-class InfoRepo with ChangeNotifier {
+/// InfoModel provides APIs to handle app-wide & online data related to user.
+/// Should be used to handle data of user of this device's repository.
+class InfoModel with ChangeNotifier {
   double _heightOfFlexSpace;
   // UID of user
   String userUID = "";
@@ -22,11 +24,11 @@ class InfoRepo with ChangeNotifier {
 
   Adapt _flexibleSpaceHeight = Adapt(size: 270);
   Profile get info => _profile;
-  InfoRepo(this.userUID) {
+  InfoModel(this.userUID) {
     refreshAll();
     _heightOfFlexSpace = _flexibleSpaceHeight.withText(text: _profile.bio);
   }
-  InfoRepo.setInfo(Profile information) {
+  InfoModel.setInfo(Profile information) {
     this._profile = information;
     this.userUID = this._profile.uid;
     refreshPosts();

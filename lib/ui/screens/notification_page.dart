@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:instagram/commons/routing_constants.dart';
 import 'package:instagram/core/services/profile.dart';
 import 'package:instagram/models/plain_models/app_notification.dart';
-import 'package:instagram/repository/information.dart';
-import 'package:instagram/models/plain_models/profile.dart';
+import 'package:instagram/models/plain_models/info.dart';
+import 'package:instagram/repository/profile.dart';
 import 'package:instagram/models/view_models/notification_page.dart';
 import 'package:instagram/ui/components/profile_avatar.dart';
 import 'package:provider/provider.dart';
@@ -18,10 +18,10 @@ class NotificationsPage extends StatefulWidget {
 }
 
 class _NotificationsPageState extends State<NotificationsPage> {
-  InfoRepo data;
+  InfoModel data;
   @override
   void didChangeDependencies() {
-    data = Provider.of<InfoRepo>(context, listen: false);
+    data = Provider.of<InfoModel>(context, listen: false);
     super.didChangeDependencies();
   }
 

@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import '../utils/namegen.dart';
-import '../../models/plain_models/profile.dart';
+import '../../repository/profile.dart';
 
 /// Provides CRUD operations with profile info in database
 class ProfileService {

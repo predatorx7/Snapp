@@ -1,8 +1,17 @@
 import 'package:flutter/foundation.dart';
 
 // Todo: test
-enum ContentType { message, post, profile, story }
+enum ContentType {
+  message,
+  post,
+  profile,
+  story,
+  image,
+  // Not yet supported
+  giphy,
+}
 
+/// Holds a single message data
 class Message {
   /// Message's Unique key
   String key;
@@ -50,6 +59,8 @@ class Message {
       this.type = ContentType.profile;
     } else if (_type == ContentType.story.toString()) {
       this.type = ContentType.story;
+    } else if (_type == ContentType.image.toString()) {
+      this.type = ContentType.image;
     }
   }
 

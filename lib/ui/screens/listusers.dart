@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:instagram/commons/routing_constants.dart';
 import 'package:instagram/commons/styles.dart';
-import 'package:instagram/repository/information.dart';
-import 'package:instagram/models/plain_models/profile.dart';
+import 'package:instagram/models/plain_models/info.dart';
+import 'package:instagram/repository/profile.dart';
 import 'package:instagram/ui/components/profile_avatar.dart';
 import 'package:provider/provider.dart';
 
@@ -15,10 +15,10 @@ class ListUsers extends StatefulWidget {
 }
 
 class _ListUsersState extends State<ListUsers> {
-  InfoRepo observer;
+  InfoModel observer;
   @override
   void didChangeDependencies() {
-    observer = Provider.of<InfoRepo>(context);
+    observer = Provider.of<InfoModel>(context);
     super.didChangeDependencies();
   }
   @override

@@ -5,8 +5,8 @@ import 'package:instagram/commons/routing_constants.dart';
 import 'package:instagram/commons/styles.dart';
 import 'package:instagram/core/services/profile.dart';
 import 'package:instagram/core/utils/namegen.dart';
-import 'package:instagram/repository/information.dart';
-import 'package:instagram/models/plain_models/profile.dart';
+import 'package:instagram/models/plain_models/info.dart';
+import 'package:instagram/repository/profile.dart';
 import 'package:instagram/models/view_models/edit_profile.dart';
 import 'package:instagram/ui/components/process_indicator.dart';
 import 'package:instagram/ui/components/profile_avatar.dart';
@@ -28,7 +28,7 @@ class _EditProfileState extends State<EditProfile> {
       bioController,
       emailController,
       genderController;
-  InfoRepo info;
+  InfoModel info;
   EditProfileModel view;
   @override
   void initState() {
@@ -43,7 +43,7 @@ class _EditProfileState extends State<EditProfile> {
   @override
   void didChangeDependencies() {
     if (!loaded) {
-      info = Provider.of<InfoRepo>(context);
+      info = Provider.of<InfoModel>(context);
       view = Provider.of<EditProfileModel>(context);
       nameController.text = info.info.fullName;
       usernameController.text = info.info.username;

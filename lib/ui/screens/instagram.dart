@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:instagram/commons/assets.dart';
 import 'package:instagram/commons/routing_constants.dart';
 import 'package:instagram/models/view_models/message_all.dart';
-import 'package:instagram/repository/information.dart';
+import 'package:instagram/models/plain_models/info.dart';
 import 'package:instagram/models/view_models/instagram.dart';
 import 'package:instagram/models/view_models/notification_page.dart';
 import 'package:instagram/ui/components/bottom_navbar.dart';
@@ -29,7 +29,7 @@ class Instagram extends StatefulWidget {
 
 class _InstagramState
     extends State<Instagram>{
-  InfoRepo data;
+  InfoModel data;
   PageController _pageController;
 
   @override
@@ -40,7 +40,7 @@ class _InstagramState
 
   @override
   void didChangeDependencies() {
-    data = Provider.of<InfoRepo>(context);
+    data = Provider.of<InfoModel>(context);
     super.didChangeDependencies();
   }
 

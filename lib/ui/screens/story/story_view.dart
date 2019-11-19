@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:instagram/commons/styles.dart';
-import 'package:instagram/models/plain_models/story.dart';
+import 'package:instagram/repository/story.dart';
 import 'package:instagram/ui/components/profile_avatar.dart';
 import 'package:timeago/timeago.dart' as timeago;
 

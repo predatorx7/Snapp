@@ -4,10 +4,11 @@ import 'package:instagram/commons/routing_constants.dart';
 import 'package:instagram/commons/styles.dart';
 import 'package:instagram/core/services/posts.dart';
 import 'package:instagram/models/plain_models/app_notification.dart';
-import 'package:instagram/models/plain_models/profile.dart';
-import 'package:instagram/repository/ex_information.dart';
-import 'package:instagram/repository/information.dart';
-import 'package:instagram/models/plain_models/post.dart';
+import 'package:instagram/repository/profile.dart';
+import 'package:instagram/models/plain_models/visited_info.dart';
+import 'package:instagram/models/plain_models/info.dart';
+import 'package:instagram/repository/post.dart';
+import 'package:instagram/ui/components/bottom_sheet_share.dart';
 import 'package:outline_material_icons/outline_material_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:scoped_model/scoped_model.dart';
@@ -24,14 +25,14 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
   String uid;
   List postList;
   double heartSize = 100;
-  ExInfoRepo _data;
-  InfoRepo _observer;
+  VisitedInfoModel _data;
+  InfoModel _observer;
   bool firstTime = true;
 
   @override
   void didChangeDependencies() {
-    _data = Provider.of<ExInfoRepo>(context);
-    _observer = Provider.of<InfoRepo>(context, listen: false);
+    _data = Provider.of<VisitedInfoModel>(context);
+    _observer = Provider.of<InfoModel>(context, listen: false);
     if (firstTime) {
       _data.setInfoSilently(_data.info);
       firstTime = false;
@@ -64,18 +65,16 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
             child: Column(
               children: <Widget>[
                 Padding(
-                  padding:
-                  const EdgeInsets.only(left: 6, top: 4, bottom: 4),
+                  padding: const EdgeInsets.only(left: 6, top: 4, bottom: 4),
                   child: Row(
                     children: <Widget>[
                       CircleAvatar(
                         radius: 18,
                         backgroundColor: Colors.grey[200],
-                        backgroundImage:
-                        _data.info.profileImage.isNotEmpty
+                        backgroundImage: _data.info.profileImage.isNotEmpty
                             ? Image.network(
-                          _data.info.profileImage,
-                        ).image
+                                _data.info.profileImage,
+                              ).image
                             : null,
                         child: Visibility(
                           visible: _data.info.profileImage.isEmpty,
@@ -104,8 +103,7 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
                             builder: (BuildContext context) {
                               return Dialog(
                                 shape: RoundedRectangleBorder(
-                                    borderRadius:
-                                    BorderRadius.circular(4)),
+                                    borderRadius: BorderRadius.circular(4)),
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: <Widget>[
@@ -120,8 +118,7 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
                                     ),
                                     ListTile(
                                       onTap: () async {
-                                        await _data
-                                            .doUnFollow(_observer.info);
+                                        await _data.doUnFollow(_observer.info);
                                         Navigator.maybePop(context);
                                       },
                                       title: Text(
@@ -145,8 +142,7 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
                             },
                           );
                         },
-                        icon:
-                        Icon(Icons.more_vert, color: Colors.black),
+                        icon: Icon(Icons.more_vert, color: Colors.black),
                       ),
                     ],
                   ),
@@ -154,105 +150,99 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
                 Expanded(
                   child: ScopedModelDescendant<PostsListModel>(
                       builder: (context, _, view) {
-                        view.setliked(
-                            metadata.likes.contains(_observer.info.uid));
-                        return GestureDetector(
-                          onDoubleTap: () async {
-                            // Toggle heart animation
-                            view.doAnimation();
-                            if (!view.liked) {
-                              await PostService.doLike(
-                                  _observer.info, metadata);
-                              await AppNotification.notify(
-                                AppNotification(
-                                  notifyTo: metadata.publisher,
-                                  notificationFrom: _observer.info.uid,
-                                  event: OnEvent.likedPost,
-                                  postKey: metadata.postKey,
-                                ),
-                              );
-                              metadata.likes.add(_observer.info.uid);
-                            }
-                          },
-                          child: Stack(
-                            children: <Widget>[
-                              GridTile(
-                                child: Container(
-                                  color: Colors.grey[200],
-                                  child: Image.network(
-                                    metadata.imageURL,
-                                    loadingBuilder: (BuildContext context,
-                                        Widget child,
-                                        ImageChunkEvent loadingProgress) {
-                                      if (loadingProgress == null)
-                                        return child;
-                                      return Center(
-                                        child: Theme(
-                                          data: Theme.of(context).copyWith(
-                                            accentColor: Colors.grey[300],
-                                            primaryColor: Colors.grey,
-                                          ),
-                                          child: SizedBox(
-                                            height: 28,
-                                            width: 28,
-                                            child:
-                                            new CircularProgressIndicator(
-                                              value: loadingProgress
-                                                  .expectedTotalBytes !=
+                    view.setliked(metadata.likes.contains(_observer.info.uid));
+                    return GestureDetector(
+                      onDoubleTap: () async {
+                        // Toggle heart animation
+                        view.doAnimation();
+                        if (!view.liked) {
+                          await PostService.doLike(_observer.info, metadata);
+                          await AppNotification.notify(
+                            AppNotification(
+                              notifyTo: metadata.publisher,
+                              notificationFrom: _observer.info.uid,
+                              event: OnEvent.likedPost,
+                              postKey: metadata.postKey,
+                            ),
+                          );
+                          metadata.likes.add(_observer.info.uid);
+                        }
+                      },
+                      child: Stack(
+                        children: <Widget>[
+                          GridTile(
+                            child: Container(
+                              color: Colors.grey[200],
+                              child: Image.network(
+                                metadata.imageURL,
+                                loadingBuilder: (BuildContext context,
+                                    Widget child,
+                                    ImageChunkEvent loadingProgress) {
+                                  if (loadingProgress == null) return child;
+                                  return Center(
+                                    child: Theme(
+                                      data: Theme.of(context).copyWith(
+                                        accentColor: Colors.grey[300],
+                                        primaryColor: Colors.grey,
+                                      ),
+                                      child: SizedBox(
+                                        height: 28,
+                                        width: 28,
+                                        child: new CircularProgressIndicator(
+                                          value: loadingProgress
+                                                      .expectedTotalBytes !=
                                                   null
-                                                  ? loadingProgress
-                                                  .cumulativeBytesLoaded /
+                                              ? loadingProgress
+                                                      .cumulativeBytesLoaded /
                                                   loadingProgress
                                                       .expectedTotalBytes
-                                                  : null,
-                                              strokeWidth: 2,
-                                            ),
-                                          ),
+                                              : null,
+                                          strokeWidth: 2,
                                         ),
-                                      );
-                                    },
-                                    height: widget.height,
-                                    width: widget.height,
-                                    fit: BoxFit.fitWidth,
-                                  ),
-                                ),
-                              ),
-                              Builder(
-                                builder: (context) {
-                                  switch (view.showHeart) {
-                                    case true:
-                                      return Opacity(
-                                        opacity: 0.5,
-                                        child: AnimatedSize(
-                                          vsync: this,
-                                          alignment: Alignment.center,
-                                          curve: Curves.easeIn,
-                                          duration: new Duration(
-                                              milliseconds: 900),
-                                          child: Align(
-                                            child: Icon(
-                                              Icons.favorite,
-                                              color: Colors.grey[300],
-                                              size: view.size,
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                      break;
-                                    default:
-                                      return SizedBox();
-                                  }
+                                      ),
+                                    ),
+                                  );
                                 },
+                                height: widget.height,
+                                width: widget.height,
+                                fit: BoxFit.fitWidth,
                               ),
-                            ],
+                            ),
                           ),
-                        );
-                      }),
+                          Builder(
+                            builder: (context) {
+                              switch (view.showHeart) {
+                                case true:
+                                  return Opacity(
+                                    opacity: 0.5,
+                                    child: AnimatedSize(
+                                      vsync: this,
+                                      alignment: Alignment.center,
+                                      curve: Curves.easeIn,
+                                      duration: new Duration(milliseconds: 900),
+                                      child: Align(
+                                        child: Icon(
+                                          Icons.favorite,
+                                          color: Colors.grey[300],
+                                          size: view.size,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                  break;
+                                default:
+                                  return SizedBox();
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
                 ),
                 ScopedModelDescendant<PostsListModel>(
                   builder: (context, _, view) {
-                    view.setliked(
-                        metadata.likes.contains(_observer.info.uid));
+                    view.setliked(metadata.likes.contains(_observer.info.uid));
                     return Column(
                       children: <Widget>[
                         Row(
@@ -266,20 +256,17 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
                                   await AppNotification.notify(
                                     AppNotification(
                                       notifyTo: metadata.publisher,
-                                      notificationFrom:
-                                      _observer.info.uid,
+                                      notificationFrom: _observer.info.uid,
                                       event: OnEvent.likedPost,
                                       postKey: metadata.postKey,
                                     ),
                                   );
-                                  metadata.likes
-                                      .add(_observer.info.uid);
+                                  metadata.likes.add(_observer.info.uid);
                                 } else {
                                   view.setliked(false);
                                   await PostService.unLike(
                                       _observer.info, metadata);
-                                  metadata.likes
-                                      .remove(_observer.info.uid);
+                                  metadata.likes.remove(_observer.info.uid);
                                 }
                               },
                               child: Padding(
@@ -289,8 +276,7 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
                                   child: AnimatedContainer(
                                     alignment: Alignment.center,
                                     curve: Curves.easeIn,
-                                    duration:
-                                    new Duration(milliseconds: 900),
+                                    duration: new Duration(milliseconds: 900),
                                     child: Icon(
                                       Icons.favorite,
                                       color: Colors.red[400],
@@ -319,15 +305,14 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
                               ),
                             ),
                             GestureDetector(
-                              onTap: () {
+                              onTap: () async {
                                 print('pressed send');
+                                await directShare(context, _observer, metadata);
                               },
                               child: Padding(
-                                padding: const EdgeInsets.fromLTRB(
-                                    6, 4, 6, 6),
+                                padding: const EdgeInsets.fromLTRB(6, 4, 6, 6),
                                 child: RotationTransition(
-                                  turns: new AlwaysStoppedAnimation(
-                                      -45 / 360),
+                                  turns: new AlwaysStoppedAnimation(-45 / 360),
                                   child: new Icon(
                                     OMIcons.send,
                                     size: 28,
@@ -342,8 +327,8 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
                             Padding(
                               padding: const EdgeInsets.only(top: 2),
                               child: Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 12, right: 4.0),
+                                padding:
+                                    const EdgeInsets.only(left: 12, right: 4.0),
                                 child: Text(
                                   '${metadata.likes.length} likes',
                                   style: TextStyle(
@@ -357,13 +342,12 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
                           ],
                         ),
                         Padding(
-                          padding:
-                          const EdgeInsets.only(top: 2, bottom: 12),
+                          padding: const EdgeInsets.only(top: 2, bottom: 12),
                           child: Row(
                             children: <Widget>[
                               Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 12, right: 4.0),
+                                padding:
+                                    const EdgeInsets.only(left: 12, right: 4.0),
                                 child: Text(
                                   metadata.publisherUsername,
                                   style: bodyStyle(),

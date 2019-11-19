@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:instagram/commons/styles.dart';
 import 'package:instagram/core/services/profile.dart';
-import 'package:instagram/repository/information.dart';
+import 'package:instagram/models/plain_models/info.dart';
 import 'package:instagram/ui/components/buttons.dart';
 import 'package:instagram/ui/components/process_indicator.dart';
 import 'package:provider/provider.dart';
@@ -19,7 +19,7 @@ class ProfilePicEditPage extends StatefulWidget {
 class _ProfilePicEditPageState extends State<ProfilePicEditPage> {
   File _image;
   int _buttonIndex = 0;
-  InfoRepo info;
+  InfoModel info;
   @override
   initState() {
     super.initState();
@@ -27,7 +27,7 @@ class _ProfilePicEditPageState extends State<ProfilePicEditPage> {
 
   @override
   void didChangeDependencies() {
-    info = Provider.of<InfoRepo>(context);
+    info = Provider.of<InfoModel>(context);
     super.didChangeDependencies();
   }
 

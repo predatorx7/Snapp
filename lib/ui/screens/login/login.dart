@@ -3,10 +3,10 @@ import 'package:flutter/widgets.dart';
 import 'package:instagram/commons/assets.dart';
 import 'package:instagram/commons/routing_constants.dart';
 import 'package:instagram/models/view_models/login_page.dart';
-import 'package:instagram/ui/screens/login_help.dart';
-import '../../commons/styles.dart';
-import '../../models/plain_models/auth.dart';
-import '../components/buttons.dart';
+import 'package:instagram/ui/screens/login/login_help.dart';
+import '../../../commons/styles.dart';
+import '../../../models/plain_models/auth.dart';
+import '../../components/buttons.dart';
 import 'package:provider/provider.dart';
 
 class LoginPage extends StatefulWidget {

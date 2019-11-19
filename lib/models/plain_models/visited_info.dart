@@ -1,14 +1,16 @@
 import 'package:firebase_database/firebase_database.dart';
-import 'package:instagram/repository/information.dart';
-import '../models/plain_models/profile.dart';
+import 'package:instagram/models/plain_models/info.dart';
+import '../../repository/profile.dart';
 
-class ExInfoRepo extends InfoRepo {
+/// VisitedInfoModel provides APIs to handle app-wide & online data related to user.
+/// Should be used to handle data of other user's repository.
+class VisitedInfoModel extends InfoModel {
   bool _observerFollows = false;
   bool _isBusy = false;
 
-  ExInfoRepo(String userUID) : super(userUID);
+  VisitedInfoModel(String userUID) : super(userUID);
 
-  ExInfoRepo.setInfo(Profile information) : super.setInfo(information);
+  VisitedInfoModel.setInfo(Profile information) : super.setInfo(information);
 
   bool get isBusy => _isBusy;
 

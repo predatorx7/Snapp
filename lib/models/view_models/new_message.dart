@@ -1,17 +1,20 @@
 import 'package:flutter/foundation.dart';
 
+
 enum Status {
+  fruitful,
+  // When showing suggestions
   idle,
   busy,
-  hasResults,
-  none
+  searchMode,
 }
+
 class NewMessageModel extends ChangeNotifier {
   Status _status = Status.idle;
 
   Status get status => _status;
 
-  set status(Status status) {
+  setStatus(Status status) {
     _status = status;
     notifyListeners();
   }

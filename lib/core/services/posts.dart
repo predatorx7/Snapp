@@ -4,9 +4,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'profile.dart';
-import '../../models/plain_models/post.dart';
+import '../../repository/post.dart';
 
-import '../../models/plain_models/profile.dart';
+import '../../repository/profile.dart';
 
 /// Provides CRUD operations with post info in database
 class PostService {
@@ -77,6 +77,7 @@ class PostService {
     if (dSnap.value != null) {
       print('[Post Service] Retrieved post: ${dSnap.value.toString()}');
     }
+    post = Post.createFromMap(dSnap.value, postKey);
     return post;
   }
 

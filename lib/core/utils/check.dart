@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
-import 'package:instagram/models/plain_models/profile.dart';
+import 'package:instagram/repository/profile.dart';
 
 Future<String> doesIdExists({@required String text}) async {
   print('Checking if $text exists in app database');

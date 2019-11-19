@@ -1,5 +1,5 @@
 import 'package:firebase_database/firebase_database.dart';
-import 'package:instagram/models/plain_models/message_model.dart';
+import 'package:instagram/repository/message.dart';
 
 // TODO: test
 class MessagingService {

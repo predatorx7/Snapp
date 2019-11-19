@@ -1,6 +1,6 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:instagram/models/plain_models/post.dart';
+import 'package:instagram/repository/post.dart';
 import 'package:instagram/ui/screens/visited/visited_post.dart';
 
 class PostAdapters extends StatelessWidget {

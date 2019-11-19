@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import '../../../core/services/profile.dart';
 import '../../../core/utils/namegen.dart';
 import '../../components/buttons.dart';
-import '../../../models/plain_models/profile.dart';
+import '../../../repository/profile.dart';
 import '../../../core/utils/validators.dart';
 
 class ChangeUsername extends StatefulWidget {

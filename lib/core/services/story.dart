@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'profile.dart';
-import '../../models/plain_models/profile.dart';
-import '../../models/plain_models/story.dart';
+import '../../repository/profile.dart';
+import '../../repository/story.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 /// Provides CRUD operations with story info in database

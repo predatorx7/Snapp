@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:instagram/commons/assets.dart';
 import 'package:instagram/commons/routing_constants.dart';
 import 'package:instagram/models/plain_models/app_notification.dart';
-import 'package:instagram/repository/ex_information.dart';
+import 'package:instagram/models/plain_models/visited_info.dart';
 import 'package:instagram/ui/components/profile_avatar.dart';
 import 'package:instagram/ui/screens/story/story_view.dart';
 import '../listusers.dart';
@@ -13,8 +13,8 @@ import 'package:provider/provider.dart';
 import '../../../core/adapters/posts.dart';
 import '../../../commons/styles.dart';
 import '../../../core/services/profile.dart';
-import '../../../repository/information.dart';
-import '../../../models/plain_models/profile.dart';
+import '../../../models/plain_models/info.dart';
+import '../../../repository/profile.dart';
 
 class VisitedProfilePage extends StatefulWidget {
   // Profile of this page's owner
@@ -30,8 +30,8 @@ class _VisitedProfilePageState extends State<VisitedProfilePage>
   bool gridView = true;
   String url;
   bool firstTime = true;
-  ExInfoRepo _data;
-  InfoRepo _observer;
+  VisitedInfoModel _data;
+  InfoModel _observer;
   TabController _tabController;
   ScrollController _scrollViewController;
   TextStyle stateful = TextStyle(fontWeight: FontWeight.bold, fontSize: 16);
@@ -48,8 +48,8 @@ class _VisitedProfilePageState extends State<VisitedProfilePage>
 
   @override
   void didChangeDependencies() {
-    _data = Provider.of<ExInfoRepo>(context);
-    _observer = Provider.of<InfoRepo>(context, listen: false);
+    _data = Provider.of<VisitedInfoModel>(context);
+    _observer = Provider.of<InfoModel>(context, listen: false);
     Future.delayed(
       Duration(seconds: 0),
       () {

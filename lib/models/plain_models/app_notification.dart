@@ -5,10 +5,10 @@ enum OnEvent {
   unFollowed,
   startedFollowing,
   likedPost,
-  // Not supported
+  // Not yet supported
   commentedOnYour,
-  // Not supported
-  commentedOnThis
+  // Not yet supported
+  commentedOnThis,
 }
 
 class AppNotification {

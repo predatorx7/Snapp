@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:instagram/models/plain_models/profile.dart';
+import 'package:instagram/repository/profile.dart';
 
 class EditProfileModel extends ChangeNotifier {
   Profile _information;

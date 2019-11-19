@@ -1,5 +1,5 @@
 import 'package:firebase_database/firebase_database.dart';
-import '../../models/plain_models/comments.dart';
+import '../../repository/comments.dart';
 
 /// Provides CRUD operations with comment info in database
 class CommentService {

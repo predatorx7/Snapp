@@ -5,9 +5,10 @@ import 'package:instagram/core/services/posts.dart';
 import 'package:instagram/core/services/profile.dart';
 import 'package:instagram/models/plain_models/app_notification.dart';
 import 'package:instagram/models/plain_models/feed_model.dart';
-import 'package:instagram/models/plain_models/profile.dart';
-import 'package:instagram/repository/information.dart';
-import 'package:instagram/models/plain_models/post.dart';
+import 'package:instagram/repository/profile.dart';
+import 'package:instagram/models/plain_models/info.dart';
+import 'package:instagram/repository/post.dart';
+import 'package:instagram/ui/components/bottom_sheet_share.dart';
 import 'package:instagram/ui/components/profile_avatar.dart';
 import 'package:outline_material_icons/outline_material_icons.dart';
 import 'package:provider/provider.dart';
@@ -23,11 +24,11 @@ class FeedPostList extends StatefulWidget {
 class _FeedPostListState extends State<FeedPostList>
     with TickerProviderStateMixin {
   FeedModel cFeed;
-  InfoRepo _observer;
+  InfoModel _observer;
   @override
   void didChangeDependencies() {
     cFeed = ScopedModel.of<FeedModel>(context);
-    _observer = Provider.of<InfoRepo>(context);
+    _observer = Provider.of<InfoModel>(context);
     super.didChangeDependencies();
   }
 
@@ -294,8 +295,9 @@ class _FeedPostListState extends State<FeedPostList>
                               ),
                             ),
                             GestureDetector(
-                              onTap: () {
+                              onTap: () async {
                                 print('pressed send');
+                                await directShare(context, _observer, metadata);
                               },
                               child: Padding(
                                 padding: const EdgeInsets.all(6.0),

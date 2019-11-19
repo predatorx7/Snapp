@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:instagram/commons/styles.dart';
 
 class ICFlatButton extends StatefulWidget {
   final void Function() onPressed;
@@ -45,6 +46,62 @@ class _ICFlatButtonState extends State<ICFlatButton> {
         borderRadius: BorderRadius.circular(4.0),
       ),
       onPressed: widget.onPressed,
+    );
+  }
+}
+
+class ICSendButton extends StatefulWidget {
+  final void Function() onPressed;
+
+  ICSendButton({
+    @required this.onPressed,
+  });
+
+  @override
+  _ICSendButtonState createState() => _ICSendButtonState();
+}
+
+class _ICSendButtonState extends State<ICSendButton> {
+  bool sent = false;
+  @override
+  Widget build(BuildContext context) {
+    return FlatButton(
+      color: sent ? Colors.white : Color(0xff3897f0),
+      disabledColor: Color(0x553897f0),
+      disabledTextColor: Colors.white,
+      textColor: sent ? Colors.green : Colors.white,
+      child: sent
+          ? Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Text(
+                  'Sent',
+                  style: TextStyle(color: Colors.green, fontSize: 14),
+                ),
+                SizedBox(
+                  width: 5,
+                ),
+                Icon(
+                  Icons.done,
+                  color: Colors.green,
+                )
+              ],
+            )
+          : Text(
+              'Send',
+              style: TextStyle(fontSize: 14),
+            ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(4.0),
+      ),
+      onPressed: () {
+        if (!sent) {
+          widget.onPressed();
+          setState(() {
+            sent = true;
+          });
+        }
+      },
     );
   }
 }

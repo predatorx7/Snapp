@@ -14,8 +14,8 @@ import '../../core/adapters/posts.dart';
 import '../../commons/styles.dart';
 import '../../core/services/profile.dart';
 import '../../models/plain_models/auth.dart';
-import '../../repository/information.dart';
-import '../../models/plain_models/profile.dart';
+import '../../models/plain_models/info.dart';
+import '../../repository/profile.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key key}) : super(key: key);
@@ -30,7 +30,7 @@ class _ProfilePageState extends State<ProfilePage>
   bool gridView = true;
   String url;
   bool firstTime = true;
-  InfoRepo _data;
+  InfoModel _data;
   TabController _tabController;
   ScrollController _scrollViewController;
   TextStyle stateful = TextStyle(fontWeight: FontWeight.bold, fontSize: 16);
@@ -46,7 +46,7 @@ class _ProfilePageState extends State<ProfilePage>
 
   @override
   void didChangeDependencies() {
-    _data = Provider.of<InfoRepo>(context);
+    _data = Provider.of<InfoModel>(context);
     super.didChangeDependencies();
   }
 

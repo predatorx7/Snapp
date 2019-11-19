@@ -2,7 +2,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/widgets.dart';
 import 'package:instagram/core/services/messaging.dart';
 import 'package:instagram/core/services/profile.dart';
-import 'package:instagram/models/plain_models/profile.dart';
+import 'package:instagram/repository/profile.dart';
 
 enum Status { idle, busy, sending, loading, error }
 

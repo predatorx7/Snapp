@@ -7,12 +7,12 @@ import 'package:instagram/commons/styles.dart';
 import 'package:instagram/core/utils/transactions.dart';
 import 'package:instagram/models/view_models/signup_page.dart';
 import 'package:instagram/ui/screens/instagram.dart';
-import 'package:instagram/ui/screens/login.dart';
+import 'package:instagram/ui/screens/login/login.dart';
 import 'package:provider/provider.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'models/plain_models/auth.dart';
 import 'models/view_models/instagram.dart';
-import 'repository/information.dart';
+import 'models/plain_models/info.dart';
 import 'models/view_models/login_page.dart';
 
 void main() {
@@ -50,14 +50,14 @@ class Root extends StatelessWidget {
         builder: (context, AuthNotifier userAuth, _) {
           if (userAuth.status == Status.Authenticated) {
             return ChangeNotifierProvider(
-              builder: (context) => InfoRepo(userAuth.user.uid),
+              builder: (context) => InfoModel(userAuth.user.uid),
               child: MaterialApp(
                 theme: mainTheme,
                 onGenerateRoute: generateRoute,
                 home: Builder(
                   builder: (context) {
                     return ChangeNotifierProvider(
-                      builder: (context) => InfoRepo(userAuth.user.uid),
+                      builder: (context) => InfoModel(userAuth.user.uid),
                       child: Instagram(user: userAuth.user),
                     );
                   },

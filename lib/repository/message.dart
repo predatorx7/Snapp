@@ -40,28 +40,36 @@ class Message {
     @required this.type,
     @required this.sendee,
     @required this.sender,
+    this.creationTime,
     this.key,
-  }) : this.creationTime = DateTime.now().millisecondsSinceEpoch;
+  }) {
+    if (this.creationTime == null)
+      this.creationTime = DateTime.now().millisecondsSinceEpoch;
+  }
 
-  Message.fromMap(Map messageMap) {
-    this.chatID = messageMap['chatID'];
-    this.content = messageMap['content'];
-    this.creationTime = messageMap['creationTime'];
-    this.key = messageMap['key'];
-    this.sendee = messageMap['sendee'];
-    this.sender = messageMap['sender'];
+  factory Message.fromMap(Map messageMap) {
+    ContentType _typex;
     String _type = messageMap['type'];
     if (_type == ContentType.message.toString()) {
-      this.type = ContentType.message;
+      _typex = ContentType.message;
     } else if (_type == ContentType.post.toString()) {
-      this.type = ContentType.post;
+      _typex = ContentType.post;
     } else if (_type == ContentType.profile.toString()) {
-      this.type = ContentType.profile;
+      _typex = ContentType.profile;
     } else if (_type == ContentType.story.toString()) {
-      this.type = ContentType.story;
+      _typex = ContentType.story;
     } else if (_type == ContentType.image.toString()) {
-      this.type = ContentType.image;
+      _typex = ContentType.image;
     }
+    return Message(
+      chatID: messageMap['chatID'],
+      content: messageMap['content'],
+      creationTime: messageMap['creationTime'],
+      key: messageMap['key'],
+      sendee: messageMap['sendee'],
+      sender: messageMap['sender'],
+      type: _typex,
+    );
   }
 
   Map<dynamic, dynamic> toMap() {

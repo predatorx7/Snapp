@@ -82,8 +82,9 @@ class _ProfilePageState extends State<ProfilePage>
                         },
                         child: GestureDetector(
                           onTap: () async {
-                            if(_data.activeStory.isEmpty){
-                              List<CameraDescription> camera = await availableCameras();
+                            if (_data.activeStory.isEmpty) {
+                              List<CameraDescription> camera =
+                                  await availableCameras();
                               Navigator.push(
                                 context,
                                 CupertinoPageRoute(
@@ -428,17 +429,18 @@ class _ProfilePageState extends State<ProfilePage>
                 ),
               ),
               replacement: Center(
-                  child: OutlineButton(
-                onPressed: () async {
-                  await _data.refreshAll();
-                },
-                child: Icon(Icons.refresh, color: Colors.black),
-                color: Colors.transparent,
-                highlightedBorderColor: Colors.grey,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(40),
+                child: OutlineButton(
+                  onPressed: () async {
+                    await _data.refreshAll();
+                  },
+                  child: Icon(Icons.refresh, color: Colors.black),
+                  color: Colors.transparent,
+                  highlightedBorderColor: Colors.grey,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(40),
+                  ),
                 ),
-              ),),
+              ),
             ),
           ),
         ),
@@ -474,7 +476,7 @@ class Menu extends StatelessWidget {
         children: <Widget>[
           ListTile(
             onTap: () async {
-              Provider.of<AuthNotifier>(context).signOut();
+              Provider.of<AuthNotifier>(context, listen: false).signOut();
 //              Navigator.pop(context);
             },
             title: Text(

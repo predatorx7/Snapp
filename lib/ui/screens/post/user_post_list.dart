@@ -108,7 +108,8 @@ class _PostsListState extends State<PostsList> with TickerProviderStateMixin {
                                           ListTile(
                                             onTap: () async {
                                               PostService.deletePost(metadata);
-                                              print('Post removed? ${_data.removePost(metadata)}');
+                                              print(
+                                                  'Post removed? ${_data.removePost(metadata)}');
                                               Navigator.pop(context);
                                             },
                                             title: Text(

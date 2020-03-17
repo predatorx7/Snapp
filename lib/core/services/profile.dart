@@ -20,8 +20,7 @@ class ProfileService {
         uid: user.uid,
         username: _username);
 
-    print(
-        '[Profile Service] Pushing profile to database: ${_profile.toMap()}');
+    print('[Profile Service] Pushing profile to database: ${_profile.toMap()}');
 
     try {
       await _database

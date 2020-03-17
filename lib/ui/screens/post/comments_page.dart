@@ -298,10 +298,13 @@ class _CommentsPageState extends State<CommentsPage> {
                                               observer.info.username,
                                             );
                                             AppNotification(
-                                              notifyTo: widget.postData.publisher,
-                                              notificationFrom: observer.info.uid,
+                                              notifyTo:
+                                                  widget.postData.publisher,
+                                              notificationFrom:
+                                                  observer.info.uid,
                                               event: OnEvent.commentedOnYour,
-                                              postKey: widget.postData.postKey ?? '',
+                                              postKey:
+                                                  widget.postData.postKey ?? '',
                                             );
                                             _addCommentController =
                                                 new TextEditingController();

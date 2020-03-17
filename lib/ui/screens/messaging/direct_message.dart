@@ -91,7 +91,8 @@ class _DirectMessageScreenState extends State<DirectMessageScreen> {
             // Messages View
             Flexible(
               child: FirebaseAnimatedList(
-                sort: (DataSnapshot snap1, DataSnapshot snap2){
+                sort: (DataSnapshot snap1, DataSnapshot snap2) {
+                  // To arrange how messages will be displayed to user chat
                   return snap2.key.compareTo(snap1.key);
                 },
                 shrinkWrap: true,

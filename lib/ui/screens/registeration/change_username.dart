@@ -150,7 +150,7 @@ class _ChangeUsernameState extends State<ChangeUsername> {
                           } else {
                             print(
                                 '[Change Username Page] Unauthenticated user: Changing Username');
-                            
+
                             _view.setStatus(ChangeUsernameStatus.Standby);
                           }
                           Navigator.pop(

@@ -50,7 +50,6 @@ class _LoginHelpPageState extends State<LoginHelpPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
-
             children: <Widget>[
               Padding(
                 padding: const EdgeInsets.only(
@@ -140,10 +139,10 @@ class _LoginHelpPageState extends State<LoginHelpPage> {
                                 String found = await doesIdExists(
                                   text: _fieldController.text,
                                 );
-                                if(found == null){
+                                if (found == null) {
                                   view.setError(true);
                                   view.setStatus(Status.Failed);
-                                }else {
+                                } else {
                                   view.setStatus(Status.Success);
                                   await FirebaseAuth.instance
                                       .sendPasswordResetEmail(
@@ -163,7 +162,8 @@ class _LoginHelpPageState extends State<LoginHelpPage> {
                                                 BorderRadius.circular(4)),
                                         child: Column(
                                           mainAxisSize: MainAxisSize.min,
-                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
                                           children: <Widget>[
                                             Padding(
                                               padding: EdgeInsets.only(

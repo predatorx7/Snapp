@@ -34,7 +34,8 @@ class Comment {
         pulisherUsername = data['pulisherUsername'] ?? '';
 
   /// Provides data in JSON format. Provides current time if not optionally disabled.
-  Map<String, dynamic> toJson({bool provideWithCurrentTime = true, String commentKey}) {
+  Map<String, dynamic> toJson(
+      {bool provideWithCurrentTime = true, String commentKey}) {
     /// Gets Current time
     if (provideWithCurrentTime == true) {
       DateTime currentTime = new DateTime.now();

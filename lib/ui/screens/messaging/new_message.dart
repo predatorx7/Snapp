@@ -131,55 +131,55 @@ class _NewMessageState extends State<NewMessage> {
                 ),
               ),
             ),
-
-            /// TODO: TO FIX: No result Bug
             Visibility(
               visible: control.status == Status.searchMode,
               child: ScopedModelDescendant<SearchModel>(
-                  builder: (context, _, _search) {
-                    print('Search Visible, result: ${_search.results.keys.toList().length}');
-                return Expanded(
-                  child: ListView.builder(
-                    itemCount: _search.results.keys.toList().length,
-                    itemBuilder: (context, index) {
-                      if (_search.results.isEmpty) {
-                        return Center(
-                          child: Text(
-                            'No results',
-                            style: TextStyle(
-                              color: Color(actionColor),
+                builder: (context, _, _search) {
+                  print(
+                      'Search Visible, result: ${_search.results.keys.toList().length}');
+                  return Expanded(
+                    child: ListView.builder(
+                      itemCount: _search.results.keys.toList().length,
+                      itemBuilder: (context, index) {
+                        if (_search.results.isEmpty) {
+                          return Center(
+                            child: Text(
+                              'No results',
+                              style: TextStyle(
+                                color: Color(actionColor),
+                              ),
                             ),
+                          );
+                        }
+                        String pKey = _search.results.keys.toList()[index];
+                        Profile key = _search.results[pKey];
+                        return ListTile(
+                          onTap: () {
+                            if (observer.userUID == key.uid) {
+                              // Open chats
+                            } else {
+                              Navigator.of(context).pushNamed(
+                                DirectMessagePageRoute,
+                                arguments: [
+                                  observer.userUID,
+                                  key.uid,
+                                ],
+                              );
+                            }
+                          },
+                          leading: ICProfileAvatar(
+                            profileURL: key.profileImage,
+                          ),
+                          title: Text(
+                            key.username,
+                            style: body3Style(),
                           ),
                         );
-                      }
-                      String pKey = _search.results.keys.toList()[index];
-                      Profile key = _search.results[pKey];
-                      return ListTile(
-                        onTap: () {
-                          if (observer.userUID == key.uid) {
-                            // Open chats
-                          } else {
-                            Navigator.of(context).pushNamed(
-                              DirectMessagePageRoute,
-                              arguments: [
-                                observer.userUID,
-                                key.uid,
-                              ],
-                            );
-                          }
-                        },
-                        leading: ICProfileAvatar(
-                          profileURL: key.profileImage,
-                        ),
-                        title: Text(
-                          key.username,
-                          style: body3Style(),
-                        ),
-                      );
-                    },
-                  ),
-                );
-              },),
+                      },
+                    ),
+                  );
+                },
+              ),
             ),
           ],
         ),

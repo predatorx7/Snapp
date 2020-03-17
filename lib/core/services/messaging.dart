@@ -6,9 +6,7 @@ class MessagingService {
   DatabaseReference rootRef =
       FirebaseDatabase.instance.reference().child('chat');
 
-  Future<bool> sendMessage(
-    Message message
-  ) async {
+  Future<bool> sendMessage(Message message) async {
     print("[Messaging Service] Sending message");
     try {
       String chatId = message.chatID;

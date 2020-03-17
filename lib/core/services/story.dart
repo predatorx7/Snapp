@@ -1,17 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'profile.dart';
-import '../../repository/profile.dart';
 import '../../repository/story.dart';
-import 'package:timeago/timeago.dart' as timeago;
+// import 'package:timeago/timeago.dart' as timeago;
 
-/// Provides CRUD operations with story info in database
 class StoryService {
   FirebaseDatabase _database = new FirebaseDatabase();
 
   /// Creates a new user story in database
-  void createStory(
-      _imageURL, String uid, int time, String username) async {
+  void createStory(_imageURL, String uid, int time, String username) async {
     Story _story = new Story(
       imageURL: _imageURL,
       publisher: uid,
@@ -28,7 +24,6 @@ class StoryService {
           '[Story Service] Story creation: An unexpected error occured.\nError: $e');
     }
   }
-
 
   /// To retrieve user's whole story from database
   Future<Story> getStory(FirebaseUser user) async {

@@ -12,8 +12,7 @@ class StoryList extends StatefulWidget {
   _StoryListState createState() => _StoryListState();
 }
 
-class _StoryListState extends State<StoryList>
-    with TickerProviderStateMixin {
+class _StoryListState extends State<StoryList> with TickerProviderStateMixin {
   StoryModel cFeed;
   InfoModel _observer;
   @override
@@ -29,11 +28,11 @@ class _StoryListState extends State<StoryList>
       physics: AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
       itemCount: cFeed.stories.length,
       gridDelegate:
-      new SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 1),
+          new SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 1),
       itemBuilder: (BuildContext context, int index) {
         Story metadata = cFeed.stories[index];
         bool storySeen = metadata.views.contains(_observer.info.uid);
-        // Todo implement
+        /// TODO: implement
         return null;
       },
     );

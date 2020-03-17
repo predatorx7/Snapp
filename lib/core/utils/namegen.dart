@@ -111,7 +111,6 @@ class GenerateUsername {
     // Available username
     bool key = true;
     key = await _databaseUsernameQuery.equalTo(_usernameToCheck).once().then(
-
       (DataSnapshot snapshot) {
         print('IsUsernameAvailable: ${snapshot.value}');
         if (snapshot.value != null) {

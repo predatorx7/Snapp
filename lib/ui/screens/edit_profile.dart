@@ -340,20 +340,28 @@ class _EditProfileState extends State<EditProfile> {
                         ),
                       )
                     : SizedBox(),
-                labelText: view.usernameChanged?view.usernameAvailable ? "Username" : "Username not available":"Username",
+                labelText: view.usernameChanged
+                    ? view.usernameAvailable
+                        ? "Username"
+                        : "Username not available"
+                    : "Username",
                 focusedBorder: UnderlineInputBorder(
                   borderSide: BorderSide(
-                    color: view.usernameChanged?view.usernameAvailable ? Colors.grey: Colors.red[600]:Colors.grey,
+                    color: view.usernameChanged
+                        ? view.usernameAvailable ? Colors.grey : Colors.red[600]
+                        : Colors.grey,
                   ),
                 ),
                 labelStyle: TextStyle(
-                  color: view.usernameChanged?view.usernameAvailable ? Colors.grey: Colors.red[600]:Colors.grey,
+                  color: view.usernameChanged
+                      ? view.usernameAvailable ? Colors.grey : Colors.red[600]
+                      : Colors.grey,
                 ),
               ),
               onChanged: (value) async {
                 if (value != info.info.username) {
                   view.toggleBusy(true);
-                  if(!view.usernameChanged){
+                  if (!view.usernameChanged) {
                     view.setUsernameFieldChange();
                   }
                   await Future.delayed(Duration(milliseconds: 660));

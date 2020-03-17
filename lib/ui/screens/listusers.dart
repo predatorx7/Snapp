@@ -21,6 +21,7 @@ class _ListUsersState extends State<ListUsers> {
     observer = Provider.of<InfoModel>(context);
     super.didChangeDependencies();
   }
+
   @override
   void initState() {
     super.initState();

@@ -27,10 +27,12 @@ class _SearchPageState extends State<SearchPage> {
     fd = FirebaseDatabase.instance;
     super.initState();
   }
-@override
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
   }
+
   @override
   void dispose() {
     _filter.dispose();

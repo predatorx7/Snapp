@@ -45,7 +45,8 @@ class Story {
         "Creation time for a story should not be null: $creationTime");
     return {
       "creationTime": creationTime,
-      "expiryTime": expiryTime ?? Duration(days: 1).inMilliseconds + creationTime,
+      "expiryTime":
+          expiryTime ?? Duration(days: 1).inMilliseconds + creationTime,
       "imageURL": imageURL,
       "publisher": publisher,
       "publisherUsername": publisherUsername,

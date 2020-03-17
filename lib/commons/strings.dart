@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart';
 
 class StringConstant extends InheritedWidget {
   static StringConstant of(BuildContext context) =>
-      context.inheritFromWidgetOfExactType(StringConstant);
+      context.dependOnInheritedWidgetOfExactType<StringConstant>();
 
   const StringConstant({Widget child, Key key}) : super(key: key, child: child);
   final String contantStringExample = '';

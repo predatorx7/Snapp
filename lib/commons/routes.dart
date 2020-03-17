@@ -31,7 +31,7 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case LoginRoute:
       return MaterialPageRoute(
         builder: (context) => ChangeNotifierProvider(
-          builder: (context) => LoginPageViewModel(),
+          create: (context) => LoginPageViewModel(),
           child: new LoginPage(),
         ),
       );
@@ -41,7 +41,7 @@ Route<dynamic> generateRoute(RouteSettings settings) {
         builder: (context) => MultiProvider(
           providers: [
             ChangeNotifierProvider(
-              builder: (context) => MessageNotificationModel(),
+              create: (context) => MessageNotificationModel(),
             ),
           ],
           child: Instagram(),
@@ -49,17 +49,18 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       );
     case SignUpRoute:
       return MaterialPageRoute(
-        settings: RouteSettings(isInitialRoute: true),
+        // settings: RouteSettings(isInitialRoute: true), //[stable]
+        settings: RouteSettings(),
         builder: (context) => MultiProvider(
           providers: [
             ChangeNotifierProvider(
-              builder: (context) => SignUpViewModel(),
+              create: (context) => SignUpViewModel(),
             ),
             ChangeNotifierProvider(
-              builder: (context) => SignUp2ViewModel(),
+              create: (context) => SignUp2ViewModel(),
             ),
             ChangeNotifierProvider(
-              builder: (context) => SignUp3ViewModel(),
+              create: (context) => SignUp3ViewModel(),
             ),
           ],
           child: new SignUpPage(),
@@ -73,7 +74,7 @@ Route<dynamic> generateRoute(RouteSettings settings) {
               value: SignUp3ViewModel(),
             ),
             ChangeNotifierProvider(
-              builder: (context) => ChangeUsernameViewModel(),
+              create: (context) => ChangeUsernameViewModel(),
             ),
           ],
           child: new ChangeUsername(
@@ -83,14 +84,15 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       );
     case SignUpStep2Route:
       return MaterialPageRoute(
-        settings: RouteSettings(isInitialRoute: true),
+        // settings: RouteSettings(isInitialRoute: true), //[stable]
+        settings: RouteSettings(),
         builder: (context) => MultiProvider(
           providers: [
             ChangeNotifierProvider(
-              builder: (context) => SignUp2ViewModel(),
+              create: (context) => SignUp2ViewModel(),
             ),
             ChangeNotifierProvider(
-              builder: (context) => ChangeUsernameViewModel(),
+              create: (context) => ChangeUsernameViewModel(),
             ),
           ],
           child: new SignStep2(
@@ -107,7 +109,7 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case EditProfileRoute:
       return MaterialPageRoute(
         builder: (context) => ChangeNotifierProvider<EditProfileModel>(
-          builder: (context) => EditProfileModel(),
+          create: (context) => EditProfileModel(),
           child: EditProfile(),
         ),
       );
@@ -119,7 +121,7 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       Profile x = settings.arguments;
       return MaterialPageRoute(
         builder: (context) => ChangeNotifierProvider<VisitedInfoModel>(
-          builder: (context) => VisitedInfoModel.setInfo(x),
+          create: (context) => VisitedInfoModel.setInfo(x),
           child: VisitedProfilePage(),
         ),
       );
@@ -135,14 +137,13 @@ Route<dynamic> generateRoute(RouteSettings settings) {
         builder: (context) => MultiProvider(
           providers: [
             ChangeNotifierProvider<DirectMessageModel>(
-              builder: (context) =>
-                  DirectMessageModel.initialize(
+              create: (context) => DirectMessageModel.initialize(
                 thisUser: args[0],
                 thatUser: args[1],
               ),
             ),
             ChangeNotifierProvider<VisitedInfoModel>(
-              builder: (context) => VisitedInfoModel(
+              create: (context) => VisitedInfoModel(
                 args[1],
               ),
             ),

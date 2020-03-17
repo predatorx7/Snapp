@@ -19,7 +19,7 @@ ThemeData mainTheme = ThemeData(
   cursorColor: Colors.teal,
   textSelectionColor: Color(0x550077ff),
   textSelectionHandleColor: Colors.teal,
-  primaryTextTheme: TextTheme(title: TextStyle(color: Color(0xff262626))),
+  primaryTextTheme: TextTheme(headline6: TextStyle(color: Color(0xff262626))),
   appBarTheme: AppBarTheme(
     elevation: 2,
     brightness: Brightness.light,
@@ -62,11 +62,10 @@ TextStyle head2Style() => TextStyle(
     );
 
 TextStyle head3Style() => TextStyle(
-  fontWeight: FontWeight.w600,
-  color: notBlack,
-  fontSize: 16,
-);
-
+      fontWeight: FontWeight.w600,
+      color: notBlack,
+      fontSize: 16,
+    );
 
 TextStyle actionTitleStyle() => TextStyle(
       fontWeight: FontWeight.normal,
@@ -143,12 +142,12 @@ TextStyle body5Style() => TextStyle(
       fontSize: 16,
     );
 InputBorder replyInputBorder({Color borderColor}) => OutlineInputBorder(
-  borderRadius: BorderRadius.circular(25),
-  borderSide: BorderSide(
-    width: 1,
-    color: borderColor ?? Colors.grey[350],
-  ),
-);
+      borderRadius: BorderRadius.circular(25),
+      borderSide: BorderSide(
+        width: 1,
+        color: borderColor ?? Colors.grey[350],
+      ),
+    );
 InputBorder fieldInputBorder({Color borderColor}) => OutlineInputBorder(
       borderRadius: BorderRadius.circular(5),
       borderSide: BorderSide(

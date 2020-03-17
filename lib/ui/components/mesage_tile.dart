@@ -23,13 +23,10 @@ class MessageTile extends StatefulWidget {
 }
 
 class _MessageTileState extends State<MessageTile> {
-  bool _isMessageByThisUser = false;
+  bool _isMessageByThisUser = true;
   double _constraint;
   @override
   void initState() {
-    if (widget.message.sender == widget.thisUser.uid) {
-      _isMessageByThisUser = true;
-    }
     super.initState();
   }
 
@@ -43,6 +40,9 @@ class _MessageTileState extends State<MessageTile> {
 
   @override
   Widget build(BuildContext context) {
+    // Will remain true if message sent from this user, or else will turn false;
+    _isMessageByThisUser = (widget.message.sender == widget.thisUser.uid);
+
     _constraint = MediaQuery.of(context).size.width / 1.6;
     return Container(
       padding: const EdgeInsets.only(right: 15.0, left: 15, top: 4, bottom: 4),

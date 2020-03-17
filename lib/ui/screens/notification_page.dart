@@ -44,10 +44,12 @@ class _NotificationsPageState extends State<NotificationsPage> {
               switch (hey.notificationFrom?.isEmpty) {
                 case false:
                   return FutureBuilder<DataSnapshot>(
-                      future: ProfileService().getProfileSnapshot(hey.notificationFrom),
+                      future: ProfileService()
+                          .getProfileSnapshot(hey.notificationFrom),
                       builder: (context, AsyncSnapshot<DataSnapshot> snap) {
                         if (!snap.hasData) return Container();
-                        Profile temp = Profile.fromMap(snap.data.value[snap.data.value.keys.first]);
+                        Profile temp = Profile.fromMap(
+                            snap.data.value[snap.data.value.keys.first]);
                         return ListTile(
                           onTap: () {
                             if (hey.event == OnEvent.startedFollowing) {

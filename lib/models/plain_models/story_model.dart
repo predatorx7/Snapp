@@ -34,21 +34,23 @@ class StoryModel extends Model {
     Map<String, Story> storyMap = {};
     Map<String, List<Story>> _collection = {};
     for (Profile follower in followers) {
-      DataSnapshot ds = await dr
-          .child(follower.uid)
-          .orderByChild('creationTime')
-          .once();
+      DataSnapshot ds =
+          await dr.child(follower.uid).orderByChild('creationTime').once();
       if (ds.value != null) {
         List storyKeys = ds.value.keys;
         storyKeys.sort();
         for (String storyKey in storyKeys) {
           var story = Story.createFromMap(ds.value[storyKey], storyKey);
           storyMap[storyKey] = story;
-          if (_time.difference(DateTime.fromMillisecondsSinceEpoch(startFromTime)).inSeconds < Duration(days: 1).inSeconds) {
+          if (_time
+                  .difference(
+                      DateTime.fromMillisecondsSinceEpoch(startFromTime))
+                  .inSeconds <
+              Duration(days: 1).inSeconds) {
             print('$storyKey is a valid story');
             _collection.putIfAbsent(
               story.publisher,
-                  () => [],
+              () => [],
             );
             _collection[story.publisher].add(story);
           }
@@ -69,7 +71,8 @@ class StoryModel extends Model {
       _status = StoryStatus.nothing;
       print('No stories found');
     } else {
-      print('[StoryModel] stories fetched! These users uploaded Stories: ${this.collection.length}');
+      print(
+          '[StoryModel] stories fetched! These users uploaded Stories: ${this.collection.length}');
       _status = StoryStatus.fruitful;
     }
     notifyListeners();

@@ -10,10 +10,10 @@ enum MStatus {
 
 class MessageAll extends Model {
   MStatus _status = MStatus.none;
-Map detailsMap = {};
+  Map detailsMap = {};
   MStatus get status => _status;
-List<Map> chatIDs = [];
-List<Map> allMessages = [];
+  List<Map> chatIDs = [];
+  List<Map> allMessages = [];
   DatabaseReference ref = FirebaseDatabase.instance.reference();
 
   setStatus(MStatus status) {
@@ -28,7 +28,7 @@ List<Map> allMessages = [];
 
   Future<void> pullDetails(String thisUserUID) async {
     DataSnapshot snapshot = await ref.child('chat/user/$thisUserUID').once();
-    if (snapshot.value != null){
+    if (snapshot.value != null) {
       Map _map = {};
 
       _map.addAll(snapshot.value);

@@ -99,7 +99,7 @@ class _HomeViewState extends State<HomeView> {
                   child: CommonImages.directOutline2,
                 ),
                 ChangeNotifierProvider(
-                  builder: (context) => MessageNotificationModel(),
+                  create: (context) => MessageNotificationModel(),
                   child: Consumer(
                     builder: (BuildContext context,
                         MessageNotificationModel _feedModel, _) {

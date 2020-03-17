@@ -24,7 +24,6 @@ class _LoginPageState extends State<LoginPage> {
     super.initState();
     _usernameController = new TextEditingController();
     _passwordController = new TextEditingController();
-
   }
 
   @override
@@ -33,6 +32,7 @@ class _LoginPageState extends State<LoginPage> {
     view = Provider.of<LoginPageViewModel>(context, listen: false);
     super.didChangeDependencies();
   }
+
   @override
   void dispose() {
     _usernameController.dispose();

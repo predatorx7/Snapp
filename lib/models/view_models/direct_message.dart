@@ -66,8 +66,8 @@ class DirectMessageModel extends ChangeNotifier {
     }
   }
 
-  void setStatus(Status status){
+  void setStatus(Status status) {
     this.status = status;
-   notifyListeners();
+    notifyListeners();
   }
 }

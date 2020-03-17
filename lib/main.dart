@@ -16,24 +16,26 @@ import 'models/plain_models/info.dart';
 import 'models/view_models/login_page.dart';
 
 void main() {
-  /// To keep app in Portrait Mode
+  WidgetsFlutterBinding.ensureInitialized();
+  // To keep app in Portrait Mode
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+
   // Setting up Notification Handler
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          builder: (context) => AuthNotifier.instance(),
+          create: (context) => AuthNotifier.instance(),
         ),
         // Needed for not letting new users go directly to the home
         ChangeNotifierProvider(
-          builder: (context) => SignUpViewModel(),
+          create: (context) => SignUpViewModel(),
         ),
         ChangeNotifierProvider(
-          builder: (context) => LoginPageViewModel(),
+          create: (context) => LoginPageViewModel(),
         ),
         ChangeNotifierProvider(
-          builder: (context) => Transactions(),
+          create: (context) => Transactions(),
         ),
       ],
       child: Root(),
@@ -50,14 +52,14 @@ class Root extends StatelessWidget {
         builder: (context, AuthNotifier userAuth, _) {
           if (userAuth.status == Status.Authenticated) {
             return ChangeNotifierProvider(
-              builder: (context) => InfoModel(userAuth.user.uid),
+              create: (context) => InfoModel(userAuth.user.uid),
               child: MaterialApp(
                 theme: mainTheme,
                 onGenerateRoute: generateRoute,
                 home: Builder(
                   builder: (context) {
                     return ChangeNotifierProvider(
-                      builder: (context) => InfoModel(userAuth.user.uid),
+                      create: (context) => InfoModel(userAuth.user.uid),
                       child: Instagram(user: userAuth.user),
                     );
                   },

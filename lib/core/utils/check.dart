@@ -23,6 +23,7 @@ Future<String> doesIdExists({@required String text}) async {
   }
   try {
     print('Checking ID as Email');
+
     /// Using wrong password to check email existence.
     await FirebaseAuth.instance
         .signInWithEmailAndPassword(email: text, password: 'test_password');

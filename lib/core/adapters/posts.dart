@@ -10,13 +10,14 @@ class PostAdapters extends StatelessWidget {
   final double height;
   final int index;
   final Post metadata;
-  const PostAdapters(
-      {this.uid,
-      this.isInGrid,
-      this.database,
-      this.height,
-      this.index,
-      this.metadata,});
+  const PostAdapters({
+    this.uid,
+    this.isInGrid,
+    this.database,
+    this.height,
+    this.index,
+    this.metadata,
+  });
   EdgeInsetsGeometry paddingForPost(int index, bool isInGrid) {
     double right = 2, left = 2;
 
@@ -112,10 +113,9 @@ class PostAdapters extends StatelessWidget {
                         height: 28,
                         width: 28,
                         child: new CircularProgressIndicator(
-                          value: loadingProgress.expectedTotalBytes !=
-                              null
+                          value: loadingProgress.expectedTotalBytes != null
                               ? loadingProgress.cumulativeBytesLoaded /
-                              loadingProgress.expectedTotalBytes
+                                  loadingProgress.expectedTotalBytes
                               : null,
                           strokeWidth: 2,
                         ),

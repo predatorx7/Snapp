@@ -148,6 +148,7 @@ class SignUp3ViewModel with ChangeNotifier {
     _isDone = isDone;
     notifyListeners();
   }
+
   String get username => _username;
   String get oldUsername => _oldUsername;
   set oldUsername(String x) => _oldUsername = x;

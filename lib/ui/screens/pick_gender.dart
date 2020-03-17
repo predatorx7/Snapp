@@ -55,7 +55,7 @@ class _PickGenderState extends State<PickGender> {
           RadioListTile(
             value: one,
             groupValue: selectedGender,
-                selected: selectedGender == one,
+            selected: selectedGender == one,
             onChanged: (ind) => setState(() => selectedGender = ind),
             activeColor: Color(actionColor),
             controlAffinity: ListTileControlAffinity.trailing,
@@ -67,7 +67,7 @@ class _PickGenderState extends State<PickGender> {
           RadioListTile(
             value: two,
             groupValue: selectedGender,
-                selected: selectedGender == two,
+            selected: selectedGender == two,
             onChanged: (ind) => setState(() => selectedGender = ind),
             activeColor: Color(actionColor),
             controlAffinity: ListTileControlAffinity.trailing,
@@ -79,7 +79,7 @@ class _PickGenderState extends State<PickGender> {
           RadioListTile(
             value: three,
             groupValue: selectedGender,
-                selected: selectedGender == three,
+            selected: selectedGender == three,
             onChanged: (ind) => setState(() => selectedGender = ind),
             activeColor: Color(actionColor),
             controlAffinity: ListTileControlAffinity.trailing,
@@ -91,7 +91,7 @@ class _PickGenderState extends State<PickGender> {
           RadioListTile(
             value: four,
             groupValue: selectedGender,
-                selected: selectedGender == four,
+            selected: selectedGender == four,
             onChanged: (ind) => setState(() => selectedGender = ind),
             activeColor: Color(actionColor),
             controlAffinity: ListTileControlAffinity.trailing,

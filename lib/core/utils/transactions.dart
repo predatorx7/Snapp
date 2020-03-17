@@ -12,8 +12,8 @@ class Transactions extends ChangeNotifier {
   /// Is transaction locked?
   bool get isLocked => _isLocked;
 
-  perform(Function task){
-    if(!this.isLocked){
+  perform(Function task) {
+    if (!this.isLocked) {
       int key = this.acquireLock();
       task();
       this.releaseLock(key);

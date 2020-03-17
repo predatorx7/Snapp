@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:instagram/repository/comments.dart';
 import 'package:scoped_model/scoped_model.dart';
 
-class CommentPageModel extends Model{
+class CommentPageModel extends Model {
   bool _isButtonDisabled = true;
 
   bool get isButtonDisabled => _isButtonDisabled;
@@ -11,10 +11,9 @@ class CommentPageModel extends Model{
     _isButtonDisabled = isButtonDisabled;
     notifyListeners();
   }
-
 }
 
-class SubCommentModel extends Model{
+class SubCommentModel extends Model {
   Comment _selectedCommentIndex = Comment(commentKey: 'lol');
 
   Comment get selectedComment => _selectedCommentIndex;
@@ -24,5 +23,4 @@ class SubCommentModel extends Model{
     print('Selected comment is: ${selectedCommentIndex.commentKey}');
     notifyListeners();
   }
-
 }

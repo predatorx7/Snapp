@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:instagram/commons/assets.dart';
 import 'package:instagram/commons/styles.dart';
 import 'package:instagram/repository/profile.dart';
-import 'package:provider/provider.dart';
 
 class ICProfileAvatar extends StatefulWidget {
   final FirebaseDatabase database;

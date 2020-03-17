@@ -397,7 +397,7 @@ class _SignStep2State extends State<SignStep2> {
                               builder: (context) => MultiProvider(
                                 providers: [
                                   ChangeNotifierProvider(
-                                    builder: (context) => SignUp3ViewModel(),
+                                    create: (context) => SignUp3ViewModel(),
                                   ),
                                   ChangeNotifierProvider.value(
                                     value: AuthNotifier.instance(),

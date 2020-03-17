@@ -115,7 +115,7 @@ class AppNotification {
       print('No notifications');
     }
 
-    for (Map<String, AppNotification> i in _notificationMap.values.toList()){
+    for (Map<String, AppNotification> i in _notificationMap.values.toList()) {
       _notificationList.addAll(i.values);
     }
     return _notificationList;

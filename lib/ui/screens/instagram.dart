@@ -27,8 +27,7 @@ class Instagram extends StatefulWidget {
   _InstagramState createState() => _InstagramState();
 }
 
-class _InstagramState
-    extends State<Instagram>{
+class _InstagramState extends State<Instagram> {
   InfoModel data;
   PageController _pageController;
 
@@ -79,8 +78,7 @@ class _InstagramState
             ),
             Scaffold(
               body: Visibility(
-                visible:
-                    (data.profile.uid != null),
+                visible: (data.profile.uid != null),
                 child: Stack(
                   children: <Widget>[
                     Visibility(

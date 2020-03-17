@@ -134,5 +134,5 @@ class CommonImages {
   );
 
   static const AssetImage circleGradientAsset =
-  AssetImage('assets/res_image/circle_gradient.png');
+      AssetImage('assets/res_image/circle_gradient.png');
 }

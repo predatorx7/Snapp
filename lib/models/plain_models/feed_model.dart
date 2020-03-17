@@ -31,7 +31,7 @@ class FeedModel extends Model {
       if (ds.value != null) {
         print('Post retrieved: ${ds.value}');
         for (String postKey in ds.value.keys) {
-          var post = Post.createFromMap(ds.value[postKey], postKey);
+          var post = Post.fromJson(ds.value[postKey], postKey);
           postMap[postKey] = post;
         }
       }

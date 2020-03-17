@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:instagram/commons/styles.dart';
 
 class ICFlatButton extends StatefulWidget {
   final void Function() onPressed;

@@ -9,7 +9,7 @@ class SearchModel extends Model {
   Map<String, Profile> get results => _results;
 
   Future<void> search(String key) async {
-    if(key.isEmpty){
+    if (key.isEmpty) {
       print('No search keyword entered');
       return;
     }
@@ -18,7 +18,8 @@ class SearchModel extends Model {
     await queryPerform("username", key);
     await queryPerform("email", key);
     await queryPerform("fullName", key);
-    await queryPerform("fullName", key.substring(0, 1).toUpperCase()+key.substring(1));
+    await queryPerform(
+        "fullName", key.substring(0, 1).toUpperCase() + key.substring(1));
   }
 
   Future<void> queryPerform(String orderBy, key) async {

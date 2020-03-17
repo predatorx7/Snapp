@@ -90,16 +90,16 @@ class InfoModel with ChangeNotifier {
     try {
       /// Collection of stories for a user
       Map<String, List<Story>> collection = {};
+
       /// Extracting active stories
       DateTime _time = DateTime.now();
       int startFromTime =
-          new DateTime.now()
-              .add(Duration(days: 1))
-              .millisecondsSinceEpoch;
+          new DateTime.now().add(Duration(days: 1)).millisecondsSinceEpoch;
       Map<String, Story> storyMap = {};
       Map<String, List<Story>> _collection = {};
-      DataSnapshot ds = await FirebaseDatabase.instance.reference().child(
-          'stories')
+      DataSnapshot ds = await FirebaseDatabase.instance
+          .reference()
+          .child('stories')
           .child(this.userUID)
           .orderByChild('creationTime')
           .once();
@@ -108,56 +108,54 @@ class InfoModel with ChangeNotifier {
           print('Value: ${ds.value.values.toString()}');
           var story = Story.createFromMap(ds.value[storyKey], storyKey);
           storyMap[storyKey] = story;
-          print('Difference ${DateTime
-              .fromMillisecondsSinceEpoch(startFromTime)
-              .difference(_time)
-              .inSeconds} > ${Duration(days: 1).inSeconds} ?');
+          print(
+              'Difference ${DateTime.fromMillisecondsSinceEpoch(startFromTime).difference(_time).inSeconds} > ${Duration(days: 1).inSeconds} ?');
           if (_time
-              .difference(DateTime.fromMillisecondsSinceEpoch(startFromTime))
-              .inSeconds < Duration(days: 1).inSeconds) {
+                  .difference(
+                      DateTime.fromMillisecondsSinceEpoch(startFromTime))
+                  .inSeconds <
+              Duration(days: 1).inSeconds) {
             print('$storyKey is a valid story');
             _collection.putIfAbsent(
               story.publisher,
-                  () => [],
+              () => [],
             );
             _collection[story.publisher].add(story);
           }
         }
-      } else {
-      }
+      } else {}
       collection = {};
       collection.addAll(_collection);
 //    }
-      if (collection.keys
-          .toList()
-          .isEmpty) {
+      if (collection.keys.toList().isEmpty) {
         print('No stories found');
       } else {
-        this.activeStory=collection[this.userUID].toList();
+        this.activeStory = collection[this.userUID].toList();
         print(
             'stories fetched! These users uploaded Stories: $collection.length}');
       }
-    }on Exception catch (e) {
+    } on Exception catch (e) {
       print('An Exception happened while refreshing profile information: $e');
     }
     notifyChanges();
   }
 
-    Future<void> refreshPosts() async {
-      try {
-        DataSnapshot snapshot = await _dr.child('posts/${this.userUID}').once();
-        if (snapshot.value != null) {
-          List<Post> _posts = [];
-          print(snapshot.value);
-          for (var i in snapshot.value.keys.toList()) {
-            _posts.add(Post.createFromMap(snapshot.value[i], i));
-          }
-          this.posts = _posts;
+  Future<void> refreshPosts() async {
+    try {
+      DataSnapshot snapshot = await _dr.child('posts/${this.userUID}').once();
+      if (snapshot.value != null) {
+        List<Post> _posts = [];
+        print(snapshot.value);
+        for (var i in snapshot.value.keys.toList()) {
+          _posts.add(Post.fromJson(snapshot.value[i], i));
         }
-      } on Exception catch (e) {
-        print('An Exception happened while refreshing profile information: $e');
+        this.posts = _posts;
       }
+    } on Exception catch (e) {
+      print('An Exception happened while refreshing profile information: $e');
+    }
   }
+
   /// Refresh followers & followings list
   Future<void> refreshFollow() async {
     try {

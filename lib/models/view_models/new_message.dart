@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 
-
 enum Status {
   fruitful,
   // When showing suggestions
@@ -18,5 +17,4 @@ class NewMessageModel extends ChangeNotifier {
     _status = status;
     notifyListeners();
   }
-
 }

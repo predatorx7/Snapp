@@ -6,9 +6,8 @@ class Validator3000 {
           false) {
         return 'The email address you entered is invalid.';
       }
-    } else {
-      return 'Email can\'t be empty';
     }
+    return 'Email can\'t be empty';
   }
 
   String isNameValid(String name) {
@@ -16,9 +15,8 @@ class Validator3000 {
       if (RegExp(r'^[A-Za-z ]+$').hasMatch(name) == false) {
         return 'Are you sure that you\'ve entered your name correctly?';
       }
-    } else {
-      return 'Name can\'t be empty';
     }
+    return 'Name can\'t be empty';
   }
 
   bool isIdValid(String name) {
@@ -26,8 +24,8 @@ class Validator3000 {
         .hasMatch(name)) {
       return false;
       //'Username $name is invalid. Username can\'t start or end with a period & can only contain alphabets, numbers, periods or underscores';
-    } else
-      return true;
+    }
+    return true;
   }
 
   bool isNumberValid(String number) {
@@ -41,8 +39,8 @@ class Validator3000 {
       if (password.length < 8) {
         return 'Password too short.';
       }
-    } else
-      return 'Password can\'t be empty';
+    }
+    return 'Password can\'t be empty';
   }
 
   String isPasswordStrong(String password) {
@@ -62,9 +60,8 @@ class Validator3000 {
     } else if (RegExp(r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$')
         .hasMatch(password)) {
       //
-    } else {
+    } else
       return 'Password is weak';
-    }
   }
 
   bool isNotEmptyOrNull(String text) {

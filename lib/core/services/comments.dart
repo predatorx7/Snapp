@@ -4,7 +4,8 @@ import '../../repository/comments.dart';
 /// Provides CRUD operations with comment info in database
 class CommentService {
   /// Creates a new user comment in database
-  static createComment(String _postKey, String _commentIs, String commentPublisher, String publisherUsername) {
+  static createComment(String _postKey, String _commentIs,
+      String commentPublisher, String publisherUsername) {
     Comment _comment = new Comment(
       postKey: _postKey,
       comment: _commentIs,
@@ -50,7 +51,7 @@ class CommentService {
   }
 
   /// Delete user comment
-  static Future<void> deleteComment(Comment comment)async {
+  static Future<void> deleteComment(Comment comment) async {
     print('[Comment Service] Deleting comment');
     await FirebaseDatabase.instance
         .reference()

@@ -77,7 +77,7 @@ class _MessagingPageState extends State<MessagingPage> {
                   MaterialPageRoute(
                     builder: (context) =>
                         ChangeNotifierProvider<NewMessageModel>(
-                      builder: (context) => NewMessageModel(),
+                      create: (context) => NewMessageModel(),
                       child: NewMessage(
                         users: _user.following,
                       ),
@@ -177,7 +177,7 @@ class _MessagingPageState extends State<MessagingPage> {
                                 MaterialPageRoute(
                                   builder: (context) =>
                                       ChangeNotifierProvider<NewMessageModel>(
-                                    builder: (context) => NewMessageModel(),
+                                    create: (context) => NewMessageModel(),
                                     child: NewMessage(
                                       users: _user.following,
                                     ),
@@ -241,7 +241,8 @@ class _MessagingPageState extends State<MessagingPage> {
                               : user1;
                           debugPrint('Build: $thatUser');
                           return FutureBuilder<DataSnapshot>(
-                            future: ProfileService().getProfileSnapshot(thatUser),
+                            future:
+                                ProfileService().getProfileSnapshot(thatUser),
                             builder: (context, x) {
                               switch (x.connectionState) {
                                 case ConnectionState.done:
@@ -259,7 +260,8 @@ class _MessagingPageState extends State<MessagingPage> {
                                             ]);
                                       },
                                       leading: ICProfileAvatar(
-                                        profileURL: thatUserProfile.profileImage,
+                                        profileURL:
+                                            thatUserProfile.profileImage,
                                       ),
                                       title: Text(thatUserProfile.username),
                                     );

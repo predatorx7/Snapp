@@ -58,7 +58,7 @@ class PostService {
         .then(
       (DataSnapshot snapshot) {
         if (snapshot.value != null) {
-          return Post.fromMap(snapshot.value);
+          return Post.fromDataSnapshot(snapshot.value);
         } else {
           print('Couldn\'t get post');
           return null;
@@ -77,7 +77,7 @@ class PostService {
     if (dSnap.value != null) {
       print('[Post Service] Retrieved post: ${dSnap.value.toString()}');
     }
-    post = Post.createFromMap(dSnap.value, postKey);
+    post = Post.fromJson(dSnap.value, postKey);
     return post;
   }
 

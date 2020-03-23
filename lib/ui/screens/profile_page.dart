@@ -479,7 +479,6 @@ class Menu extends StatelessWidget {
               Provider.of<AuthNotifier>(context, listen: false).signOut();
               Navigator.of(context).pushNamedAndRemoveUntil(
                   '/', (Route<dynamic> route) => false);
-//              Navigator.pop(context);
             },
             title: Text(
               'Log out of ${userInfo.username}',

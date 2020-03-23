@@ -26,11 +26,12 @@ class _StoryListState extends State<StoryList> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return GridView.builder(
       physics: AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-      itemCount: cFeed.stories.length,
+      itemCount: cFeed.collection.length,
       gridDelegate:
           new SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 1),
       itemBuilder: (BuildContext context, int index) {
-        Story metadata = cFeed.stories[index];
+        String storyOf = cFeed.collection.keys.toList()[index];
+        Story metadata = cFeed.collection[storyOf][index];
         bool storySeen = metadata.views.contains(_observer.info.uid);
         /// TODO: implement
         return null;

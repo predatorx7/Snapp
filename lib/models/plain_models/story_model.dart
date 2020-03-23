@@ -1,4 +1,5 @@
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/foundation.dart';
 import 'package:instagram/repository/post.dart';
 import 'package:instagram/repository/profile.dart';
 import 'package:instagram/repository/story.dart';
@@ -15,8 +16,13 @@ enum StoryStatus {
   idle
 }
 
+class Holder {
+  var follower, startFromTime, storyMap, _collection, dr, _time;
+  Holder(follower, startFromTime, storyMap, _collection, dr, _time);
+}
+
 class StoryModel extends Model {
-  List<Story> stories = [];
+  // List<Story> stories = [];
   StoryStatus _status = StoryStatus.idle;
 
   /// Collection of stories for a user
@@ -33,40 +39,44 @@ class StoryModel extends Model {
         new DateTime.now().add(Duration(days: 1)).millisecondsSinceEpoch;
     Map<String, Story> storyMap = {};
     Map<String, List<Story>> _collection = {};
+    Holder args = Holder(null, startFromTime, storyMap, _collection, dr, _time);
     for (Profile follower in followers) {
-      DataSnapshot ds =
-          await dr.child(follower.uid).orderByChild('creationTime').once();
-      if (ds.value != null) {
-        List storyKeys = ds.value.keys;
-        storyKeys.sort();
-        for (String storyKey in storyKeys) {
-          var story = Story.createFromMap(ds.value[storyKey], storyKey);
-          storyMap[storyKey] = story;
-          if (_time
-                  .difference(
-                      DateTime.fromMillisecondsSinceEpoch(startFromTime))
-                  .inSeconds <
-              Duration(days: 1).inSeconds) {
-            print('$storyKey is a valid story');
-            _collection.putIfAbsent(
-              story.publisher,
-              () => [],
-            );
-            _collection[story.publisher].add(story);
-          }
-        }
-      } else {
-        print('No Stories retrieved for $follower');
-      }
+      args.follower = follower;
+      compute(fetchStoriesFor, args);
+      // DataSnapshot ds =
+      //     await dr.child(follower.uid).orderByChild('creationTime').once();
+      // if (ds.value != null) {
+      //   List storyKeys = ds.value.keys;
+      //   storyKeys.sort();
+      //   for (String storyKey in storyKeys) {
+      //     var story = Story.createFromMap(ds.value[storyKey], storyKey);
+      //     storyMap[storyKey] = story;
+      //     if (_time
+      //             .difference(
+      //                 DateTime.fromMillisecondsSinceEpoch(startFromTime))
+      //             .inSeconds <
+      //         Duration(days: 1).inSeconds) {
+      //       print('$storyKey is a valid story');
+      //       _collection.putIfAbsent(
+      //         story.publisher,
+      //         () => [],
+      //       );
+      //       _collection[story.publisher].add(story);
+      //     }
+      //   }
+      // } else {
+      //   print('No Stories retrieved for $follower');
+      // }
     }
     this.collection = {};
-    this.collection.addAll(_collection);
+    this.collection.addAll(args._collection);
 //    List<String> sortedKeys = storyMap.keys.toList()..sort();
 //    this.stories = [];
 //    while (sortedKeys.isNotEmpty) {
 //      String lateKey = sortedKeys.removeLast();
 //      this.stories.add(storyMap[lateKey]);
 //    }
+    print(collection);
     if (this.collection.keys.toList().isEmpty) {
       _status = StoryStatus.nothing;
       print('No stories found');
@@ -76,5 +86,35 @@ class StoryModel extends Model {
       _status = StoryStatus.fruitful;
     }
     notifyListeners();
+  }
+}
+
+fetchStoriesFor(Holder args) async {
+  // start
+  DataSnapshot ds = await args.dr
+      .child(args.follower.uid)
+      .orderByChild('creationTime')
+      .once();
+  if (ds.value != null) {
+    List storyKeys = ds.value.keys;
+    storyKeys.sort();
+    for (String storyKey in storyKeys) {
+      var story = Story.createFromMap(ds.value[storyKey], storyKey);
+      args.storyMap[storyKey] = story;
+      if (args._time
+              .difference(
+                  DateTime.fromMillisecondsSinceEpoch(args.startFromTime))
+              .inSeconds <
+          Duration(days: 1).inSeconds) {
+        print('$storyKey is a valid story');
+        args._collection.putIfAbsent(
+          story.publisher,
+          () => [],
+        );
+        args._collection[story.publisher].add(story);
+      }
+    }
+  } else {
+    print('No Stories retrieved for ${args.follower}');
   }
 }

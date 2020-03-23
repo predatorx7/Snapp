@@ -134,7 +134,7 @@ class AuthNotifier with ChangeNotifier {
   }
 
   Future<void> _onAuthStateChanged(FirebaseUser firebaseUser) async {
-    print('[Auth] Noticed Auth Changes: ${firebaseUser.toString()}');
+    print('[Auth] Noticed Auth Changes: ${firebaseUser?.email}');
     if (firebaseUser == null) {
       _status = Status.Unauthenticated;
     } else {

@@ -67,11 +67,8 @@ Route<dynamic> generateRoute(RouteSettings settings) {
             ChangeNotifierProvider.value(
               value: SignUpViewModel(),
             ),
-            ChangeNotifierProvider(
-              create: (context) => ChangeUsernameViewModel(),
-            ),
           ],
-          child: new ChangeUsername(
+          child: ChangeUsername(
             authenticated: settings.arguments ?? false,
           ),
         ),

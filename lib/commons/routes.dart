@@ -56,12 +56,6 @@ Route<dynamic> generateRoute(RouteSettings settings) {
             ChangeNotifierProvider(
               create: (context) => SignUpViewModel(),
             ),
-            ChangeNotifierProvider(
-              create: (context) => SignUp2ViewModel(),
-            ),
-            ChangeNotifierProvider(
-              create: (context) => SignUp3ViewModel(),
-            ),
           ],
           child: new SignUpPage(),
         ),
@@ -71,7 +65,7 @@ Route<dynamic> generateRoute(RouteSettings settings) {
         builder: (context) => MultiProvider(
           providers: [
             ChangeNotifierProvider.value(
-              value: SignUp3ViewModel(),
+              value: SignUpViewModel(),
             ),
             ChangeNotifierProvider(
               create: (context) => ChangeUsernameViewModel(),
@@ -89,7 +83,7 @@ Route<dynamic> generateRoute(RouteSettings settings) {
         builder: (context) => MultiProvider(
           providers: [
             ChangeNotifierProvider(
-              create: (context) => SignUp2ViewModel(),
+              create: (context) => SignUpViewModel(),
             ),
             ChangeNotifierProvider(
               create: (context) => ChangeUsernameViewModel(),

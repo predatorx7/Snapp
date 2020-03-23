@@ -1,4 +1,5 @@
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/foundation.dart';
 import 'package:instagram/repository/post.dart';
 import 'package:instagram/repository/profile.dart';
 import 'package:scoped_model/scoped_model.dart';
@@ -21,6 +22,7 @@ class FeedModel extends Model {
   FeedStatus get status => _status;
 
   DatabaseReference dr = FirebaseDatabase.instance.reference().child('posts');
+
   Future<void> fetch(List<Profile> followers) async {
     _status = FeedStatus.busy;
     notifyListeners();

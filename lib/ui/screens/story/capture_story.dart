@@ -194,12 +194,12 @@ class DisplayPictureScreen extends StatelessWidget {
                       barrierDismissible: false,
                       context: context,
                       builder: (BuildContext context) {
-                        transact.perform(() {
-                          uploadFile(File(imagePath), user.info.uid,
+                        transact.perform(() async {
+                          await uploadFile(File(imagePath), user.info.uid,
                                   user.info.username)
                               .then((answer) {
-                            Navigator.popUntil(
-                                context, ModalRoute.withName('/'));
+                            Navigator.of(context).pushNamedAndRemoveUntil(
+                                '/', (Route<dynamic> route) => false);
                           });
                         });
                         return Dialog(
@@ -269,7 +269,16 @@ Future uploadFile(File _image, String uid, String username) async {
       .ref()
       .child('stories/$uid/${DateTime.now().millisecondsSinceEpoch}');
   StorageUploadTask uploadTask = storageReference.putFile(_image);
-  await uploadTask.onComplete;
+  try {
+    await uploadTask.onComplete.timeout(
+      Duration(
+        seconds: 30,
+      ),
+    );
+  } on TimeoutException {
+    print('File upload failed');
+    return;
+  }
   print('File Uploaded');
   storageReference.getDownloadURL().then(
     (fileURL) {

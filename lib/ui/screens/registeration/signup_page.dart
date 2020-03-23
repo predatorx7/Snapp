@@ -198,10 +198,10 @@ class __SignStep1State extends State<_SignStep1> {
                             view.setStatus(SignUpStatus.Running);
                             bool emailExists;
                             Validator3000 valValue = Validator3000();
-                            print('I work');
                             var textIs =
                                 valValue.isEmailValid(_usernameController.text);
                             if (textIs != null) {
+                              print("Validation response: $textIs");
                               view.setError(true);
                             } else {
                               emailExists = await RegisterService()
@@ -280,7 +280,7 @@ class _SignStep2State extends State<SignStep2> {
 
   @override
   Widget build(BuildContext context) {
-    final _signUp = Provider.of<SignUp2ViewModel>(context);
+    final _signUp = Provider.of<SignUpViewModel>(context);
     return Scaffold(
       key: _key,
       body: Padding(
@@ -365,12 +365,12 @@ class _SignStep2State extends State<SignStep2> {
               width: double.infinity,
               child: ICFlatButton(
                 conditionForProcessIndicator:
-                    _signUp.signUpStatus == SignUp2Status.Running,
+                    _signUp.signUpStatus == SignUpStatus.Running,
                 text: 'Continue',
                 onPressed: _signUp.isButtonDisabled
                     ? null
                     : () async {
-                        _signUp.setStatus(SignUp2Status.Running);
+                        _signUp.setStatus(SignUpStatus.Running);
                         Validator3000 valValue = Validator3000();
                         print('I work');
                         var validity = true;
@@ -397,7 +397,7 @@ class _SignStep2State extends State<SignStep2> {
                               builder: (context) => MultiProvider(
                                 providers: [
                                   ChangeNotifierProvider(
-                                    create: (context) => SignUp3ViewModel(),
+                                    create: (context) => SignUpViewModel(),
                                   ),
                                   ChangeNotifierProvider.value(
                                     value: AuthNotifier.instance(),
@@ -412,7 +412,7 @@ class _SignStep2State extends State<SignStep2> {
                             ),
                           );
                         }
-                        _signUp.setStatus(SignUp2Status.Failed);
+                        _signUp.setStatus(SignUpStatus.Failed);
                       },
               ),
             ),
@@ -458,7 +458,7 @@ class SignStep3 extends StatefulWidget {
 
 class _SignStep3State extends State<SignStep3> {
   String userId, userEmail;
-  SignUp3ViewModel _view;
+  SignUpViewModel _view;
   ProfileService profileAdapter = ProfileService();
   AuthNotifier userAuth;
   GlobalKey _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -470,7 +470,7 @@ class _SignStep3State extends State<SignStep3> {
   @override
   void didChangeDependencies() {
     userAuth = Provider.of<AuthNotifier>(context);
-    _view = Provider.of<SignUp3ViewModel>(context);
+    _view = Provider.of<SignUpViewModel>(context);
     if (!_view.hasUsername) {
       _view.provideUsername(widget.email, widget.fullName);
     }
@@ -518,7 +518,8 @@ class _SignStep3State extends State<SignStep3> {
               height: 46,
               width: double.infinity,
               child: ICFlatButton(
-                conditionForProcessIndicator: (_view.username == null),
+                conditionForProcessIndicator: (_view.username == null ||
+                    (_view.signUpStatus == SignUpStatus.Running)),
                 text: 'Next',
                 onPressed: (_view.username == null)
                     ? null
@@ -526,17 +527,23 @@ class _SignStep3State extends State<SignStep3> {
                         print('[Sign Up Page 3] Username: ${_view.username}');
                         if (!_view.isDone) {
                           _view.setDone(true);
+                          _view.setStatus(SignUpStatus.Running);
                           bool result = await userAuth.signUp(
-                              widget.email,
-                              widget.fullName,
-                              widget.password,
-                              context,
-                              _view.username);
+                            widget.email,
+                            widget.fullName,
+                            widget.password,
+                            context,
+                            _view.username,
+                          );
                           result
                               ? print('Registered successfully')
-                              /* Navigator.popUntil(context, ModalRoute.withName('/')) */
-                              : print('Something unexpected happened');
+                              : _view.setStatus(SignUpStatus.Failed);
                           print('Finished');
+                          if (result) {
+                            Navigator.of(context).pushNamedAndRemoveUntil(
+                                '/', (Route<dynamic> route) => false);
+                            _view.setStatus(SignUpStatus.Success);
+                          }
                         }
                       },
               ),

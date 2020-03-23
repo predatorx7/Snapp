@@ -6,8 +6,10 @@ class Validator3000 {
           false) {
         return 'The email address you entered is invalid.';
       }
+    } else {
+      return 'Email can\'t be empty';
     }
-    return 'Email can\'t be empty';
+    return null;
   }
 
   String isNameValid(String name) {
@@ -15,8 +17,10 @@ class Validator3000 {
       if (RegExp(r'^[A-Za-z ]+$').hasMatch(name) == false) {
         return 'Are you sure that you\'ve entered your name correctly?';
       }
+    } else {
+      return 'Name can\'t be empty';
     }
-    return 'Name can\'t be empty';
+    return null;
   }
 
   bool isIdValid(String name) {
@@ -39,8 +43,10 @@ class Validator3000 {
       if (password.length < 8) {
         return 'Password too short.';
       }
+    } else {
+      return 'Password can\'t be empty';
     }
-    return 'Password can\'t be empty';
+    return null;
   }
 
   String isPasswordStrong(String password) {

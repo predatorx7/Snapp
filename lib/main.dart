@@ -50,42 +50,30 @@ class Root extends StatelessWidget {
       model: InstagramPaginationModel(),
       child: Consumer(
         builder: (context, AuthNotifier userAuth, _) {
-          if (userAuth.status == Status.Authenticated) {
-            return ChangeNotifierProvider(
-              create: (context) => InfoModel(userAuth.user.uid),
-              child: MaterialApp(
-                theme: mainTheme,
-                onGenerateRoute: generateRoute,
-                home: Builder(
-                  builder: (context) {
+          return MaterialApp(
+            theme: mainTheme,
+            onGenerateRoute: generateRoute,
+            home: Builder(
+              builder: (context) {
+                switch (userAuth.status) {
+                  case Status.Authenticated:
+                    // Authenticated
                     return ChangeNotifierProvider(
                       create: (context) => InfoModel(userAuth.user.uid),
                       child: Instagram(user: userAuth.user),
                     );
-                  },
-                ),
-              ),
-            );
-          } else {
-            print('Not authenticated');
-            return MaterialApp(
-              theme: mainTheme,
-              onGenerateRoute: generateRoute,
-              home: Builder(
-                builder: (context) {
-                  switch (userAuth.status) {
-                    case Status.Uninitialized:
-                      return Splash();
-                    case Status.Unauthenticated:
-                    case Status.Authenticating:
-                      return LoginPage();
-                    default:
-                      return Splash();
-                  }
-                },
-              ),
-            );
-          }
+                  // Unauthenticated
+                  case Status.Uninitialized:
+                    return Splash();
+                  case Status.Unauthenticated:
+                  case Status.Authenticating:
+                    return LoginPage();
+                  default:
+                    return Splash();
+                }
+              },
+            ),
+          );
         },
       ),
     );

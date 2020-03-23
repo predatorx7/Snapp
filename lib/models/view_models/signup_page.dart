@@ -14,131 +14,7 @@ class SignUpViewModel with ChangeNotifier {
   bool get isTapped => _isTapped;
   bool get showError => _showError;
   SignUpStatus get signUpStatus => _status;
-
-  setUsername(String username) {
-    _username = username;
-    notifyListeners();
-  }
-
-  void setStatus(SignUpStatus newStatus) {
-    _status = newStatus;
-    notifyListeners();
-  }
-
-  void toggleButton(bool isButtonDisabled) {
-    _isButtonDisabled = isButtonDisabled;
-    notifyListeners();
-  }
-
-  void setTap(bool isTapped) {
-    _isTapped = isTapped;
-    notifyListeners();
-  }
-
-  void setError(bool showError) {
-    _showError = showError;
-    notifyListeners();
-  }
-
-  void setButton(bool isDisabled) {
-    _isButtonDisabled = isDisabled;
-    notifyListeners();
-  }
-
-  void validateInput({String value, TextEditingController textController}) {
-    if (value.isNotEmpty && textController.text.isNotEmpty) {
-      if (_isButtonDisabled) {
-        print('[SignUpPageViewModel] Enabling Button');
-        _isButtonDisabled = false;
-        notifyListeners();
-      }
-    } else if (!_isButtonDisabled) {
-      print('[SignUPPageViewModel] Disabling Button');
-      _isButtonDisabled = true;
-      notifyListeners();
-    }
-  }
-}
-
-enum SignUp2Status {
-  Uninitialized,
-  Started,
-  Running,
-  Checking,
-  Failed,
-  Success
-}
-
-class SignUp2ViewModel with ChangeNotifier {
-  SignUp2Status _status = SignUp2Status.Uninitialized;
-  bool _isButtonDisabled = true, _isTapped = false, _showError = false;
-  String _username;
-
-  String get username => _username;
-
-  bool get isButtonDisabled => _isButtonDisabled;
-  bool get isTapped => _isTapped;
-  bool get showError => _showError;
-  SignUp2Status get signUpStatus => _status;
-
-  setUsername(String username) {
-    _username = username;
-    notifyListeners();
-  }
-
-  void setStatus(SignUp2Status newStatus) {
-    _status = newStatus;
-    notifyListeners();
-  }
-
-  void toggleButton(bool isButtonDisabled) {
-    _isButtonDisabled = isButtonDisabled;
-    notifyListeners();
-  }
-
-  void setTap(bool isTapped) {
-    _isTapped = isTapped;
-    notifyListeners();
-  }
-
-  void setError(bool showError) {
-    _showError = showError;
-    notifyListeners();
-  }
-
-  void setButton(bool isDisabled) {
-    _isButtonDisabled = isDisabled;
-    notifyListeners();
-  }
-
-  void validateInput({String value, TextEditingController textController}) {
-    if (value.isNotEmpty && textController.text.isNotEmpty) {
-      if (_isButtonDisabled) {
-        print('[SignUpPageViewModel] Enabling Button');
-        _isButtonDisabled = false;
-        notifyListeners();
-      }
-    } else if (!_isButtonDisabled) {
-      print('[SignUPPageViewModel] Disabling Button');
-      _isButtonDisabled = true;
-      notifyListeners();
-    }
-  }
-}
-
-enum SignUp3Status {
-  Uninitialized,
-  Started,
-  Running,
-  Checking,
-  Failed,
-  Success
-}
-
-class SignUp3ViewModel with ChangeNotifier {
-  SignUp3Status _status = SignUp3Status.Uninitialized;
-  bool _isButtonDisabled = false, _isTapped = false, _showError = false;
-  String _username, _oldUsername;
+  String _oldUsername;
   bool hasUsername = false;
   bool _isDone = false;
 
@@ -149,21 +25,14 @@ class SignUp3ViewModel with ChangeNotifier {
     notifyListeners();
   }
 
-  String get username => _username;
   String get oldUsername => _oldUsername;
   set oldUsername(String x) => _oldUsername = x;
-  bool get isButtonDisabled => _isButtonDisabled;
-  bool get isTapped => _isTapped;
-  bool get showError => _showError;
-  SignUp3Status get signUpStatus => _status;
-
-  void setUsername(String username) {
+  setUsername(String username) {
     _username = username;
-    print('[View] Setting Username');
     notifyListeners();
   }
 
-  void setStatus(SignUp3Status newStatus) {
+  void setStatus(SignUpStatus newStatus) {
     _status = newStatus;
     notifyListeners();
   }

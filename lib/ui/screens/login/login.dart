@@ -124,17 +124,14 @@ class _LoginPageState extends State<LoginPage> {
                           onPressed: _view.isButtonDisabled
                               ? null
                               : () async {
-//                            Future.delayed(Duration(seconds: 15), (){
-//                              // Wait for 15 seconds
-//                              if(connectionStatus == ConnectivityStatus.Offline){
-//                                // If offline then exit.
-//                               return;
-//                              }
-//                            });
                                   if (await user.signIn(
                                       _usernameController.text,
                                       _passwordController.text,
-                                      _key)) {}
+                                      _key)) {
+                                    Navigator.of(context)
+                                        .pushNamedAndRemoveUntil('/',
+                                            (Route<dynamic> route) => false);
+                                  }
                                 },
                         );
                       },

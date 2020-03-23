@@ -20,7 +20,7 @@ class _ChangeUsernameState extends State<ChangeUsername> {
   TextEditingController _usernameController;
   GlobalKey<ScaffoldState> _key = GlobalKey<ScaffoldState>();
   FocusNode _focusPassword;
-  SignUp3ViewModel _fromSignUp;
+  SignUpViewModel _fromSignUp;
   ChangeUsernameViewModel _view;
   bool updatedUsername = false;
 
@@ -33,7 +33,7 @@ class _ChangeUsernameState extends State<ChangeUsername> {
 
   @override
   void didChangeDependencies() {
-    _fromSignUp = Provider.of<SignUp3ViewModel>(context);
+    _fromSignUp = Provider.of<SignUpViewModel>(context);
     _view = Provider.of<ChangeUsernameViewModel>(context);
     if (!updatedUsername) {
       if (!widget.authenticated) {

@@ -1,4 +1,5 @@
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/foundation.dart';
 import 'package:instagram/repository/profile.dart';
 import 'package:scoped_model/scoped_model.dart';
 
